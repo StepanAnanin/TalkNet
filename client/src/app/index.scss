@@ -4,18 +4,23 @@
         — White
         — black
         — dark grey 
-        — ...
+        — purple
 
 */
 
-// ========================= variables =========================
-
-$black: #18181b;
-$darkGrey: #1f1f23;
-// $hintedGrey: #0e0e10;
+@import "./variables.scss";
 
 // ======================= global styles =======================
 
 * {
     box-sizing: border-box;
+
+    font-family: "Nunito", sans-serif;
+    font-family: "Open Sans", sans-serif;
+    font-family: "Raleway", sans-serif;
+}
+
+body {
+    // margin: 0;
+    // padding: 0;
 }

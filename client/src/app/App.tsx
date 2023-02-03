@@ -1,16 +1,29 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "../shared/lib/errors/ErrorBoundary";
+
+// TODO change dev server port
+const HomePage = React.lazy(() => import("../pages/HomePage"));
 
 function App() {
     return (
-        <BrowserRouter basename="/">
-            <Routes>
-                <Route path="/*" element={<div>Error 404</div>} />
-                <Route path="/" element={<div>1</div>} />
-                <Route path="/test" element={<div>2</div>} />
-                <Route path="/asd" element={<div>3</div>} />
-            </Routes>
-        </BrowserRouter>
+        <ErrorBoundary>
+            <BrowserRouter basename="/">
+                <Routes>
+                    <Route path="/*" element={<div>Error 404</div>} />
+                    <Route
+                        path="/"
+                        element={
+                            <React.Suspense fallback={<div>Loading...</div>}>
+                                <HomePage />
+                            </React.Suspense>
+                        }
+                    />
+                    <Route path="/login" element={<div>login</div>} />
+                    <Route path="/registrate" element={<div>registrate</div>} />
+                </Routes>
+            </BrowserRouter>
+        </ErrorBoundary>
     );
 }
 

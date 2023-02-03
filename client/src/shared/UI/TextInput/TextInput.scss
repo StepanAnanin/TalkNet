@@ -1,0 +1,44 @@
+@import "../../../app/variables.scss";
+
+.TNUI-TextInput {
+    width: 100%;
+    min-width: 150px;
+
+    display: flex;
+    align-items: center;
+
+    border: none;
+    background-color: transparent;
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+// ============ Sizes style ============
+
+.TNUI-TextInput-small {
+    font-size: 16px;
+}
+
+.TNUI-TextInput-medium {
+    font-size: 18px;
+}
+
+.TNUI-TextInput-large {
+    font-size: 20px;
+}
+
+// =========== Variant style ===========
+
+.TNUI-TextInput-contained {
+    color: white;
+}
+
+.TNUI-TextInput-default {
+    color: white;
+}
+
+.TNUI-TextInput-outlined {
+    color: rgba(255, 255, 255, 0.85);
+}

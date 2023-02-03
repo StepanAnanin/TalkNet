@@ -1,0 +1,83 @@
+@import "../../../app/variables.scss";
+
+.TNUI-Button {
+    min-width: 125px;
+
+    border: none;
+    background-color: transparent;
+    border-radius: 5px;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition: all 0.15s ease-in-out;
+
+    &:hover {
+        background-color: $lightPrimary;
+    }
+
+    &:active {
+        background-color: $darkPrimary;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+// ============ Sizes style ============
+
+.TNUI-Button-small {
+    padding-block: 0.25rem;
+    padding-inline: 5px;
+    font-size: 14px;
+}
+
+.TNUI-Button-medium {
+    padding-block: 0.35rem;
+    padding-inline: 5px;
+    font-size: 16px;
+}
+
+.TNUI-Button-large {
+    padding-block: 0.4rem;
+    padding-inline: 5px;
+    font-size: 18px;
+}
+
+// =========== Variant style ===========
+
+.TNUI-Button-contained {
+    color: white;
+    background-color: $primary;
+    // box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.35);
+}
+
+.TNUI-Button-default {
+    color: $lightPrimary;
+    transition: 0.3s ease-in-out;
+
+    &:hover {
+        background-color: $primaryTransperant0;
+    }
+
+    &:active {
+        background-color: $primaryTransperant1;
+    }
+}
+
+.TNUI-Button-outlined {
+    color: $lightPrimary;
+    border: 1px solid $lightPrimary;
+
+    transition: background-color 0.25s ease-in-out;
+
+    &:hover {
+        background-color: $primaryTransperant0;
+    }
+
+    &:active {
+        background-color: $primaryTransperant1;
+    }
+}

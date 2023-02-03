@@ -1,6 +1,6 @@
 # TalkNet
 
-TalkNet is social network. Created via MERN stack. Main programming language — TypeScript.
+TalkNet is social network. Created using MERN stack. Main programming language — TypeScript.
 
 ## WARNING
 
