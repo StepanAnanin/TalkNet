@@ -1,7 +1,7 @@
 import React from "react";
 import Page from "../shared/UI/Page";
 import Button from "../shared/UI/Button";
-import TextInput from "../shared/UI/TextInput";
+import Header from "../widgets/Header";
 
 export default function HomePage() {
     function clickHandler(e: any) {
@@ -10,14 +10,11 @@ export default function HomePage() {
 
     return (
         <Page>
-            <Button onClick={clickHandler} variant="outlined">
-                Назад
-            </Button>
+            <Header />
             <br />
             <br />
             <br />
-            <br />
-            <TextInput />
+            <Button onClick={clickHandler}>Назад</Button>
         </Page>
     );
 }

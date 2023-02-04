@@ -1,0 +1,58 @@
+.TNUI-Logo {
+    display: flex;
+    align-items: center;
+
+    &-img {
+        user-select: none;
+
+        -webkit-user-drag: none;
+    }
+
+    &-label {
+        color: white;
+        letter-spacing: 1px;
+
+        user-select: none;
+    }
+}
+
+// ============ Sizes style ============
+
+.TNUI-Logo-small {
+    .TNUI-Logo-img {
+        height: 35px;
+        width: 35px;
+    }
+
+    .TNUI-Logo-label {
+        margin-left: 5px;
+
+        font-size: 28px;
+    }
+}
+
+.TNUI-Logo-medium {
+    .TNUI-Logo-img {
+        height: 45px;
+        width: 45px;
+    }
+
+    .TNUI-Logo-label {
+        margin-left: 5px;
+
+        font-size: 36px;
+    }
+}
+
+.TNUI-Logo-large {
+    .TNUI-Logo-img {
+        height: 55px;
+        width: 55px;
+    }
+
+    .TNUI-Logo-label {
+        margin-left: 5px;
+
+        font-size: 44px;
+    }
+}

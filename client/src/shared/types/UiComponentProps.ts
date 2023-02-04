@@ -1,19 +1,18 @@
 /**
+ * Default props (like listeners, attributes, etc) which have all HTML elemets of type `T`.
+ *
  * Represent UI component which isn't interactive and hasn't size options
  *
  * @Examples page, form, section, etc.
  */
-
-export interface UiComponentProps {
-    className?: string;
-}
+export type UiComponentProps<T extends HTMLElement> = React.DetailedHTMLProps<React.HTMLAttributes<T>, T>;
 
 /**
  * Represent UI component which has size options but ins't variable
  *
  * @Examples header (for text), logo (without link), etc.
  */
-export interface ScalabelUiComponentProps extends UiComponentProps {
+export interface ScalabelUiComponentProps<T extends HTMLElement> extends UiComponentProps<T> {
     size?: "small" | "medium" | "large";
 }
 
@@ -22,6 +21,6 @@ export interface ScalabelUiComponentProps extends UiComponentProps {
  *
  * @Examples button, input, link, etc.
  */
-export interface VariableUiComponentProps extends ScalabelUiComponentProps {
+export interface VariableUiComponentProps<T extends HTMLElement> extends ScalabelUiComponentProps<T> {
     variant?: "default" | "contained" | "outlined";
 }

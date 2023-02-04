@@ -1,0 +1,105 @@
+@import "../../../app/variables.scss";
+
+.TNUI-Avatar {
+    display: flex;
+    align-items: center;
+
+    border-radius: 100%;
+
+    .TNUI-Avatar-img {
+        position: absolute;
+
+        color: white;
+
+        border-radius: 100%;
+
+        object-fit: cover;
+
+        overflow: hidden;
+
+        user-select: none;
+        -webkit-user-drag: none;
+
+        z-index: 10;
+    }
+
+    .TNUI-Avatar-alt {
+        position: absolute;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 100%;
+
+        color: white;
+        background-color: $lightPrimary;
+
+        overflow: hidden;
+        text-transform: uppercase;
+
+        user-select: none;
+
+        z-index: 11;
+    }
+}
+
+// =========== Variant style ===========
+
+.TNUI-Avatar-outlined {
+    outline: 2px solid $primary;
+    outline-offset: 0px;
+}
+
+// ============ Sizes style ============
+
+.TNUI-Avatar-small {
+    height: 40px;
+    width: 40px;
+
+    .TNUI-Avatar-img {
+        height: 40px;
+        width: 40px;
+    }
+
+    .TNUI-Avatar-alt {
+        height: 40px;
+        width: 40px;
+
+        font-size: 24px;
+    }
+}
+
+.TNUI-Avatar-medium {
+    height: 60px;
+    width: 60px;
+
+    .TNUI-Avatar-img {
+        height: 60px;
+        width: 60px;
+    }
+
+    .TNUI-Avatar-alt {
+        height: 60px;
+        width: 60px;
+
+        font-size: 36px;
+    }
+}
+
+.TNUI-Avatar-large {
+    height: 80px;
+    width: 80px;
+
+    .TNUI-Avatar-img {
+        height: 80px;
+        width: 80px;
+    }
+
+    .TNUI-Avatar-alt {
+        height: 80px;
+        width: 80px;
+
+        font-size: 48px;
+    }
+}

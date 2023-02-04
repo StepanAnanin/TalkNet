@@ -4,9 +4,7 @@ import "./InputWrapper.scss";
 import type { Property } from "../../../../node_modules/csstype";
 import type { VariableUiComponentProps } from "../../types/UiComponentProps";
 
-type defaultInputWrapperProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLDivElement>, HTMLDivElement>;
-
-interface InputWrapperProps extends VariableUiComponentProps, defaultInputWrapperProps {
+interface InputWrapperProps extends VariableUiComponentProps<HTMLDivElement> {
     theme?: "dark" | "light";
     placeholderClassName?: string;
     placeholder?: string;
@@ -15,6 +13,7 @@ interface InputWrapperProps extends VariableUiComponentProps, defaultInputWrappe
 }
 
 // TODO implement theme changing (TSX done, only CSS remain)
+// TODO remove this component. Cuz it is dependency for other component
 export default function InputWrapper(props: InputWrapperProps) {
     const {
         children,
@@ -30,25 +29,25 @@ export default function InputWrapper(props: InputWrapperProps) {
         ...otherProps
     } = props;
 
-    // ================================= picking a styles =================================
+    // ================================== picking styles ==================================
 
     // On declaration style must match with variant prop default value
-    let wrapperVariantStyle = "TNUI-InputWrapper-outlined";
+    let wrapperVariantClass = "TNUI-InputWrapper-outlined";
 
     // On declaration style must match with size prop default value
-    let wrapperSizeStyle = "TNUI-InputWrapper-medium";
+    let wrapperSizeClass = "TNUI-InputWrapper-medium";
 
     const themeClass = theme === "dark" ? "TNUI-InputWrapper-darkTheme" : "TNUI-InputWrapper-lightTheme";
 
     if (size !== "medium") {
-        wrapperSizeStyle = size === "small" ? "TNUI-InputWrapper-small" : "TNUI-InputWrapper-large";
+        wrapperSizeClass = size === "small" ? "TNUI-InputWrapper-small" : "TNUI-InputWrapper-large";
     }
 
     if (variant !== "outlined") {
-        wrapperVariantStyle = variant === "default" ? "TNUI-InputWrapper-default" : "TNUI-InputWrapper-contained";
+        wrapperVariantClass = variant === "default" ? "TNUI-InputWrapper-default" : "TNUI-InputWrapper-contained";
     }
 
-    const wrapperClasses = ["TNUI-InputWrapper", themeClass, wrapperSizeStyle, wrapperVariantStyle, className ?? ""].join(
+    const wrapperClasses = ["TNUI-InputWrapper", themeClass, wrapperSizeClass, wrapperVariantClass, className ?? ""].join(
         " "
     );
     const placeholderClasses = ["TNUI-InputWrapper-placeholder", placeholderClassName ?? ""].join(" ");

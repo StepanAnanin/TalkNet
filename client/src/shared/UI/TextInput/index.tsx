@@ -4,12 +4,7 @@ import InputWrapper from "../InputWrapper";
 
 import type { VariableUiComponentProps } from "../../types/UiComponentProps";
 
-type defaultInputProps = Omit<
-    React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
-    "size"
->;
-
-interface TextInputProps extends defaultInputProps, VariableUiComponentProps {
+interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
     theme?: "dark" | "light";
     placeholder?: string;
     inputClassName?: string;
@@ -32,7 +27,7 @@ export default function TextInput(props: TextInputProps) {
         ...otherProps
     } = props;
 
-    // ================================= picking a styles =================================
+    // ================================== picking styles ==================================
 
     // On declaration style must match with size prop default value
     let inputSizeClass = "TNUI-TextInput-medium";
