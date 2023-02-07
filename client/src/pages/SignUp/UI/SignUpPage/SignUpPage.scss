@@ -1,0 +1,10 @@
+.sign-up-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &-registration-form {
+        margin-top: 125px;
+        margin-inline: auto;
+    }
+}

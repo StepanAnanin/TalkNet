@@ -1,0 +1,62 @@
+@import "../../../../app/styles/variables.scss";
+
+.UserRegistrationForm {
+    width: 25%;
+    min-width: 500px;
+
+    padding: 20px 15px 15px;
+    margin-inline: 10px;
+
+    border-radius: 5px;
+
+    background-color: $darkGrey;
+
+    &-header {
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 30px;
+
+        .UserRegistrationForm-logo {
+            padding-right: 10px;
+
+            border-right: 3px solid white;
+        }
+
+        .UserRegistrationForm-label {
+            padding-left: 10px;
+
+            color: white;
+
+            font-size: 36px;
+
+            user-select: none;
+        }
+    }
+
+    &-input {
+        width: 100% !important;
+        margin-block: 20px;
+    }
+
+    // &-accept-terms {
+    // margin-inline: 5px;
+    // }
+
+    &-control {
+        width: 100%;
+
+        display: flex;
+        justify-content: space-between;
+
+        margin-top: 20px;
+
+        button {
+            // letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    }
+}

@@ -1,9 +1,12 @@
 {
     "name": "talk-net-client",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "private": true,
     "dependencies": {
+        "@emotion/react": "^11.10.5",
+        "@emotion/styled": "^11.10.5",
         "@mui/icons-material": "^5.11.0",
+        "@mui/material": "^5.11.7",
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
         "@testing-library/user-event": "^13.5.0",
@@ -71,6 +74,7 @@
         "@types/react-router-dom": "^5.3.3",
         "babel-plugin-named-exports-order": "^0.0.2",
         "prop-types": "^15.8.1",
+        "storybook-dark-mode": "^2.0.5",
         "webpack": "^5.75.0"
     }
 }

@@ -1,0 +1,86 @@
+@import "../../../app/styles/variables.scss";
+
+$defaultCheckboxWidth: 20px;
+$defaultCheckboxHeight: 20px;
+$borderWidth: 2px;
+
+.TNUI-Checkbox-wrapper {
+    display: flex;
+    // align-items: center;
+
+    .TNUI-Checkbox {
+        position: absolute;
+
+        height: $defaultCheckboxHeight !important;
+        width: $defaultCheckboxWidth !important;
+
+        border-radius: 3px;
+
+        color: white;
+
+        pointer-events: none;
+    }
+
+    .TNUI-Checkbox-origin {
+        position: absolute;
+        box-sizing: content-box;
+
+        height: $defaultCheckboxHeight !important;
+        width: $defaultCheckboxWidth !important;
+
+        margin: 0;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+
+        cursor: pointer;
+    }
+
+    .TNUI-Checkbox-label {
+        margin-left: $defaultCheckboxWidth + 5px;
+    }
+}
+
+// ============ Theme style ============
+
+.TNUI-Checkbox-wrapper-dark {
+    .TNUI-Checkbox {
+        border: $borderWidth solid white;
+    }
+
+    .TNUI-Checkbox-label {
+        color: white;
+    }
+}
+
+.TNUI-Checkbox-wrapper-light {
+    .TNUI-Checkbox {
+        border: $borderWidth solid rgb(75, 75, 75);
+    }
+
+    .TNUI-Checkbox-label {
+        color: black;
+    }
+}
+
+// =========== Checked style ===========
+
+// TODO Require refactoring:
+//  Need to remove :has() selector cuz it's not supported of Firefox browser.
+//  (see: https://developer.mozilla.org/en-US/docs/Web/CSS/:has#browser_compatibility)
+.TNUI-Checkbox-wrapper:has(.TNUI-Checkbox-origin:checked) {
+    &.TNUI-Checkbox-wrapper-dark {
+        .TNUI-Checkbox {
+            background-color: $lightPrimary;
+            border-color: $lightPrimary;
+        }
+    }
+
+    &.TNUI-Checkbox-wrapper-light {
+        .TNUI-Checkbox {
+            background-color: $lightPrimary;
+            border-color: $lightPrimary;
+        }
+    }
+}

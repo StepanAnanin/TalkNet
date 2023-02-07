@@ -1,7 +1,7 @@
 import React from "react";
 import "./Page.scss";
 
-import type { UiComponentProps } from "../../types/UiComponentProps";
+import type { UiComponentProps } from "../../types/UI/UiComponentProps";
 
 interface PageComponentProps extends UiComponentProps<HTMLDivElement> {
     title?: string;

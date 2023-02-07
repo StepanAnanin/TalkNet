@@ -1,7 +1,7 @@
 import React from "react";
 import "./Avatar.scss";
 
-import type { ScalabelUiComponentProps } from "../../types/UiComponentProps";
+import type { ScalabelUiComponentProps } from "../../types/UI/UiComponentProps";
 
 interface AvatarProps extends ScalabelUiComponentProps<HTMLDivElement> {
     src?: string;
@@ -10,7 +10,7 @@ interface AvatarProps extends ScalabelUiComponentProps<HTMLDivElement> {
 }
 
 export default function Avatar(props: AvatarProps) {
-    const { className, src, alt, size = "small", outlined = false } = props;
+    const { className, src, alt, size = "small", outlined = false, ...otherProps } = props;
     const imgRef = React.useRef<HTMLImageElement | null>(null);
 
     // ================================== picking styles ==================================
@@ -54,7 +54,7 @@ export default function Avatar(props: AvatarProps) {
     }
 
     return (
-        <div className={classes}>
+        <div className={classes} {...otherProps}>
             <img
                 className="TNUI-Avatar-img"
                 src={src}

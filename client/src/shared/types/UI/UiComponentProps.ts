@@ -1,3 +1,5 @@
+import type UiComponentProperties from "./UiComponentProperties";
+
 /**
  * Default props (like listeners, attributes, etc) which have all HTML elemets of type `T`.
  *
@@ -13,7 +15,7 @@ export type UiComponentProps<T extends HTMLElement> = React.DetailedHTMLProps<Re
  * @Examples header (for text), logo (without link), etc.
  */
 export interface ScalabelUiComponentProps<T extends HTMLElement> extends UiComponentProps<T> {
-    size?: "small" | "medium" | "large";
+    size?: UiComponentProperties.size;
 }
 
 /**
@@ -22,5 +24,5 @@ export interface ScalabelUiComponentProps<T extends HTMLElement> extends UiCompo
  * @Examples button, input, link, etc.
  */
 export interface VariableUiComponentProps<T extends HTMLElement> extends ScalabelUiComponentProps<T> {
-    variant?: "default" | "contained" | "outlined";
+    variant?: UiComponentProperties.variant;
 }

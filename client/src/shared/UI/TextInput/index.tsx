@@ -2,14 +2,15 @@ import React from "react";
 import "./TextInput.scss";
 import InputWrapper from "../InputWrapper";
 
-import type { VariableUiComponentProps } from "../../types/UiComponentProps";
+import type { VariableUiComponentProps } from "../../types/UI/UiComponentProps";
+import type TextInputType from "../../types/UI/TextInputType";
 
 interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
     theme?: "dark" | "light";
     placeholder?: string;
     inputClassName?: string;
     placeholderClassName?: string;
-    type?: "email" | "number" | "password" | "search" | "tel" | "text" | "url";
+    type?: TextInputType;
     style?: React.CSSProperties;
 }
 

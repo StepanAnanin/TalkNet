@@ -2,7 +2,7 @@ import React from "react";
 import "./InputWrapper.scss";
 
 import type { Property } from "../../../../node_modules/csstype";
-import type { VariableUiComponentProps } from "../../types/UiComponentProps";
+import type { VariableUiComponentProps } from "../../types/UI/UiComponentProps";
 
 interface InputWrapperProps extends VariableUiComponentProps<HTMLDivElement> {
     theme?: "dark" | "light";

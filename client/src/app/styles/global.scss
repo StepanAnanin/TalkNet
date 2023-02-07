@@ -30,3 +30,16 @@ html {
 #root {
     height: 100%;
 }
+
+.clear-link {
+    text-decoration: none;
+    color: black;
+}
+
+.primary-text {
+    color: $lightPrimary;
+}
+
+.bold-text {
+    font-weight: 600;
+}

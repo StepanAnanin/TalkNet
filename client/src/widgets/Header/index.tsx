@@ -4,7 +4,7 @@ import Avatar from "../../shared/UI/Avatar";
 import Button from "../../shared/UI/Button";
 import Logo from "../../shared/UI/Logo";
 
-import type { UiComponentProps } from "../../shared/types/UiComponentProps";
+import type { UiComponentProps } from "../../shared/types/UI/UiComponentProps";
 
 // NOTE:
 //  Tag <header/> in DOM is instances of HTMLElement class.
@@ -14,14 +14,14 @@ interface HeaderProps extends UiComponentProps<HTMLElement> {
 }
 
 export default function Header(props: HeaderProps) {
-    const { className } = props;
+    const { className, ...otherProps } = props;
 
     // ================================== picking styles ==================================
 
     const classes = ["TNUI-Header", className ?? ""].join(" ");
 
     return (
-        <header className={classes}>
+        <header className={classes} {...otherProps}>
             <div className="TNUI-Header-left">
                 <Logo />
             </div>

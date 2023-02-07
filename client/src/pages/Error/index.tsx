@@ -1,5 +1,5 @@
 import React from "react";
-import Page from "../shared/UI/Page";
+import Page from "../../shared/UI/Page";
 
 interface ErrorPageProps {
     message: string;

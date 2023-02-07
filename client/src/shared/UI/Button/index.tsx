@@ -1,7 +1,7 @@
 import React from "react";
 import "./Button.scss";
 
-import type { VariableUiComponentProps } from "../../types/UiComponentProps";
+import type { VariableUiComponentProps } from "../../types/UI/UiComponentProps";
 
 interface ButtonProps extends VariableUiComponentProps<HTMLButtonElement> {
     //
@@ -29,7 +29,7 @@ export default function Button(props: ButtonProps) {
     const classes = ["TNUI-Button", buttonSizeClass, buttonVariantClass, className ?? ""].join(" ");
 
     return (
-        <button className={classes} {...otherProps}>
+        <button className={classes} {...otherProps} type="button">
             {children}
         </button>
     );
