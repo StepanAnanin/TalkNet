@@ -1,45 +1,194 @@
 @import "../../../app/styles/variables.scss";
 
-.TNUI-TextInput {
-    width: 100%;
+.TNUI-InputWrapper {
+    width: fit-content;
     min-width: 150px;
 
     display: flex;
-    align-items: center;
+    flex-direction: column;
 
-    border: none;
-    background-color: transparent;
+    background-color: $darkGrey;
 
-    &:focus-visible {
-        outline: none;
+    transition: all 0.15s ease-in-out;
+
+    &-placeholder {
+        position: absolute;
+
+        margin-left: 5px;
+
+        user-select: none;
+        pointer-events: none;
+
+        transition: all 0.15s ease-in-out;
+    }
+
+    // ========================== input styles ==========================
+
+    .TNUI-TextInput {
+        width: 100%;
+        min-width: 150px;
+
+        display: flex;
+        align-items: center;
+
+        border: none;
+        // background-color: transparent;
+        background-color: $darkGrey;
+
+        // Autofill ruins input's background colour
+        // https://stackoverflow.com/questions/61083813/how-to-avoid-internal-autofill-selected-style-to-be-applied
+        &:-webkit-autofill,
+        &:-webkit-autofill:focus {
+            transition: background-color 999999999999999999s 0s, color 999999999999999999s 0s;
+        }
+
+        &:focus-visible {
+            outline: none;
+        }
+    }
+
+    // ============ Sizes style ============
+
+    .TNUI-TextInput-small {
+        font-size: 16px;
+    }
+
+    .TNUI-TextInput-medium {
+        font-size: 18px;
+    }
+
+    .TNUI-TextInput-large {
+        font-size: 20px;
+    }
+
+    // =========== Variant style ===========
+
+    .TNUI-TextInput-contained {
+        color: white;
+    }
+
+    .TNUI-TextInput-default {
+        color: white;
+    }
+
+    .TNUI-TextInput-outlined {
+        color: white;
+    }
+}
+
+// =========================== wrapper styles ===========================
+
+// Handle placeholder movement up on input focus or when input isn't empty.
+// For work require input element to have attribute required.
+.TNUI-InputWrapper:has(input:focus, input:not([value=""]):valid) {
+    .TNUI-InputWrapper-placeholder {
+        font-size: 15px;
     }
 }
 
 // ============ Sizes style ============
 
-.TNUI-TextInput-small {
-    font-size: 16px;
+.TNUI-InputWrapper-small .TNUI-InputWrapper {
+    &-placeholder {
+        font-size: 16px;
+    }
 }
 
-.TNUI-TextInput-medium {
-    font-size: 18px;
+.TNUI-InputWrapper-medium .TNUI-InputWrapper {
+    &-placeholder {
+        font-size: 18px;
+    }
 }
 
-.TNUI-TextInput-large {
-    font-size: 20px;
+.TNUI-InputWrapper-large .TNUI-InputWrapper {
+    &-placeholder {
+        font-size: 20px;
+    }
 }
 
 // =========== Variant style ===========
 
-.TNUI-TextInput-contained {
-    color: white;
+.TNUI-InputWrapper-default {
+    height: 2rem;
+
+    justify-content: flex-end;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+
+    .TNUI-InputWrapper-placeholder {
+        color: white;
+    }
+
+    &:hover {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+    }
 }
 
-.TNUI-TextInput-default {
-    color: white;
+.TNUI-InputWrapper-default:has(input:focus, input:not([value=""]):valid) {
+    border-bottom: 2px solid $lightPrimary;
+
+    .TNUI-InputWrapper-placeholder {
+        margin: 0 0 25px 5px;
+
+        color: $lightPrimary;
+    }
 }
 
-.TNUI-TextInput-outlined {
-    // color: rgba(255, 255, 255, 0.85);
-    color: white;
+// =====================================
+
+.TNUI-InputWrapper-contained {
+    height: 2.55rem;
+
+    padding: 5px;
+
+    justify-content: flex-end;
+
+    background-color: $primaryTransperant0;
+
+    border-bottom: 1px solid white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
+    .TNUI-InputWrapper-placeholder {
+        color: white;
+
+        font-size: 22px;
+    }
+}
+
+.TNUI-InputWrapper-contained:has(input:focus, input:not([value=""]):valid) {
+    border-color: $lightPrimary;
+    background-color: $primaryTransperant1;
+
+    .TNUI-InputWrapper-placeholder {
+        margin: 0 0 25px 5px;
+
+        color: $lightPrimary;
+    }
+}
+
+// =====================================
+
+.TNUI-InputWrapper-outlined {
+    padding: 10px 5px 5px 5px;
+
+    border: 1px solid grey;
+    border-radius: 5px;
+
+    .TNUI-InputWrapper-placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+.TNUI-InputWrapper-outlined:has(input:focus, input:not([value=""]):valid) {
+    border-color: $lightPrimary;
+
+    .TNUI-InputWrapper-placeholder {
+        margin: -20px 0 0 5px;
+        padding-inline: 5px;
+
+        color: rgba(255, 255, 255, 0.7);
+
+        background-color: $darkGrey;
+    }
 }

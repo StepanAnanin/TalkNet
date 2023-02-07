@@ -10,15 +10,7 @@ interface LogoProps extends ScalabelUiComponentProps<HTMLSpanElement> {
 export default function Logo(props: LogoProps) {
     const { className, size = "small", ...otherProps } = props;
 
-    // ================================== picking styles ==================================
-
-    let logoSizeClass = "TNUI-Logo-small";
-
-    if (size !== "small") {
-        logoSizeClass = size === "medium" ? "TNUI-Logo-medium" : "TNUI-Logo-large";
-    }
-
-    const classes = ["TNUI-Logo", logoSizeClass, className ?? ""].join(" ");
+    const classes = ["TNUI-Logo", "TNUI-Logo-" + size, className ?? ""].join(" ");
 
     return (
         <span className={classes} {...otherProps}>

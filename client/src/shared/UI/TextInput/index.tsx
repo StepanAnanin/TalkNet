@@ -1,6 +1,5 @@
-import React from "react";
 import "./TextInput.scss";
-import InputWrapper from "../InputWrapper";
+import React from "react";
 
 import type { VariableUiComponentProps } from "../../types/UI/UiComponentProps";
 import type TextInputType from "../../types/UI/TextInputType";
@@ -30,34 +29,40 @@ export default function TextInput(props: TextInputProps) {
 
     // ================================== picking styles ==================================
 
-    // On declaration style must match with size prop default value
-    let inputSizeClass = "TNUI-TextInput-medium";
+    const inputClasses = [
+        "TNUI-TextInput",
+        "TNUI-TextInput-" + size,
+        "TNUI-TextInput-" + variant,
+        inputClassName ?? "",
+    ].join(" ");
 
-    // On declaration style must match with variant prop default value
-    let inputVariantClass = "TNUI-TextInput-outlined";
+    const wrapperClasses = [
+        "TNUI-InputWrapper",
+        "TNUI-InputWrapper-" + theme,
+        "TNUI-InputWrapper-" + size,
+        "TNUI-InputWrapper-" + variant,
+        className ?? "",
+    ].join(" ");
 
-    const themeClass = theme === "dark" ? "TNUI-TextInput-darkTheme" : "TNUI-TextInput-lightTheme";
+    const placeholderClasses = ["TNUI-InputWrapper-placeholder", placeholderClassName ?? ""].join(" ");
 
-    if (size !== "medium") {
-        inputSizeClass = size === "small" ? "TNUI-TextInput-small" : "TNUI-TextInput-large";
+    // ===================================== handlers =====================================
+
+    function inputWrapperClickHandler(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        const inputElement = e.currentTarget.querySelector("input");
+
+        if (!(inputElement instanceof HTMLInputElement)) {
+            console.warn(`InputWrapper: For correct work prop children must be input element (HTMLInputElement).`);
+            return;
+        }
+
+        inputElement.focus();
     }
-
-    if (variant !== "outlined") {
-        inputVariantClass = variant === "default" ? "TNUI-TextInput-default" : "TNUI-TextInput-contained";
-    }
-
-    const inputClasses = ["TNUI-TextInput", themeClass, inputSizeClass, inputVariantClass, inputClassName ?? ""].join(" ");
 
     return (
-        <InputWrapper
-            className={className}
-            theme={theme}
-            size={size}
-            variant={variant}
-            placeholder={placeholder}
-            placeholderClassName={placeholderClassName}
-        >
+        <div className={wrapperClasses} onClick={inputWrapperClickHandler}>
+            {placeholder && <span className={placeholderClasses}>{placeholder}</span>}
             <input className={inputClasses} {...otherProps} required />
-        </InputWrapper>
+        </div>
     );
 }

@@ -16,13 +16,8 @@ export default function Avatar(props: AvatarProps) {
     // ================================== picking styles ==================================
 
     const outlineClass = outlined ? "TNUI-Avatar-outlined" : "";
-    let avatarSizeClass = "TNUI-Avatar-small";
 
-    if (size !== "small") {
-        avatarSizeClass = size === "medium" ? "TNUI-Avatar-medium" : "TNUI-Avatar-large";
-    }
-
-    const classes = ["TNUI-Avatar", avatarSizeClass, outlineClass, className ?? ""].join(" ");
+    const classes = ["TNUI-Avatar", "TNUI-Avatar-" + size, outlineClass, className ?? ""].join(" ");
 
     // ===================================== handlers =====================================
 

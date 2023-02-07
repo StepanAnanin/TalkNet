@@ -1,0 +1,73 @@
+@import "../../../app/styles/variables.scss";
+
+$defaultBorderRadius: 5px;
+
+// .TNUI-Paper-root {
+//     display: flex;
+//     flex-direction: column;
+//     // width: fit-content;
+//     // height: fit-content;
+// }
+
+// =========== Variant style ===========
+
+.TNUI-Paper {
+    &-default {
+        border-radius: $defaultBorderRadius;
+        border: none;
+    }
+
+    &-contained {
+        border-radius: 0;
+        border: none;
+    }
+
+    &-outlined {
+        border-radius: $defaultBorderRadius;
+        border: 1px solid $lightPrimary;
+    }
+}
+
+// ============ Theme style ============
+
+.TNUI-Paper-dark {
+    &.TNUI-Paper-colour-shift-2 {
+        background-color: $darkGrey;
+    }
+
+    &.TNUI-Paper-colour-shift-1 {
+        background-color: $black;
+    }
+
+    &.TNUI-Paper-colour-shift-0 {
+        background-color: black;
+    }
+}
+
+.TNUI-Paper-light {
+    &.TNUI-Paper-colour-shift-2 {
+        background-color: rgb(150, 150, 150);
+    }
+
+    &.TNUI-Paper-colour-shift-1 {
+        background-color: rgb(200, 200, 200);
+    }
+
+    &.TNUI-Paper-colour-shift-0 {
+        background-color: white;
+    }
+}
+
+// ===== Border radius scale style =====
+
+.TNUI-Paper-border-radius-scale-1 {
+    border-radius: $defaultBorderRadius;
+}
+
+.TNUI-Paper-border-radius-scale-2 {
+    border-radius: $defaultBorderRadius * 2;
+}
+
+.TNUI-Paper-border-radius-scale-3 {
+    border-radius: $defaultBorderRadius * 3;
+}

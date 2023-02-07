@@ -26,11 +26,7 @@ export default function Checkbox(props: CheckboxProps) {
     }
 
     const checkboxClasses = ["TNUI-Checkbox", checkboxClassName ?? ""].join(" ");
-    const wrapperClasses = [
-        "TNUI-Checkbox-wrapper",
-        theme === "dark" ? "TNUI-Checkbox-wrapper-dark" : "TNUI-Checkbox-wrapper-light",
-        className ?? "",
-    ].join(" ");
+    const wrapperClasses = ["TNUI-Checkbox-wrapper", "TNUI-Checkbox-wrapper-" + theme, className ?? ""].join(" ");
 
     return (
         <div className={wrapperClasses} {...otherProps}>

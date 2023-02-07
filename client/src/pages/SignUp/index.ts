@@ -1,3 +1,3 @@
 import SignUpPage from "./UI/SignUpPage";
 
-export { SignUpPage };
+export default SignUpPage;

@@ -1,10 +1,10 @@
 import React from "react";
 import "./Header.scss";
-import Avatar from "../../shared/UI/Avatar";
-import Button from "../../shared/UI/Button";
-import Logo from "../../shared/UI/Logo";
+import Avatar from "../../../shared/UI/Avatar";
+import Button from "../../../shared/UI/Button";
+import Logo from "../../../shared/UI/Logo";
 
-import type { UiComponentProps } from "../../shared/types/UI/UiComponentProps";
+import type { UiComponentProps } from "../../../shared/types/UI/UiComponentProps";
 
 // NOTE:
 //  Tag <header/> in DOM is instances of HTMLElement class.

@@ -3,9 +3,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "../shared/lib/errors/ErrorBoundary";
 
-// TODO change dev server port
 const HomePage = React.lazy(() => import("../pages/Home"));
-const SignUpPage = React.lazy(() => import("../pages/SignUp").then((publicApi) => ({ default: publicApi.SignUpPage })));
+const SignUpPage = React.lazy(() => import("../pages/SignUp"));
 const SignInPage = React.lazy(() => import("../pages/SignIn"));
 
 function App() {
