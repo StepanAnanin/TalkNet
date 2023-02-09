@@ -1,8 +1,15 @@
 import type { CorsOptions } from "cors";
 import type UserAccessLevel from "./types/UserAccessLevel";
 
+type SMTP_OPTIONS = {
+    HOST_NAME: string;
+    USER_NAME: string;
+    PORT: number;
+    PASSWORD: string;
+};
+
 // TODO Now will work only in dev mode
-const clientURL = "http://localhost:3000";
+const clientURL = "http://localhost:3005";
 const API_URL = "http://localhost:" + process.env.SERVER_PORT;
 
 const config = {
@@ -16,6 +23,13 @@ const config = {
         credentials: true,
         origin: clientURL,
     } as CorsOptions,
+
+    SMTP: {
+        HOST_NAME: "smtp.gmail.com",
+        USER_NAME: "talknetru@gmail.com",
+        PORT: 587,
+        PASSWORD: process.env.SMTP_PASSWORD,
+    } as SMTP_OPTIONS,
 
     USER_ACCESS_LEVELS: {
         unlimited: 0,

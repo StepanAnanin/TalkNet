@@ -76,7 +76,7 @@ class UserService {
         }
 
         try {
-            // await EMailService.sendActivationEMail(email, config.API_URL + "/user/activate/" + activationLink);
+            await EMailService.sendActivationEMail(email, config.API_URL + "/user/activate/" + activationLink);
         } catch (err) {
             console.error(err);
 
@@ -99,7 +99,9 @@ class UserService {
 
         await tokenService.saveRefreshTokenToDB(user._id, tokens.refreshToken);
 
-        return { ...tokens, user: userDTO };
+        console.log("\x1b[45m", `New user was created; id: ${user._id}, E-Mail: ${user.email}`, "\x1b[0m");
+
+        return { user: userDTO };
     }
 
     public async login(email: string, password: string) {
@@ -126,6 +128,8 @@ class UserService {
         const tokens = tokenService.generateTokens({ ...userDTO });
 
         await tokenService.saveRefreshTokenToDB(user._id, tokens.refreshToken);
+
+        console.log(`User ${user._id} logged in`);
 
         return { ...tokens, user: userDTO };
     }
@@ -168,7 +172,7 @@ class UserService {
     }
 
     public async activateAccount(activationLink: string) {
-        const user = await userModel.findOne({ activationLink });
+        const user = await userModel.findOne({ "activationState.link": activationLink });
 
         if (!user) {
             throw new HTTPError(404, `Пользователь с ссыклой активации ${activationLink} не был найден.`);
@@ -179,6 +183,8 @@ class UserService {
         user.activationState.link = null;
 
         await user.save();
+
+        console.log(`Account ${user._id} was successfully activated`);
     }
 
     public async changePassword(email: string, currentPassword: string, newPassword: string) {

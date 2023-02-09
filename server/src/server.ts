@@ -18,9 +18,7 @@ app.use("/static", express.static(`${__dirname}/static`));
 async function start() {
     console.clear();
 
-    console.group();
-
-    console.log("Server startup initialization...");
+    console.group("Server startup initialization...");
 
     console.log(`Checking enviroment variables...`);
 
@@ -52,7 +50,7 @@ async function start() {
 }
 
 function checkEnviromentVariables() {
-    return !(!process.env.SERVER_PORT || !process.env.DB_CONNECTION_URL);
+    return !(!process.env.SERVER_PORT || !process.env.DB_CONNECTION_URL || !process.env.SMTP_PASSWORD);
 }
 
 start();

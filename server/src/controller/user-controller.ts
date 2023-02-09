@@ -1,8 +1,9 @@
+import type { Request, Response, NextFunction } from "express";
+
 import config from "../config";
 import HTTPError from "../errors/HTTPError";
 import userModel from "../DB/models/User";
 import userService from "../services/user-service";
-import type { Request, Response, NextFunction } from "express";
 
 class UserContoller {
     public async registrate(req: Request, res: Response) {
@@ -51,8 +52,6 @@ class UserContoller {
             return;
         }
 
-        // TODO for some reason typescript think that replaceAll doesn't exist, but ES2021.String included in tsconfig and target setted to ES2022
-        // @ts-ignore
         if (!userName.replaceAll(" ", "")) {
             res.status(400).json({ message: "Имя пользователя не указанно." });
             return;
@@ -102,7 +101,11 @@ class UserContoller {
                 path: "/",
             });
 
-            res.status(200).json({ message: `Пользователь успешно аутентифицированн.`, ...userData });
+            res.status(200).json({
+                message: `Пользователь успешно аутентифицированн.`,
+                accessToken: userData.accessToken,
+                user: { ...userData.user },
+            });
         } catch (err: any) {
             if (err instanceof HTTPError) {
                 res.status(err.errorCode).json({ message: err.message });
@@ -127,7 +130,9 @@ class UserContoller {
             await userService.logout(refreshToken);
 
             res.clearCookie("refreshToken");
-            res.json(200);
+            res.status(200).json({ message: "Выход из системы выполнен успешно." });
+
+            console.log("User logged out");
         } catch (err) {
             res.status(500).json({ message: `Что-то пошло не так...` });
             console.error(err);
@@ -148,8 +153,13 @@ class UserContoller {
 
             res.redirect(config.CLIENT_URL);
         } catch (err: any) {
-            if (err instanceof HTTPError && err.errorCode === 404) {
-                res.status(404).json({ message: `Ссылка активации не действительна.` });
+            if (err instanceof HTTPError) {
+                if (err.errorCode === 404) {
+                    res.status(404).json({ message: `Ссылка активации не действительна.` });
+                    return;
+                }
+
+                res.status(err.errorCode).json({ message: err.message });
                 return;
             }
 
@@ -166,16 +176,25 @@ class UserContoller {
 
         const refreshToken = req.cookies.refreshToken;
 
+        if (!refreshToken) {
+            res.status(400).json({ message: "Missing refresh token" });
+            return;
+        }
+
         try {
             const userData = await userService.updateRefreshToken(refreshToken);
 
             res.cookie("refreshToken", userData.refreshToken, {
-                maxAge: 14 * 24 * 60 * 60 * 1000,
+                maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
                 httpOnly: true,
                 path: "/",
             });
 
-            res.status(200).json({ message: `Refresh token successfully updated.`, ...userData });
+            res.status(200).json({
+                message: `Refresh token successfully updated.`,
+                accessToken: userData.accessToken,
+                user: { ...userData.user },
+            });
         } catch (err: any) {
             if (err instanceof HTTPError && err.errorCode === 401) {
                 res.status(err.errorCode).json({ message: `Требуется аутентификация` });
@@ -205,9 +224,7 @@ class UserContoller {
             });
             return;
         }
-        String;
-        // TODO for some reason typescript think that replaceAll doesn't exist, but ES2021.String included in tsconfig and target setted to ES2022
-        // @ts-ignore
+
         if (!newUsername.replaceAll(" ", "")) {
             res.status(400).json({ message: "Недопустимое имя пользователя" });
             return;
@@ -296,20 +313,6 @@ class UserContoller {
             console.error(err);
 
             res.status(500).json({ message: "Что-то пошло не так..." });
-        }
-    }
-
-    // TODO remove this
-    public async TEST_METHOD(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
-        try {
-            res.json(await userModel.find());
-        } catch (err) {
-            res.status(500).json({ message: `Что-то пошло не так...` });
-            console.error(err);
         }
     }
 }
