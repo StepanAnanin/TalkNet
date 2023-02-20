@@ -1,0 +1,76 @@
+@import "../../../../app/styles/variables.scss";
+
+.TNUI-Alert {
+    display: flex;
+
+    border-radius: 5px;
+
+    padding: 10px 15px;
+
+    &-icon {
+        margin-right: 10px;
+
+        text-align: center;
+
+        * {
+            width: 35px !important;
+            height: 35px !important;
+        }
+    }
+
+    &-body {
+        .TNUI-Alert-message {
+            margin: 0;
+        }
+    }
+}
+
+// ========== Severity styles ==========
+
+.TNUI-Alert-Error {
+    background-color: $darkCrimson;
+
+    .TNUI-Alert-icon {
+        color: rgb(245, 0, 0);
+    }
+
+    .TNUI-Alert-body {
+        color: $lightPink;
+    }
+}
+
+.TNUI-Alert-Warning {
+    background-color: rgb(255, 220, 169);
+
+    .TNUI-Alert-icon {
+        color: rgb(255, 153, 0);
+    }
+
+    .TNUI-Alert-body {
+        color: rgb(241, 145, 0);
+    }
+}
+
+.TNUI-Alert-Info {
+    background-color: $primaryTransperant5;
+
+    .TNUI-Alert-icon {
+        color: $lightestPrimary;
+    }
+
+    .TNUI-Alert-body {
+        color: $lightestPrimary;
+    }
+}
+
+.TNUI-Alert-Success {
+    background-color: $lightestGreen;
+
+    .TNUI-Alert-icon {
+        color: $darkGreen;
+    }
+
+    .TNUI-Alert-body {
+        color: $darkGreen;
+    }
+}

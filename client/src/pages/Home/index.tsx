@@ -3,10 +3,14 @@ import Page from "../../shared/UI/Page";
 import Button from "../../shared/UI/Button";
 import Header from "../../widgets/Header";
 import UserRegistrationForm from "../SignUp/UI/UserRegistrationForm";
+import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
+import Alert from "../../shared/UI/Alert";
 
 export default function HomePage() {
-    function clickHandler(e: any) {
-        console.log(e.currentTarget);
+    const { user } = useTypedSelector((state) => state.auth);
+
+    function clickHandler() {
+        console.log(user);
     }
 
     return (
@@ -16,7 +20,12 @@ export default function HomePage() {
                 <br />
                 <br />
                 <br />
-                <Button onClick={clickHandler}>Назад</Button>
+                <Button onClick={clickHandler}>Log Auth Data</Button>
+                <Alert severity="Info" header="Внимание">
+                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Minus ducimus enim, aliquid, nihil numquam
+                    dicta asperiores ullam maiores laboriosam, qui in distinctio repellat voluptates dolorum facere officia
+                    repudiandae inventore. Cumque!
+                </Alert>
                 <UserRegistrationForm />
             </div>
         </Page>

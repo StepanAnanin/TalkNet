@@ -1,4 +1,20 @@
+import React from "react";
 import { themes } from "@storybook/theming";
+import { MemoryRouter } from "react-router";
+import { configure, addDecorator } from "@storybook/react";
+import { createStore } from "redux";
+import { Provider } from "react-redux";
+import { rootReducer } from "../src/app/core/WithStore";
+
+const store = createStore(rootReducer);
+
+addDecorator((Story) => (
+    <Provider store={store}>
+        <MemoryRouter initialEntries={["/"]}>
+            <Story />
+        </MemoryRouter>
+    </Provider>
+));
 
 export const parameters = {
     darkMode: {
@@ -16,3 +32,5 @@ export const parameters = {
         },
     },
 };
+
+configure(require.context("../src", true, /\.stories\.js$/), module);

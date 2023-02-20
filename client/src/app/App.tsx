@@ -1,45 +1,16 @@
 import "./styles/global.scss";
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ErrorBoundary from "../shared/lib/errors/ErrorBoundary";
-
-const HomePage = React.lazy(() => import("../pages/Home"));
-const SignUpPage = React.lazy(() => import("../pages/SignUp"));
-const SignInPage = React.lazy(() => import("../pages/SignIn"));
+import WithErrorBoundary from "./core/WithErrorBoundary";
+import WithRouter from "./core/WithRouter";
+import WithStore from "./core/WithStore";
 
 function App() {
     return (
-        <ErrorBoundary>
-            <BrowserRouter basename="/">
-                <Routes>
-                    <Route path="/*" element={<div>Error 404</div>} />
-                    <Route
-                        path="/"
-                        element={
-                            <React.Suspense fallback={<div>Loading...</div>}>
-                                <HomePage />
-                            </React.Suspense>
-                        }
-                    />
-                    <Route
-                        path="/signin"
-                        element={
-                            <React.Suspense fallback={<div>Loading...</div>}>
-                                <SignInPage />
-                            </React.Suspense>
-                        }
-                    />
-                    <Route
-                        path="/signup"
-                        element={
-                            <React.Suspense fallback={<div>Loading...</div>}>
-                                <SignUpPage />
-                            </React.Suspense>
-                        }
-                    />
-                </Routes>
-            </BrowserRouter>
-        </ErrorBoundary>
+        <WithErrorBoundary>
+            <WithStore>
+                <WithRouter />
+            </WithStore>
+        </WithErrorBoundary>
     );
 }
 

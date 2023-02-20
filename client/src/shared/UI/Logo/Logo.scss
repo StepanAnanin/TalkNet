@@ -1,19 +1,25 @@
-.TNUI-Logo {
-    display: flex;
-    align-items: center;
+.TNUI-Logo-wrapper {
+    .TNUI-Logo {
+        display: flex;
+        align-items: center;
 
-    &-img {
-        user-select: none;
+        &-img {
+            user-select: none;
 
-        -webkit-user-drag: none;
+            -webkit-user-drag: none;
+        }
+
+        &-label {
+            color: white;
+            letter-spacing: 1px;
+
+            user-select: none;
+        }
     }
+}
 
-    &-label {
-        color: white;
-        letter-spacing: 1px;
-
-        user-select: none;
-    }
+.TNUI-Logo-link {
+    text-decoration: none;
 }
 
 // ============ Sizes style ============

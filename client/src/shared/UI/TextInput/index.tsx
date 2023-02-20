@@ -14,7 +14,7 @@ interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
 }
 
 // TODO implement theme changing (TSX done, only CSS remain)
-export default function TextInput(props: TextInputProps) {
+function TextInput(props: TextInputProps) {
     const {
         children,
         className,
@@ -66,3 +66,5 @@ export default function TextInput(props: TextInputProps) {
         </div>
     );
 }
+
+export default React.forwardRef(TextInput);

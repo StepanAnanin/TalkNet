@@ -1,5 +1,5 @@
 import React from "react";
-import ErrorPage from "../../../pages/Error";
+import ErrorPage from "../../pages/Error";
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
@@ -10,7 +10,7 @@ interface ErrorBoundaryState {
     message?: string;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class WithErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
     constructor(props: ErrorBoundaryProps) {
         super(props);
         this.state = { hasError: false };
@@ -22,11 +22,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
     public render(): React.ReactNode {
         if (this.state.hasError) {
-            return <ErrorPage message={`Error occured: ${this.state.message}`} />;
+            return <ErrorPage message={`Критическая ошибка: ${this.state.message}`} />;
         }
 
         return this.props.children;
     }
 }
 
-export default ErrorBoundary;
+export default WithErrorBoundary;

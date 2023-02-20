@@ -17,7 +17,10 @@
 
     font-family: "Nunito", sans-serif;
     font-family: "Open Sans", sans-serif;
-    font-family: "Raleway", sans-serif;
+
+    // NOTE Property below make numbers align uneven, it's problem of 'Raleway' not a bug
+
+    // font-family: "Raleway", sans-serif;
 }
 
 body,
