@@ -14,7 +14,7 @@
         align-items: center;
         justify-content: center;
 
-        margin-bottom: 30px;
+        margin-bottom: 20px;
 
         .UserRegistrationForm-header_logo {
             padding-right: 10px;
@@ -33,14 +33,47 @@
         }
     }
 
-    &-input {
-        width: 100% !important;
-        margin-block: 20px;
+    &-alert {
+        margin-bottom: 15px;
     }
 
-    // &-accept-terms {
-    // margin-inline: 5px;
-    // }
+    &-input-block {
+        display: flex;
+        justify-content: space-between;
+
+        .UserRegistrationForm-input {
+            margin: 0;
+
+            &:first-child {
+                margin-right: 5px;
+            }
+
+            &:last-child {
+                margin-left: 5px;
+            }
+        }
+    }
+
+    &-input {
+        width: 100% !important;
+        margin-block: 10px;
+    }
+
+    #UserRegistrationForm-password-display-checkbox {
+        margin-top: 10px;
+    }
+
+    &-note {
+        margin: 10px 0 0 0;
+
+        color: white;
+
+        font-size: 11px;
+    }
+
+    &-accept-terms {
+        margin-top: 10px;
+    }
 
     &-control {
         width: 100%;
@@ -50,8 +83,8 @@
 
         margin-top: 20px;
 
-        button {
-            // letter-spacing: 1px;
+        &_button {
+            padding-inline: 20px;
             text-transform: uppercase;
         }
     }

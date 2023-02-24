@@ -9,28 +9,25 @@ import { addLogin } from "../../../entities/User";
 import { useTypedDispatch } from "../../../shared/model/hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../shared/model/hooks/useTypedSelector";
 import validateEmail from "../../../shared/lib/validators/validateEmail";
-import validatePassword from "../../../pages/SignUp/lib/validators/validatePassword";
+import Alert from "../../../shared/UI/Alert";
+import Checkbox from "../../../shared/UI/Checkbox";
 
 interface AuthFormProps {
     className?: string;
     style?: React.CSSProperties;
 }
 
-interface alertState {
-    message: string;
-    status: "error" | "warning";
-}
-
 export default function AuthForm({ className, style }: AuthFormProps) {
     const { request: authRequest } = useTypedSelector((state) => state.auth);
     const dispatch = useTypedDispatch();
 
-    const [alert, setAlert] = React.useState<alertState | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
+    const [isPasswordHidden, setIsPasswordHidden] = React.useState(true);
 
     // Updating alert state depending on authRequest
     React.useEffect(() => {
-        if (authRequest.status === "failed" && authRequest.message && authRequest.message !== alert?.message) {
-            setAlert({ message: authRequest.message, status: "error" });
+        if (authRequest.status === "failed" && authRequest.message && authRequest.message !== error) {
+            setError(authRequest.message);
         }
     }, [authRequest]);
 
@@ -51,25 +48,31 @@ export default function AuthForm({ className, style }: AuthFormProps) {
         const passwordInputValue = passwordInputElement.value;
 
         const emailValidationResult = validateEmail(emailInputValue);
-        const passwordValidationResult = validatePassword(passwordInputValue);
 
         if (!emailValidationResult.OK) {
-            setAlert({ message: emailValidationResult.message!, status: "warning" });
+            setError(emailValidationResult.message!);
             return;
         }
 
-        if (!passwordValidationResult.OK) {
-            setAlert({ message: passwordValidationResult.message!, status: "warning" });
+        if (!passwordInputValue.replaceAll(" ", "")) {
+            setError("Введите пароль");
             return;
         }
 
         dispatch(addLogin(emailInputValue, passwordInputValue));
     }
 
-    async function goBackButtonClickHandler(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    function goBackButtonClickHandler(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
 
         window.history.back();
+    }
+
+    function passwordDisplayControlCheckboxClickHandler(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        // Without this condition this handler will be called twice upon clicking label
+        if (e.target instanceof HTMLInputElement) {
+            setIsPasswordHidden((p) => !p);
+        }
     }
 
     const classes = ["AuthForm", className ?? ""].join(" ");
@@ -80,28 +83,34 @@ export default function AuthForm({ className, style }: AuthFormProps) {
                 <Logo className="AuthForm-header_logo" size="medium" />
                 <span className="AuthForm-header_label">Вход</span>
             </div>
-            {alert && (
-                <div className="AuthForm-alert" style={{ color: "red" }}>
-                    {alert.message}
-                </div>
+            {error && (
+                <Alert className="AuthForm-alert" severity="Error" header="Ошибка">
+                    {error}
+                </Alert>
             )}
             <form className="AuthForm-form">
-                <TextInput placeholder="E-Mail" className="AuthForm-form_input" id={emailInputID} size="large" />
+                <TextInput placeholder="E-Mail" className="AuthForm-form_input" id={emailInputID} />
                 <TextInput
-                    type="password"
+                    type={isPasswordHidden ? "password" : "text"}
                     placeholder="Пароль"
                     className="AuthForm-form_input"
                     id={passwordInputID}
-                    size="large"
                 />
-                <Link to="/signup" className="AuthForm-form_sign-up-link">
-                    Регистрация
-                </Link>
+                <div className="AuthForm-form_block">
+                    <Checkbox
+                        id="AuthForm-form_password-display-control-checkbox"
+                        onClick={passwordDisplayControlCheckboxClickHandler}
+                        label={<span>Показать пароль</span>}
+                    />
+                    <Link to="/signup" className="AuthForm-form_sign-up-link">
+                        Регистрация
+                    </Link>
+                </div>
                 <div className="AuthForm-form_control">
-                    <Button variant="outlined" size="large" onClick={goBackButtonClickHandler}>
+                    <Button className="AuthForm-form_control-button" variant="outlined" onClick={goBackButtonClickHandler}>
                         НАЗАД
                     </Button>
-                    <Button variant="contained" size="large" onClick={signInButtonClickHandler}>
+                    <Button className="AuthForm-form_control-button" variant="contained" onClick={signInButtonClickHandler}>
                         ВХОД
                     </Button>
                 </div>

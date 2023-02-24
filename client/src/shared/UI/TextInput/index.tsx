@@ -11,10 +11,11 @@ interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
     placeholderClassName?: string;
     type?: TextInputType;
     style?: React.CSSProperties;
+    required?: boolean;
 }
 
 // TODO implement theme changing (TSX done, only CSS remain)
-function TextInput(props: TextInputProps) {
+export default function TextInput(props: TextInputProps) {
     const {
         children,
         className,
@@ -24,6 +25,7 @@ function TextInput(props: TextInputProps) {
         size = "medium",
         variant = "outlined",
         placeholder,
+        required = false,
         ...otherProps
     } = props;
 
@@ -61,10 +63,13 @@ function TextInput(props: TextInputProps) {
 
     return (
         <div className={wrapperClasses} onClick={inputWrapperClickHandler}>
-            {placeholder && <span className={placeholderClasses}>{placeholder}</span>}
+            {placeholder && (
+                <span className={placeholderClasses}>
+                    {placeholder}
+                    {required && <span className="red-text">*</span>}
+                </span>
+            )}
             <input className={inputClasses} {...otherProps} required />
         </div>
     );
 }
-
-export default React.forwardRef(TextInput);

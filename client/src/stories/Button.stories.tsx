@@ -13,6 +13,9 @@ export default {
         size: {
             defaultValue: "medium",
         },
+        disabled: {
+            defaultValue: false,
+        },
     },
 } as ComponentMeta<typeof Button>;
 

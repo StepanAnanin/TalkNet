@@ -4,6 +4,7 @@ import type { AppDispatch } from "../../../../../shared/types/store";
 import TalkNetAPI from "../../../../../shared/api/TalkNetAPI";
 import authSlice from "../reducers/authReducer";
 import LocalStorageController from "../../../../../shared/lib/LocalStorageController";
+import { AxiosError } from "axios";
 
 type loginSuccessRequest = {
     accessToken: string;
@@ -22,8 +23,12 @@ export function addLogin(email: string, password: string) {
 
             dispatch(authSlice.actions.login(response.user));
         } catch (err: any) {
-            console.error(err);
-            dispatch(authSlice.actions.setError("Ошибка аутентификации"));
+            if (err instanceof AxiosError) {
+                dispatch(authSlice.actions.setError(err.response?.data.message ?? "Ошибка аутентификации"));
+                return;
+            }
+
+            dispatch(authSlice.actions.setError("Произошла неуточнённая ошибка"));
         }
     };
 }
