@@ -1,0 +1,51 @@
+@import "../../../app/styles/variables.scss";
+
+.TNUI-AvatarMenu-avatar {
+    cursor: pointer;
+}
+
+.TNUI-AvatarMenu {
+    box-sizing: content-box;
+
+    position: fixed;
+
+    width: 250px !important;
+
+    margin: 0;
+
+    border: 1px solid black;
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+    .TNUI-AvatarMenu-item {
+        &_avatar {
+            width: 40px !important;
+            height: 40px !important;
+
+            margin-right: 5px;
+        }
+
+        &_img {
+            width: 30px !important;
+            height: 30px !important;
+
+            margin-left: 5px;
+
+            color: $lightestPrimary;
+        }
+
+        &_label {
+            width: 175px;
+            text-align: left;
+
+            margin-left: 5px;
+
+            color: white;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}

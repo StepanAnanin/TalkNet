@@ -41,6 +41,11 @@
         user-select: none;
 
         z-index: 11;
+
+        &_img {
+            width: 30px !important;
+            height: 30px !important;
+        }
     }
 }
 

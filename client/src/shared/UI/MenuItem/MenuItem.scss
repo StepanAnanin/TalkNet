@@ -1,0 +1,17 @@
+.TNUI-MenuItem {
+    display: flex;
+    align-items: center;
+
+    padding: 7px 15px;
+
+    cursor: pointer;
+
+    list-style-type: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &:hover {
+        background-color: grey;
+    }
+}

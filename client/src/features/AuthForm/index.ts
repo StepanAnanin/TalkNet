@@ -1,3 +1,3 @@
-import AuthForm from "./UI";
+import AuthForm from "./UI/AuthForm";
 
 export { AuthForm };

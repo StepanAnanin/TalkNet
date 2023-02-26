@@ -3,12 +3,15 @@ import "./Avatar.scss";
 
 import type { ScalabelUiComponentProps } from "../../types/UI/UiComponentProps";
 
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+
 interface AvatarProps extends ScalabelUiComponentProps<HTMLDivElement> {
     src?: string;
-    alt?: string;
+    alt?: string | React.ReactNode;
     outlined?: boolean;
 }
 
+// TODO replace alt on failed getting img to default user img (take it from MUI icons)
 export default function Avatar(props: AvatarProps) {
     const { className, src, alt, size = "small", outlined = false, ...otherProps } = props;
     const imgRef = React.useRef<HTMLImageElement | null>(null);
@@ -50,15 +53,19 @@ export default function Avatar(props: AvatarProps) {
 
     return (
         <div className={classes} {...otherProps}>
-            <img
-                className="TNUI-Avatar-img"
-                src={src}
-                alt=""
-                ref={imgRef}
-                onError={imgLoadErrorHandler}
-                onLoad={imgLoaderHandler}
-            />
-            <div className="TNUI-Avatar-alt">{alt}</div>
+            {src && (
+                <img
+                    className="TNUI-Avatar-img"
+                    src={src}
+                    alt=""
+                    ref={imgRef}
+                    onError={imgLoadErrorHandler}
+                    onLoad={imgLoaderHandler}
+                />
+            )}
+            <div className="TNUI-Avatar-alt">
+                <PersonRoundedIcon className="TNUI-Avatar-alt_img" />
+            </div>
         </div>
     );
 }

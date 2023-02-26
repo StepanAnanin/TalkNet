@@ -28,9 +28,7 @@ export interface IinputIds {
 
 type AlertType = "Error" | "Success";
 
-// TODO add date of birth property to User
 // TODO add captcha
-// TODO add show password checkbox (also for signin)
 export default function UserRegistrationForm(props: UserRegistrationFormProps) {
     const { className, ...otherProps } = props;
 

@@ -1,0 +1,30 @@
+@import "../../../app/styles/variables.scss";
+
+.TNUI-Menu {
+    width: fit-content;
+
+    padding: 0;
+
+    background-color: $darkGrey;
+
+    &-wrapper {
+        display: flex;
+        flex-direction: column;
+
+        padding-block: 10px;
+    }
+
+    &-colour-scheme {
+        &-black {
+            color: black;
+        }
+
+        &-white {
+            color: white;
+        }
+
+        &-primary {
+            color: $lightPrimary;
+        }
+    }
+}

@@ -1,11 +1,13 @@
-import React from "react";
 import "./Header.scss";
-import Avatar from "../../../shared/UI/Avatar";
+import React from "react";
+
 import Button from "../../../shared/UI/Button";
 import Logo from "../../../shared/UI/Logo";
 
 import type { UiComponentProps } from "../../../shared/types/UI/UiComponentProps";
 import { Link } from "react-router-dom";
+import { useTypedSelector } from "../../../shared/model/hooks/useTypedSelector";
+import { AvatarMenu } from "../../../features/AvatarMenu";
 
 // NOTE:
 //  Tag <header/> in DOM is instances of HTMLElement class.
@@ -16,6 +18,7 @@ interface HeaderProps extends UiComponentProps<HTMLElement> {
 
 export default function Header(props: HeaderProps) {
     const { className, dontShowSignInButton = false, ...otherProps } = props;
+    const { user } = useTypedSelector((state) => state.auth);
 
     // ================================== picking styles ==================================
 
@@ -27,18 +30,16 @@ export default function Header(props: HeaderProps) {
                 <Logo link />
             </div>
             <div className="TNUI-Header-right">
-                {/* <Avatar
-                    className="TNUI-Header-user-avatar"
-                    src="https://lh3.googleusercontent.com/ogw/AAEL6sgg6jf1uy6ccb1Smq3ysp_FXPZ3p4kReGNFROZ8=s32-c-mo"
-                    alt="F"
-                /> */}
-                {!dontShowSignInButton && (
-                    <Link to="/signin">
-                        <Button className="TNUI-Header-signin-button" variant="contained">
-                            ВХОД
-                        </Button>
-                    </Link>
-                )}
+                {!dontShowSignInButton &&
+                    (user ? (
+                        <AvatarMenu user={user} />
+                    ) : (
+                        <Link to="/signin">
+                            <Button className="TNUI-Header-signin-button" variant="contained">
+                                ВХОД
+                            </Button>
+                        </Link>
+                    ))}
             </div>
         </header>
     );

@@ -18,7 +18,7 @@ $defaultBorderRadius: 5px;
     }
 
     &-contained {
-        border-radius: 0;
+        border-radius: 0 !important;
         border: none;
     }
 

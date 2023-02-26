@@ -6,7 +6,7 @@ import authSlice from "../reducers/authReducer";
 import LocalStorageController from "../../../../../shared/lib/LocalStorageController";
 import { AxiosError } from "axios";
 
-type loginSuccessRequest = {
+type SuccessRequest = {
     accessToken: string;
     message: string;
     user: User;
@@ -17,7 +17,7 @@ export function addLogin(email: string, password: string) {
         try {
             dispatch(authSlice.actions.setRequestStatusToPending());
 
-            const response = (await TalkNetAPI.post<loginSuccessRequest>("/user/login", { email, password })).data;
+            const response = (await TalkNetAPI.post<SuccessRequest>("/user/login", { email, password })).data;
 
             LocalStorageController.accessToken.set(response.accessToken);
 
@@ -58,8 +58,7 @@ export function addRefresh() {
         try {
             dispatch(authSlice.actions.setRequestStatusToPending());
 
-            // TODO upd type, it's not User, see loginSuccessRequest
-            const user = (await TalkNetAPI.post<User>("/user/refresh")).data;
+            const user = (await TalkNetAPI.post<SuccessRequest>("/user/refresh")).data.user;
 
             dispatch(authSlice.actions.refresh(user));
         } catch (err: any) {

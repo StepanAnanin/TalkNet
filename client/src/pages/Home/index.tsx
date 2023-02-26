@@ -5,6 +5,9 @@ import Header from "../../widgets/Header";
 import UserRegistrationForm from "../SignUp/UI/UserRegistrationForm";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import Alert from "../../shared/UI/Alert";
+import Avatar from "../../shared/UI/Avatar";
+import Menu from "../../shared/UI/Menu";
+import MenuItem from "../../shared/UI/MenuItem";
 
 export default function HomePage() {
     const { user } = useTypedSelector((state) => state.auth);
@@ -21,12 +24,13 @@ export default function HomePage() {
                 <br />
                 <br />
                 <Button onClick={clickHandler}>Log Auth Data</Button>
-                <Alert severity="Info" header="Внимание">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Minus ducimus enim, aliquid, nihil numquam
-                    dicta asperiores ullam maiores laboriosam, qui in distinctio repellat voluptates dolorum facere officia
-                    repudiandae inventore. Cumque!
-                </Alert>
-                <UserRegistrationForm />
+                <Avatar alt="C" />
+                <Menu>
+                    <MenuItem>Abaxoth</MenuItem>
+                    <MenuItem>Test</MenuItem>
+                    <MenuItem>Тест</MenuItem>
+                    <MenuItem>Выход</MenuItem>
+                </Menu>
             </div>
         </Page>
     );

@@ -14,7 +14,6 @@ interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
     required?: boolean;
 }
 
-// TODO implement theme changing (TSX done, only CSS remain)
 export default function TextInput(props: TextInputProps) {
     const {
         children,

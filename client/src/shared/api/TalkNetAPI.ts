@@ -1,8 +1,6 @@
 import axios from "axios";
 import TalkNetApiURL from "../lib/URL/TalkNetApiURL";
 
-//TODO Add interceptors
-
 const TalkNetAPI = axios.create({
     withCredentials: true,
     baseURL: TalkNetApiURL,

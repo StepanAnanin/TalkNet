@@ -18,6 +18,10 @@
     font-family: "Nunito", sans-serif;
     font-family: "Open Sans", sans-serif;
 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+
     // NOTE Property below make numbers align uneven, it's problem of 'Raleway' not a bug
 
     // font-family: "Raleway", sans-serif;
@@ -43,10 +47,19 @@ html {
     color: $lightPrimary;
 }
 
+.dark-primary-text {
+    color: $primary !important;
+}
+
 .bold-text {
     font-weight: 600;
 }
 
 .red-text {
     color: red;
+}
+
+.text-overflow-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -11,6 +11,7 @@ import { useTypedSelector } from "../../../shared/model/hooks/useTypedSelector";
 import validateEmail from "../../../shared/lib/validators/validateEmail";
 import Alert from "../../../shared/UI/Alert";
 import Checkbox from "../../../shared/UI/Checkbox";
+import { DefaultLoader } from "../../../shared/UI/Loader";
 
 interface AuthFormProps {
     className?: string;
@@ -59,7 +60,7 @@ export default function AuthForm({ className, style }: AuthFormProps) {
             return;
         }
 
-        dispatch(addLogin(emailInputValue, passwordInputValue));
+        await dispatch(addLogin(emailInputValue, passwordInputValue));
     }
 
     function goBackButtonClickHandler(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -111,7 +112,11 @@ export default function AuthForm({ className, style }: AuthFormProps) {
                         НАЗАД
                     </Button>
                     <Button className="AuthForm-form_control-button" variant="contained" onClick={signInButtonClickHandler}>
-                        ВХОД
+                        {authRequest.status === "pending" ? (
+                            <DefaultLoader size="small" spinnerColour="lightest-primary" />
+                        ) : (
+                            "ВХОД"
+                        )}
                     </Button>
                 </div>
             </form>
