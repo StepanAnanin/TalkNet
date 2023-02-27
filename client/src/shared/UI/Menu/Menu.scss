@@ -3,16 +3,12 @@
 .TNUI-Menu {
     width: fit-content;
 
+    display: flex;
+    flex-direction: column;
+
     padding: 0;
 
     background-color: $darkGrey;
-
-    &-wrapper {
-        display: flex;
-        flex-direction: column;
-
-        padding-block: 10px;
-    }
 
     &-colour-scheme {
         &-black {

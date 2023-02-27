@@ -1,3 +1,5 @@
+@import "../../../app/styles/variables.scss";
+
 .TNUI-MenuItem {
     display: flex;
     align-items: center;
@@ -12,6 +14,6 @@
     overflow: hidden;
 
     &:hover {
-        background-color: grey;
+        background-color: $grey;
     }
 }

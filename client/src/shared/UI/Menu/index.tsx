@@ -3,8 +3,6 @@ import React from "react";
 
 import type { UiComponentProps } from "../../types/UI/UiComponentProps";
 
-import Paper from "../Paper";
-
 // It's dependecy for MenuItem props
 export type MenuTextColour = "white" | "black" | "primary";
 
@@ -19,7 +17,7 @@ export default React.forwardRef((props: MenuProps, ref: React.ForwardedRef<HTMLU
 
     return (
         <ul ref={ref} className={classes} {...otherProps}>
-            <div className="TNUI-Menu-wrapper">{children}</div>
+            {children}
         </ul>
     );
 });

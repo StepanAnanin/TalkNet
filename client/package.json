@@ -1,6 +1,6 @@
 {
     "name": "talk-net-client",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "private": true,
     "dependencies": {
         "@emotion/react": "^11.10.5",

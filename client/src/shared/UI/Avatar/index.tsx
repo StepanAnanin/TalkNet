@@ -12,7 +12,7 @@ interface AvatarProps extends ScalabelUiComponentProps<HTMLDivElement> {
 }
 
 // TODO replace alt on failed getting img to default user img (take it from MUI icons)
-export default function Avatar(props: AvatarProps) {
+export default React.forwardRef(function Avatar(props: AvatarProps, ref: React.ForwardedRef<HTMLDivElement>) {
     const { className, src, alt, size = "small", outlined = false, ...otherProps } = props;
     const imgRef = React.useRef<HTMLImageElement | null>(null);
 
@@ -52,7 +52,7 @@ export default function Avatar(props: AvatarProps) {
     }
 
     return (
-        <div className={classes} {...otherProps}>
+        <div ref={ref} className={classes} {...otherProps}>
             {src && (
                 <img
                     className="TNUI-Avatar-img"
@@ -68,4 +68,4 @@ export default function Avatar(props: AvatarProps) {
             </div>
         </div>
     );
-}
+});
