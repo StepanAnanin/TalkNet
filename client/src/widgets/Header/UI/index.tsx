@@ -13,11 +13,11 @@ import { AvatarMenu } from "../../../features/AvatarMenu";
 //  Tag <header/> in DOM is instances of HTMLElement class.
 //  (You can check it by hovering over this element and reading it's type)
 interface HeaderProps extends UiComponentProps<HTMLElement> {
-    dontShowSignInButton?: boolean;
+    hideSignInButton?: boolean;
 }
 
 export default function Header(props: HeaderProps) {
-    const { className, dontShowSignInButton = false, ...otherProps } = props;
+    const { className, hideSignInButton = false, ...otherProps } = props;
     const { user } = useTypedSelector((state) => state.auth);
 
     // ================================== picking styles ==================================
@@ -30,7 +30,7 @@ export default function Header(props: HeaderProps) {
                 <Logo link />
             </div>
             <div className="TNUI-Header-right">
-                {!dontShowSignInButton &&
+                {!hideSignInButton &&
                     (user ? (
                         <AvatarMenu user={user} />
                     ) : (

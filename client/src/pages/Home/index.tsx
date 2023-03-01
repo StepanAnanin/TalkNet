@@ -17,7 +17,7 @@ export default function HomePage() {
     }
 
     return (
-        <Page>
+        <Page title="TalkNet | Главная">
             <Header />
             <div style={{ paddingInline: "50px" }}>
                 <br />

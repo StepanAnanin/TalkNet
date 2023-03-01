@@ -1,0 +1,25 @@
+@import "../../../../app/styles/variables.scss";
+
+.TNUI-ErrorAlert404 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &-header {
+        padding-right: 15px;
+
+        font-size: 42px;
+
+        color: $primary;
+
+        border-right: 2px solid white;
+    }
+
+    &-message {
+        padding-left: 15px;
+
+        font-size: 30px;
+
+        color: white;
+    }
+}

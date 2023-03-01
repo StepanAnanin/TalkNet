@@ -14,7 +14,7 @@ export default function SignUpPage() {
 
     return (
         <Page className="sign-up-page" title="TalkNet | Регистрация">
-            <Header dontShowSignInButton />
+            <Header hideSignInButton />
             <UserRegistrationForm className="sign-up-page-registration-form" />
         </Page>
     );

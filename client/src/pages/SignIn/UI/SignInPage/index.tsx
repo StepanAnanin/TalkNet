@@ -14,8 +14,8 @@ export default function LoginPage() {
     }
 
     return (
-        <Page className="sign-in-page">
-            <Header dontShowSignInButton />
+        <Page className="sign-in-page" title="TalkNet | Вход">
+            <Header hideSignInButton />
             <AuthForm className="sign-in-page-auth-form" />
         </Page>
     );

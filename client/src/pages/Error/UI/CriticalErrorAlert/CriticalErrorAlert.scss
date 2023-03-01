@@ -1,0 +1,67 @@
+@import "../../../../app/styles/variables.scss";
+@import "../../../../app/styles/global.scss";
+
+.TNUI-CriticalErrorAlert {
+    width: 475px;
+    max-height: 300px;
+
+    overflow: hidden;
+}
+
+.TNUI-CriticalErrorAlert-wrapper {
+    display: flex;
+
+    .TNUI-CriticalErrorAlert-img {
+        width: 60px;
+        height: 60px;
+
+        display: flex;
+        justify-content: center;
+
+        margin-right: 10px;
+
+        * {
+            width: 100%;
+            height: 100%;
+
+            color: rgb(255, 40, 40);
+        }
+    }
+
+    .TNUI-CriticalErrorAlert-body {
+        width: 375px;
+
+        .TNUI-CriticalErrorAlert-header {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .TNUI-CriticalErrorAlert-message {
+            @include custom-scrollbar(10px, transparent, red);
+
+            max-height: 200px;
+
+            margin-top: 5px;
+
+            overflow-y: scroll;
+        }
+
+        .TNUI-CriticalErrorAlert-go-back-button {
+            margin-top: 10px;
+            margin-left: 290px;
+
+            padding-block: 3px;
+            padding-inline: 15px;
+
+            border: 1px solid red;
+            border-radius: 5px;
+
+            background-color: transparent;
+            color: red;
+
+            font-size: 18px;
+
+            cursor: pointer;
+        }
+    }
+}

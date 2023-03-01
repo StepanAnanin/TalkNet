@@ -4,6 +4,7 @@ import TalkNetAPI from "../../shared/api/TalkNetAPI";
 import LocalStorageController from "../../shared/lib/LocalStorageController";
 import { useTypedDispatch } from "../../shared/model/hooks/useTypedDispatch";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
+import LoadingPage from "../../pages/Loading";
 
 interface WithAPIProps {
     children: React.ReactNode;
@@ -68,7 +69,7 @@ export default function WithAPI({ children }: WithAPIProps) {
 
     if (isAuthUpdatingInProcess) {
         // TODO replace this with loading page
-        return <div>Loading...</div>;
+        return <LoadingPage />;
     }
 
     return <>{children}</>;
