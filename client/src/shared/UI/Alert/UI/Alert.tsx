@@ -15,6 +15,7 @@ interface AlertProps extends UiComponentProps<HTMLDivElement> {
     severity: "Error" | "Warning" | "Info" | "Success";
 }
 
+// TODO add lane on left side of alert
 export default function Alert(props: AlertProps) {
     const { className, severity, header, hideIcon = false, children, ...otherProps } = props;
 

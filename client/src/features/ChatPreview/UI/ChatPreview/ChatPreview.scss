@@ -1,0 +1,77 @@
+@import "../../../../app/styles/variables.scss";
+
+$ChatPreviewHeight: 70px;
+
+.TNUI-ChatPreview {
+    height: $ChatPreviewHeight;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: $darkGrey;
+    }
+
+    &.TNUI-ChatPreview-active {
+        background-color: $darkestPrimary;
+        // background-color: $grey;
+    }
+
+    &-avatar {
+        margin-inline: 10px;
+    }
+
+    &-info {
+        width: calc(100% - $ChatPreviewHeight);
+
+        display: flex;
+        flex-direction: column;
+
+        &_chat-name {
+            margin-bottom: 5px;
+
+            color: white;
+
+            font-size: 18px;
+
+            user-select: none;
+        }
+
+        &_last-message {
+            width: 95%;
+            height: 20px;
+
+            color: rgb(175, 175, 175);
+
+            font-size: 14px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            user-select: none;
+        }
+    }
+
+    // ======================= minified styles =======================
+
+    &-minified {
+        &.TNUI-ChatPreview {
+            height: 60px !important;
+
+            margin-bottom: 2px;
+
+            &-avatar {
+                margin-inline: 5px;
+            }
+        }
+    }
+}

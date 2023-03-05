@@ -1,0 +1,39 @@
+@import "../../../app/styles/variables.scss";
+@import "../../../app/styles/mixins.scss";
+
+.TNUI-TextField-wrapper {
+    width: 100%;
+
+    display: flex;
+    align-items: flex-end;
+
+    padding: 5px 10px;
+
+    border-radius: 5px;
+
+    background-color: $darkGrey;
+
+    cursor: text;
+}
+
+.TNUI-TextField {
+    @include custom-scrollbar(5px);
+
+    width: 100%;
+
+    display: inline-flex;
+    align-items: center;
+
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+
+    padding: 0 !important;
+
+    color: white;
+    font-size: 14px;
+
+    outline: none;
+
+    overflow-y: scroll;
+    resize: none;
+}

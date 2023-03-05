@@ -14,6 +14,9 @@ interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
     required?: boolean;
 }
 
+// TODO
+// add React.forwardRef, after this components which used TextInput
+// and read it through DOM will require refactoring, need to replace selection via DOM to refs
 export default function TextInput(props: TextInputProps) {
     const {
         children,
@@ -69,6 +72,7 @@ export default function TextInput(props: TextInputProps) {
                 </span>
             )}
             <input className={inputClasses} {...otherProps} required />
+            {children}
         </div>
     );
 }

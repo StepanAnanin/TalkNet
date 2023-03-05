@@ -24,7 +24,7 @@
     }
 
     .TNUI-Avatar-alt {
-        position: absolute;
+        // position: absolute;
 
         display: flex;
         align-items: center;
@@ -76,6 +76,23 @@
 }
 
 .TNUI-Avatar-medium {
+    height: 50px;
+    width: 50px;
+
+    .TNUI-Avatar-img {
+        height: 50px;
+        width: 50px;
+    }
+
+    .TNUI-Avatar-alt {
+        height: 50px;
+        width: 50px;
+
+        font-size: 36px;
+    }
+}
+
+.TNUI-Avatar-large {
     height: 60px;
     width: 60px;
 
@@ -87,23 +104,6 @@
     .TNUI-Avatar-alt {
         height: 60px;
         width: 60px;
-
-        font-size: 36px;
-    }
-}
-
-.TNUI-Avatar-large {
-    height: 80px;
-    width: 80px;
-
-    .TNUI-Avatar-img {
-        height: 80px;
-        width: 80px;
-    }
-
-    .TNUI-Avatar-alt {
-        height: 80px;
-        width: 80px;
 
         font-size: 48px;
     }

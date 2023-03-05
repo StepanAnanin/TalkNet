@@ -1,0 +1,41 @@
+@import "../../../../app/styles/mixins.scss";
+@import "../../../../app/styles/variables.scss";
+@import "../../../../app/styles/screen-breakpoints.scss";
+
+.TNUI-Chat {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding-bottom: 5px;
+
+    &-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding-inline: 5%;
+    }
+
+    &-messages {
+        @include custom-scrollbar(10px, transparent, rgba(50, 50, 50, 0.5));
+
+        width: 100%;
+        min-width: 450px;
+
+        flex-grow: 1;
+
+        display: flex;
+        flex-direction: column-reverse;
+
+        overflow-y: scroll;
+    }
+
+    &-message-input {
+        // height: 75px;
+    }
+
+    @media screen and (max-width: $pc) {
+        padding-inline: 0;
+    }
+}

@@ -8,6 +8,7 @@ import React from "react";
  * @returns memoised and debounced version of callback
  */
 
+// BUG Now has problems with typesation
 export default function useDebounce(callback: (...args: any[]) => void, delay: number) {
     const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 

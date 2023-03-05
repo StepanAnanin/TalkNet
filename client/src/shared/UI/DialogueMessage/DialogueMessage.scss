@@ -1,0 +1,125 @@
+@import "../../../app/styles/variables.scss";
+
+$DialogueMessage_body-border-radius: 15px;
+
+.TNUI-DialogueMessage {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    &-body {
+        width: fit-content;
+
+        max-width: 50%;
+
+        padding: 5px 10px;
+
+        .TNUI-DialogueMessage {
+            &-info {
+                display: flex;
+                align-items: center;
+            }
+
+            &-text {
+                margin: 0;
+
+                color: white;
+
+                &_changed-alert {
+                    color: rgb(255, 255, 255, 0.5);
+
+                    user-select: none;
+                }
+            }
+
+            &-send-date {
+                width: 100%;
+
+                display: flex;
+
+                font-size: 12px;
+
+                user-select: none;
+            }
+
+            &-status {
+                height: 18px;
+                width: 18px;
+
+                display: flex;
+                align-items: end;
+
+                font-size: 12px;
+
+                &_success-img {
+                    height: 18px;
+                    width: 18px;
+
+                    color: $lightestPrimary;
+                }
+
+                &_failed-img {
+                    height: 16px;
+                    width: 16px;
+
+                    color: red; // $lightRed
+                }
+            }
+        }
+    }
+
+    //=========== sender style ===========
+
+    &-send-by-user {
+        justify-content: flex-end;
+
+        .TNUI-DialogueMessage {
+            &-body {
+                background-color: $primary;
+
+                border-top-left-radius: $DialogueMessage_body-border-radius;
+                border-top-right-radius: $DialogueMessage_body-border-radius;
+                border-bottom-left-radius: $DialogueMessage_body-border-radius;
+            }
+
+            &-info {
+                flex-direction: row-reverse;
+            }
+
+            &-status {
+                margin-left: 5px;
+            }
+
+            &-send-date {
+                color: $lightestPrimary;
+            }
+        }
+    }
+
+    &-send-by-interlocutor {
+        justify-content: flex-start;
+
+        .TNUI-DialogueMessage {
+            &-body {
+                background-color: $grey;
+
+                border-top-left-radius: $DialogueMessage_body-border-radius;
+                border-top-right-radius: $DialogueMessage_body-border-radius;
+                border-bottom-right-radius: $DialogueMessage_body-border-radius;
+            }
+
+            // &-info {}
+
+            &-status {
+                margin-right: 5px;
+            }
+
+            &-send-date {
+                justify-content: flex-end;
+
+                color: rgb(100, 100, 100);
+            }
+        }
+    }
+}

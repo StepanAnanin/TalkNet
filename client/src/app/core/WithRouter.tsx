@@ -6,6 +6,7 @@ import ErrorPage404 from "../../pages/Error404";
 const HomePage = lazy(() => import("../../pages/Home"));
 const SignUpPage = lazy(() => import("../../pages/SignUp"));
 const SignInPage = lazy(() => import("../../pages/SignIn"));
+const MessagesPage = lazy(() => import("../../pages/Messages"));
 
 export default function WithRouter() {
     return (
@@ -32,6 +33,14 @@ export default function WithRouter() {
                 element={
                     <Suspense fallback={<LoadingPage />}>
                         <SignUpPage />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="/m"
+                element={
+                    <Suspense>
+                        <MessagesPage />
                     </Suspense>
                 }
             />
