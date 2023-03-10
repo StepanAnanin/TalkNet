@@ -27,6 +27,7 @@ interface AvatarMenuProps extends UiComponentProps<HTMLUListElement> {
  * Currently can appear only below avatar
  */
 
+// TODO remove settings link
 // TODO replace some properties of User
 // TODO add theme changing button here
 export default function AvatarMenu(props: AvatarMenuProps) {

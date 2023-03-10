@@ -1,0 +1,171 @@
+@import "../../../../app/styles/variables.scss";
+
+$NavigatorHeaderHeight: 115px;
+
+.TNUI-NavigatorHeader {
+    height: $NavigatorHeaderHeight;
+    width: 100%;
+
+    min-height: $NavigatorHeaderHeight;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: $darkGrey;
+
+    &-top {
+        width: 100%;
+        height: $NavigatorHeaderHeight * 0.6875;
+
+        display: flex;
+        align-items: center;
+
+        background-color: $black;
+
+        .TNUI-NavigatorHeader-page-list {
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-shadow: inset 0px 0px 14px 0px rgba(0, 0, 0, 0.35);
+
+            overflow-x: scroll;
+            overflow-y: hidden;
+
+            &::-webkit-scrollbar {
+                background-color: transparent;
+                width: 0;
+                height: 0;
+            }
+
+            &_item {
+                height: 65px;
+                width: 65px;
+
+                margin-inline: 5px;
+
+                // border: 1px dashed red;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+
+                color: white;
+
+                text-decoration: none;
+
+                cursor: pointer;
+
+                &:hover {
+                    .TNUI-NavigatorHeader-page-list_item {
+                        &-img-wrapper {
+                            background-color: $grey;
+                        }
+
+                        &-label {
+                            color: $lightestPrimary;
+                        }
+                    }
+                }
+
+                &.current {
+                    .TNUI-NavigatorHeader-page-list_item {
+                        &-img-wrapper {
+                            background-color: $grey;
+
+                            box-shadow: 0px 0px 13px 1px $primaryTransperant3;
+                        }
+
+                        &-label {
+                            color: $lightPrimary;
+                        }
+                    }
+                }
+
+                &-img-wrapper {
+                    width: 50px;
+                    height: 50px;
+
+                    border-radius: 100%;
+
+                    background-color: $darkGrey;
+
+                    transition: all 0.15s ease-in-out;
+                }
+
+                &-img {
+                    width: 100%;
+                    height: 100%;
+
+                    padding: 10px;
+
+                    color: $lightestPrimary;
+                }
+
+                &-label {
+                    color: rgba(255, 255, 255, 0.85);
+
+                    font-size: 11px;
+
+                    white-space: normal;
+
+                    transition: all 0.15s ease-in-out;
+                }
+            }
+        }
+    }
+
+    &-bottom {
+        width: 100%;
+        height: $NavigatorHeaderHeight * 0.3125;
+
+        display: flex;
+        align-items: center;
+
+        .TNUI-NavigatorHeader-search {
+            height: 30px;
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            margin-inline: 10px;
+            padding-inline: 10px;
+
+            border-radius: 15px;
+
+            background-color: $grey;
+
+            &_input {
+                width: 100%;
+                height: 100%;
+
+                border: none;
+                outline: none;
+
+                color: white;
+                background-color: transparent;
+
+                font-size: 16px;
+            }
+
+            &_icon {
+                color: rgb(20, 20, 20, 0.6);
+            }
+        }
+    }
+
+    &-icon {
+        height: 30px !important;
+        width: 30px !important;
+
+        color: $primary;
+
+        cursor: pointer;
+    }
+}

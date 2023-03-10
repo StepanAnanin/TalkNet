@@ -1,0 +1,16 @@
+@import "../../../../app/styles/variables.scss";
+@import "../../../../app/styles/mixins.scss";
+
+.TNUI-NavigatorExplorer {
+    @include custom-scrollbar(5px, $black, rgba(50, 50, 50, 0.25));
+
+    flex-grow: 1;
+
+    padding: 5px;
+
+    overflow-y: scroll;
+}
+
+.TNUI-NavigatorExplorer-closed {
+    // width: 75px;
+}
