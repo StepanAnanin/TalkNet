@@ -21,6 +21,20 @@ import tokenModel from "../DB/models/Token";
  */
 
 class UserService {
+    protected createUserDTO(user: IUser) {
+        return new UserDTO({
+            id: user._id,
+            name: user.name,
+            surname: user.surname,
+            patronymic: user.patronymic,
+            email: user.email,
+            lastPasswordChange: user.settings.lastPasswordChange,
+            isActivated: user.activationState.isActivated,
+            isAccountDeletionInProcess: user.settings.accountDeletionState.isInitialized,
+            isEmailChangeInProcess: user.settings.emailChangeState.isInitialized,
+        });
+    }
+
     protected async verifyAuth(user: IUser, password: string) {
         return await bcrypt.compare(password, user.password);
     }
@@ -43,20 +57,18 @@ class UserService {
         return user ? user._id.toString() : null;
     }
 
-    public async registrate(userName: string, email: string, password: string) {
+    public async registrate(name: string, surname: string, patronymic: string | null, email: string, password: string) {
         if (await userModel.findOne({ email })) {
             throw new HTTPError(409, `Пользователь с адресом электронной почты ${email} уже зарегестрирован.`);
-        }
-
-        if (await userModel.findOne({ userName })) {
-            throw new HTTPError(409, `Пользователь с именем ${userName} уже зарегестрирован.`);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const activationLink = uuid();
 
         const user = await userModel.create({
-            userName,
+            name,
+            surname,
+            patronymic,
             email,
             password: hashedPassword,
             activationState: {
@@ -85,16 +97,7 @@ class UserService {
             throw new Error(`Не удалось отправить электронное письмо с ссылкой активации аккаунта.`);
         }
 
-        const userDTO = new UserDTO({
-            id: user._id,
-            userName: user.userName,
-            email: user.email,
-            lastPasswordChange: user.lastPasswordChange,
-            isActivated: user.activationState.isActivated,
-            isAccountDeletionInProcess: user.accountDeletionState.isInitialized,
-            isEmailChangeInProcess: user.emailChangeState.isInitialized,
-        });
-
+        const userDTO = this.createUserDTO(user);
         const tokens = tokenService.generateTokens({ ...userDTO });
 
         await tokenService.saveRefreshTokenToDB(user._id, tokens.refreshToken);
@@ -115,16 +118,7 @@ class UserService {
             throw new HTTPError(403, "Данный аккаунт заблокирован");
         }
 
-        const userDTO = new UserDTO({
-            id: user._id,
-            userName: user.userName,
-            email: user.email,
-            lastPasswordChange: user.lastPasswordChange,
-            isActivated: user.activationState.isActivated,
-            isAccountDeletionInProcess: user.accountDeletionState.isInitialized,
-            isEmailChangeInProcess: user.emailChangeState.isInitialized,
-        });
-
+        const userDTO = this.createUserDTO(user);
         const tokens = tokenService.generateTokens({ ...userDTO });
 
         await tokenService.saveRefreshTokenToDB(user._id, tokens.refreshToken);
@@ -154,16 +148,7 @@ class UserService {
 
         const user = (await userModel.findOne({ email: userData.email }))!;
 
-        const userDTO = new UserDTO({
-            id: user._id,
-            userName: user.userName,
-            email: user.email,
-            lastPasswordChange: user.lastPasswordChange,
-            isActivated: user.activationState.isActivated,
-            isAccountDeletionInProcess: user.accountDeletionState.isInitialized,
-            isEmailChangeInProcess: user.emailChangeState.isInitialized,
-        });
-
+        const userDTO = this.createUserDTO(user);
         const tokens = tokenService.generateTokens({ ...userDTO });
 
         await tokenService.saveRefreshTokenToDB(user._id, tokens.refreshToken);
@@ -200,15 +185,7 @@ class UserService {
     }
 
     public async changeUserName(email: string, password: string, newUsername: string) {
-        const user = await userModel.findOne({ email });
-
-        if (!user || !(await this.verifyAuth(user, password))) {
-            throw new HTTPError(400, `Неверный EMail или пароль`);
-        }
-
-        user.userName = newUsername;
-
-        await user!.save();
+        throw new Error(`Not implemented`);
     }
 
     public async configureAvatarUploader() {

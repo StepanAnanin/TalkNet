@@ -1,6 +1,6 @@
 {
     "name": "talk-net-server",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Core server of TalkNet application",
     "main": "server.js",
     "scripts": {

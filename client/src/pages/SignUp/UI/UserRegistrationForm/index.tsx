@@ -29,6 +29,8 @@ export interface IinputIds {
 type AlertType = "Error" | "Success";
 
 // TODO add captcha
+// BUG load button has UI bug
+// BUG Missing patronymic input
 export default function UserRegistrationForm(props: UserRegistrationFormProps) {
     const { className, ...otherProps } = props;
 

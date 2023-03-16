@@ -84,7 +84,7 @@ export default function AvatarMenu(props: AvatarMenuProps) {
                     <ClickAwayListener className="TNUI-AvatarMenu-wrapper" onClickAway={clickAwayHandler}>
                         <MenuItem className="TNUI-AvatarMenu-item">
                             <Avatar src={src} className="TNUI-AvatarMenu-item_avatar" />
-                            <span className="TNUI-AvatarMenu-item_label">{user.userName} Ананьин</span>
+                            <span className="TNUI-AvatarMenu-item_label">{`${user.name} ${user.surname}`}</span>
                         </MenuItem>
                         <Link className="clear-link" to="/settings">
                             <MenuItem className="TNUI-AvatarMenu-item">

@@ -1,6 +1,8 @@
 export default interface User {
     id: string;
-    userName: string;
+    name: string;
+    surname: string;
+    patronymic: string | null;
     email: string;
     isActivated: boolean;
     lastPasswordChange: number;

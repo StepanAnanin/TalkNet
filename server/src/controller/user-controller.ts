@@ -4,6 +4,7 @@ import config from "../config";
 import HTTPError from "../errors/HTTPError";
 import userModel from "../DB/models/User";
 import userService from "../services/user-service";
+import validateRequest from "../lib/validators/validateRequest";
 
 class UserContoller {
     public async registrate(req: Request, res: Response) {
@@ -11,59 +12,80 @@ class UserContoller {
 
         const email = req.body.email;
         const password = req.body.password;
-        const userName = req.body.userName;
+        const name = req.body.name;
+        const surname = req.body.surname;
+        const patronymic = req.body.patronymic ?? null;
 
-        if (!email || typeof email !== "string") {
-            res.status(400).json({ message: `EMail пользователя не указан или имеет не правильный тип данных.` });
+        const requestValidationResult = validateRequest(req.body, [
+            { key: "password", type: "string" },
+            { key: "name", type: "string" },
+            { key: "surname", type: "string" },
+            { key: "email", type: "string" },
+        ]);
+
+        if (!requestValidationResult.ok) {
+            res.status(400).json({ message: requestValidationResult.message });
             return;
         }
 
+        // ========================== Email validation ==========================
+
+        // TODO refactoring?
         if (
             !email.includes("@") ||
             email.split("@").length !== 2 ||
             !email.split("@").at(-1)!.includes(".") ||
             email.split("@").at(-1)!.length < 3
         ) {
-            res.status(400).json({ message: `Переданный EMail имеет неправильный формат.`, email });
+            res.status(400).json({ message: `EMail имеет неправильный формат.`, email });
             return;
         }
 
         if (email.length > 32) {
             res.status(400).json({
-                message: `Переданный EMail слишком длинный. Максимально допустимая длинна — 32 символа`,
+                message: `EMail слишком длинный. Максимально допустимая длинна — 32 символа`,
             });
             return;
         }
 
         if (email.length < 5) {
             res.status(400).json({
-                message: `Переданный EMail слишком короткий. Минимально допустимая длинна — 5 символов`,
+                message: `EMail слишком короткий. Минимально допустимая длинна — 5 символов`,
             });
             return;
         }
 
-        if (!password || typeof password !== "string") {
-            res.status(400).json({ message: `Пароль пользователя не указан или имеет не правильный тип данных.` });
-            return;
-        }
-
-        if (!userName || typeof userName !== "string") {
-            res.status(400).json({ message: `Имя пользователя не указано или имеет не правильный тип данных.` });
-            return;
-        }
-
-        if (!userName.replaceAll(" ", "")) {
-            res.status(400).json({ message: "Имя пользователя не указанно." });
-            return;
-        }
-
-        if (userName.length > 64) {
+        if (name.length > 64) {
             res.status(400).json({ message: "Имя пользователя слишком длинное." });
             return;
         }
 
+        if (surname.length > 64) {
+            res.status(400).json({ message: "Фамилия пользователя слишком длинная." });
+            return;
+        }
+
+        // ========================== Patronymic validation ==========================
+
+        if (patronymic !== null) {
+            if (typeof patronymic !== "string") {
+                res.status(400).json({ message: "Отчество пользователя имеет не правильный тип данных." });
+                return;
+            }
+
+            if (!patronymic.replaceAll(" ", "")) {
+                res.status(400).json({ message: `Отчество пользователя имеет недопустимое значение.` });
+                return;
+            }
+
+            if (patronymic.length > 64) {
+                res.status(400).json({ message: `Отчество пользователя слишком длинное.` });
+                return;
+            }
+        }
+
         try {
-            const userData = await userService.registrate(userName, email, password);
+            const userData = await userService.registrate(name, surname, patronymic, email, password);
 
             res.status(200).json({ message: `Пользователь успешно создан`, ...userData });
         } catch (err: any) {
@@ -83,15 +105,16 @@ class UserContoller {
         const email = req.body.email;
         const password = req.body.password;
 
-        if (!email || typeof email !== "string") {
-            res.status(400).json({ message: `EMail пользователя не указан или имеет не правильный тип данных.` });
+        const requestValidationResult = validateRequest(req.body, [
+            { key: "password", type: "string" },
+            { key: "email", type: "string" },
+        ]);
+
+        if (!requestValidationResult.ok) {
+            res.status(400).json({ message: requestValidationResult.message });
             return;
         }
 
-        if (!password || typeof password !== "string") {
-            res.status(400).json({ message: `Пароль пользователя не указан или имеет не правильный тип данных.` });
-            return;
-        }
         try {
             const userData = await userService.login(email, password);
 
@@ -206,50 +229,6 @@ class UserContoller {
         }
     }
 
-    public async changeUserName(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
-        res.setHeader("Accept-Charset", "utf-8");
-
-        const email = req.body.email;
-        const password = req.body.password;
-        const newUsername = req.body.newUsername;
-
-        if (typeof password !== "string" || typeof email !== "string" || typeof newUsername !== "string") {
-            res.status(400).json({
-                message:
-                    "Type Error: request's body must have this properties: password, email, newUserName which are all string",
-            });
-            return;
-        }
-
-        if (!newUsername.replaceAll(" ", "")) {
-            res.status(400).json({ message: "Недопустимое имя пользователя" });
-            return;
-        }
-
-        if (newUsername.length > 64) {
-            res.status(400).json({ message: "Имя пользователя слишком длинное" });
-            return;
-        }
-
-        try {
-            await userService.changeUserName(email, password, newUsername);
-
-            res.status(200).json({ message: `Имя пользователя успешно изменено.` });
-        } catch (err) {
-            if (err instanceof HTTPError) {
-                res.status(err.errorCode).json({ message: err.message });
-                return;
-            }
-
-            console.error(err);
-            res.status(500).json({ message: "Что-то пошло не так..." });
-        }
-    }
-
     public async changePassword(req: Request, res: Response) {
         if (res.headersSent) {
             return;
@@ -261,11 +240,14 @@ class UserContoller {
         const currentPassword = req.body.currentPassword;
         const newPassword = req.body.newPassword;
 
-        if (typeof currentPassword !== "string" || typeof email !== "string" || typeof newPassword !== "string") {
-            res.status(400).json({
-                message:
-                    "Invalid request: request's body must have this properties: currentPassword, email, newPassword which are all string",
-            });
+        const requestValidationResult = validateRequest(req.body, [
+            { key: "currentPassword", type: "string" },
+            { key: "newPassword", type: "string" },
+            { key: "email", type: "string" },
+        ]);
+
+        if (!requestValidationResult.ok) {
+            res.status(400).json({ message: requestValidationResult.message });
             return;
         }
 

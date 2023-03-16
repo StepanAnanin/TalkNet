@@ -1,6 +1,8 @@
 type constructorModel = {
     id: string;
-    userName: string;
+    name: string;
+    surname: string;
+    patronymic: string | null;
     email: string;
     isActivated: boolean;
     lastPasswordChange: number;
@@ -10,7 +12,9 @@ type constructorModel = {
 
 export default class UserDTO {
     public id: string;
-    public userName: string;
+    public name: string;
+    public surname: string;
+    public patronymic: string | null;
     public email: string;
     public isActivated: boolean;
     public lastPasswordChange: number;
@@ -19,7 +23,9 @@ export default class UserDTO {
 
     constructor(model: constructorModel) {
         this.id = model.id;
-        this.userName = model.userName;
+        this.name = model.name;
+        this.surname = model.surname;
+        this.patronymic = model.patronymic;
         this.email = model.email;
         this.isActivated = model.isActivated;
         this.lastPasswordChange = model.lastPasswordChange;

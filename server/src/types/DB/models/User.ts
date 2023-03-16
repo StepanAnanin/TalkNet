@@ -1,21 +1,18 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 import type I_ActivationState from "../../../types/DB/schemas/ActivationState";
-import type I_InitializeblePropertyState from "../../../types/DB/schemas/InitializeblePropertyState";
+import type UserSettings from "../../../types/DB/schemas/UserSettings";
 import type { UserAccessLevelValue } from "../../../types/UserAccessLevel";
 
 export default interface IUser extends Document {
-    // ========== Main Properties ==========
-
-    userName: string;
+    name: string;
+    surname: string;
+    patronymic: string | null;
     email: string;
     password: string;
-    activationState: I_ActivationState;
+    phoneNumber: number | null;
     accessLevel: UserAccessLevelValue;
-
-    // ========== Secondary Properties ==========
-
-    lastPasswordChange: number;
-    emailChangeState: I_InitializeblePropertyState;
-    accountDeletionState: I_InitializeblePropertyState;
+    activationState: I_ActivationState;
+    friends: Types.Array<Types.ObjectId>;
+    settings: UserSettings;
 }
