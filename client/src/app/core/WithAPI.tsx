@@ -5,6 +5,7 @@ import LocalStorageController from "../../shared/lib/LocalStorageController";
 import { useTypedDispatch } from "../../shared/model/hooks/useTypedDispatch";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import LoadingPage from "../../pages/Loading";
+import { AxiosError } from "axios";
 
 interface WithAPIProps {
     children: React.ReactNode;
@@ -17,11 +18,15 @@ interface WithAPIProps {
  *
  * (cuz inside it's used state from global store)
  */
+// BUG On very fast page reloading auth data will be lost cuz client unable to update refresh token in time localy,
+// but on server refresh token is changed so client has setted old refreshToken.
+// Possible solution — don't update refresh token on refreshing access token;
 export default function WithAPI({ children }: WithAPIProps) {
     const [isAuthUpdatingInProcess, setIsAuthUpdatingInProcess] = React.useState(false);
 
     const { user } = useTypedSelector((state) => state.auth);
     const dispatch = useTypedDispatch();
+    const retryRef = React.useRef(false);
 
     React.useEffect(() => {
         (async function () {
@@ -40,20 +45,21 @@ export default function WithAPI({ children }: WithAPIProps) {
         return config;
     });
 
-    // TODO need to test this
     TalkNetAPI.interceptors.response.use(
         (res) => {
             return res;
         },
-        async (err) => {
-            const originalRequest = err.config;
+        async (err: AxiosError) => {
+            const originalRequest = err.config!;
 
-            if (err.response.status === 401 && err.config && !err.config._isRetry) {
+            // @ts-ignore
+            if (err.response!.status === 401 && err.config && !err.config._isRetry) {
+                // @ts-ignore
                 originalRequest._isRetry = true;
 
                 try {
-                    if (user && LocalStorageController.accessToken.get()) {
-                        console.log(`Access token expired`);
+                    if (LocalStorageController.accessToken.get() && !retryRef.current) {
+                        retryRef.current = true; // idk is this work?
                         await dispatch(addRefresh());
                     }
 
@@ -68,7 +74,6 @@ export default function WithAPI({ children }: WithAPIProps) {
     );
 
     if (isAuthUpdatingInProcess) {
-        // TODO replace this with loading page
         return <LoadingPage />;
     }
 

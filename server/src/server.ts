@@ -1,10 +1,11 @@
 import "dotenv/config";
-import express from "express";
+import express, { Router } from "express";
 import config from "./config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import UserRouter from "./routers/UserRouter";
+import ChatRouter from "./routers/ChatRouter";
 
 const app = express();
 const port = process.env.SERVER_PORT;
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(config.CORS_OPTIONS));
 app.use("/user", UserRouter);
+app.use("/chat", ChatRouter);
 app.use("/static", express.static(`${__dirname}/static`));
 
 async function start() {

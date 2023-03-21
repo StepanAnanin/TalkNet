@@ -14,9 +14,8 @@ export default async function authMiddleware(req: Request, res: Response, next: 
 
         // authHeader has a form like: "Bearer {accesToken}"
         const accessToken = authHeader.split(` `)[1];
-        const refreshToken = req.cookies.refreshToken as string | undefined;
 
-        if (!accessToken || !refreshToken) {
+        if (!accessToken) {
             throw new HTTPError(401);
         }
 
@@ -30,7 +29,7 @@ export default async function authMiddleware(req: Request, res: Response, next: 
         req.user = jwtUserData;
     } catch (err) {
         if (err instanceof TokenExpiredError) {
-            res.status(401).json({ message: "Access token is expired" });
+            res.status(401).json({ tokenExpired: true, message: "Access token has expired" });
             return;
         }
 

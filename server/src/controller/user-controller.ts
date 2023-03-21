@@ -8,6 +8,10 @@ import validateRequest from "../lib/validators/validateRequest";
 
 class UserContoller {
     public async registrate(req: Request, res: Response) {
+        if (res.headersSent) {
+            return;
+        }
+
         res.setHeader("Accept-Charset", "utf-8");
 
         const email = req.body.email;
@@ -100,6 +104,10 @@ class UserContoller {
     }
 
     public async login(req: Request, res: Response) {
+        if (res.headersSent) {
+            return;
+        }
+
         res.setHeader("Accept-Charset", "utf-8");
 
         const email = req.body.email;
@@ -163,6 +171,10 @@ class UserContoller {
     }
 
     public async activateAccount(req: Request, res: Response) {
+        if (res.headersSent) {
+            return;
+        }
+
         res.setHeader("Accept-Charset", "utf-8");
 
         const activationLink = req.params.link;

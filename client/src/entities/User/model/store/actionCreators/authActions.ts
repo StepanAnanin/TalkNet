@@ -58,9 +58,13 @@ export function addRefresh() {
         try {
             dispatch(authSlice.actions.setRequestStatusToPending());
 
-            const user = (await TalkNetAPI.post<SuccessRequest>("/user/refresh")).data.user;
+            const response = (await TalkNetAPI.post<SuccessRequest>("/user/refresh")).data;
 
-            dispatch(authSlice.actions.refresh(user));
+            LocalStorageController.accessToken.set(response.accessToken);
+
+            dispatch(authSlice.actions.refresh(response.user));
+
+            console.log("Access token refreshed");
         } catch (err: any) {
             console.error(err);
             dispatch(authSlice.actions.setError("При обновлении токена доступа произошла ошибка"));

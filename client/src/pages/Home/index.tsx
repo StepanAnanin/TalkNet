@@ -6,7 +6,6 @@ import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import Avatar from "../../shared/UI/Avatar";
 import Menu from "../../shared/UI/Menu";
 import MenuItem from "../../shared/UI/MenuItem";
-import TextFiled from "../../shared/UI/TextField";
 
 export default function HomePage() {
     const { user } = useTypedSelector((state) => state.auth);
@@ -30,7 +29,6 @@ export default function HomePage() {
                     <MenuItem>Тест</MenuItem>
                     <MenuItem>Выход</MenuItem>
                 </Menu>
-                <TextFiled defaultValue="Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, molestiae!" />
             </div>
         </Page>
     );

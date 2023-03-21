@@ -4,6 +4,7 @@ import type ValidationResult from "../../types/lib/ValidationResult";
 interface ExpectedProperty {
     key: string;
     type: DefaultTypes | DefaultTypes[];
+    notRequired?: boolean;
 }
 
 /**
@@ -21,6 +22,11 @@ export default function validateRequest(requestBody: unknown, expectedProperties
         const propertyValue = requestBody[property.key];
         const propertyType = typeof propertyValue;
 
+        // If not required property is skipped
+        if (property.notRequired && propertyValue === undefined) {
+            continue;
+        }
+
         // If property isn't exist
         if (propertyValue === undefined) {
             result.ok = false;
@@ -28,6 +34,7 @@ export default function validateRequest(requestBody: unknown, expectedProperties
             break;
         }
 
+        // If passed an empty string;
         if (propertyType === "string" && !(propertyValue as string).replaceAll(" ", "")) {
             result.ok = false;
             result.message = `Property '${property.key}' has incorrect value.`;

@@ -10,7 +10,7 @@ const UserSchema = new Schema<IUser>({
     patronymic: { type: String, default: null },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    phoneNumber: { type: Number, unique: true, default: null },
+    phoneNumber: { type: Number, default: null },
     accessLevel: { type: Number, default: 5, required: true },
     activationState: { type: ActivationState, required: true },
     friends: [Schema.Types.ObjectId],
