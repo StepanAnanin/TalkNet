@@ -1,58 +1,39 @@
 import React from "react";
 
-import type MessangerService from "../../types/shared/model/hooks/useMessangerService";
+import type IMessangerService from "../../types/shared/lib/MessangerService";
 
 import { useTypedSelector } from "./useTypedSelector";
 import MessangerServiceURL from "../../lib/URL/MessangerServiceURL";
-import LocalStorageController from "../../lib/LocalStorageController";
 import { addRefresh } from "../../../entities/User";
 import { useTypedDispatch } from "./useTypedDispatch";
-
-interface ParsedMessage {
-    code: number;
-    message: string;
-}
+import MessangerService from "../../lib/MessangerService";
+import { MessangerServiceIncomingEvent } from "../../lib/MessangerServiceEvent";
 
 export default function useMessangerService() {
     const { user } = useTypedSelector((state) => state.auth);
     const dispatch = useTypedDispatch();
-    const wsConnectionRef = React.useRef<WebSocket | null>(null);
-    const lastEventRef = React.useRef<MessangerService.Event.Any | null>(null);
 
-    if (!(wsConnectionRef.current instanceof WebSocket)) {
+    const [incomingEvent, setIncomingEvent] = React.useState<MessangerServiceIncomingEvent | null>(null);
+    const MessangerServiceConnectionRef = React.useRef<MessangerService | null>(null);
+    const lastEventRef = React.useRef<IMessangerService.OutcomingEvent.Any | null>(null);
+
+    if (!user) {
+        throw new Error(`Messanger service connection require authorization`);
+    }
+
+    if (!(MessangerServiceConnectionRef.current instanceof MessangerService)) {
         establishConnection();
     }
 
-    function wsSend(ws: WebSocket, event: MessangerService.Event.Any) {
-        const requestPayload = {
-            accessToken: LocalStorageController.accessToken.get(),
-            userID: user!.id,
-            chatID: event.chatID,
-            event: event.event,
-            payload: event.payload,
-        };
-
-        if (ws.readyState) {
-            ws.send(JSON.stringify(requestPayload));
-            return;
-        }
-
-        setTimeout(() => wsSend(ws, event), 50);
-    }
-
     function establishConnection() {
-        if (wsConnectionRef.current instanceof WebSocket) {
+        if (MessangerServiceConnectionRef.current instanceof MessangerService) {
             console.warn("Connection already established");
             return;
         }
 
-        wsConnectionRef.current = new WebSocket(MessangerServiceURL);
+        MessangerServiceConnectionRef.current = new MessangerService(MessangerServiceURL, user!);
 
-        // wsConnectionRef.current.onopen = function () {
-        //     console.log("Messanger Service connection established.");
-        // };
-
-        wsConnectionRef.current.onclose = function (event) {
+        MessangerServiceConnectionRef.current.onclose = function (event) {
             if (event.wasClean) {
                 console.log("Соединение закрыто чисто");
             } else {
@@ -61,41 +42,45 @@ export default function useMessangerService() {
             console.log("Код: " + event.code + " причина: " + event.reason);
         };
 
-        wsConnectionRef.current.onerror = function (error) {
+        MessangerServiceConnectionRef.current.onerror = function (error) {
             console.error(error);
         };
 
-        wsConnectionRef.current.onmessage = async function (ev) {
-            const wsConnection = wsConnectionRef.current!;
+        MessangerServiceConnectionRef.current.onmessage = async function (ev) {
+            const messangerServiceConnection = MessangerServiceConnectionRef.current!;
 
-            const parsedMessage: ParsedMessage = JSON.parse(ev.data);
+            const parsedEvent: IMessangerService.IncomingEvent.Any = JSON.parse(ev.data);
 
-            if (parsedMessage.code === 401) {
+            const incomingEvent = new MessangerServiceIncomingEvent(user!.id, parsedEvent);
+
+            if (parsedEvent.code === 401) {
                 console.log("Messanger service request error: Access token expired. Updating...");
 
                 await dispatch(addRefresh());
 
-                wsSend(wsConnection, lastEventRef.current!);
+                // messangerServiceConnection.wsSend(lastEventRef.current!);
+                messangerServiceConnection.repeatLastOutcomingEvent();
 
                 return;
             }
 
-            // TODO add hendlers here
+            // TODO add here handlers for incoming requests from server
+            setIncomingEvent(incomingEvent);
 
-            console.log(`Messanger Service:\n${JSON.stringify(parsedMessage.message)}`);
+            console.log(`Messanger Service:\n${JSON.stringify(parsedEvent)}`);
         };
     }
 
-    function dispathMessangerServiceEvent(connectionEvent: MessangerService.Event.Any) {
-        const wsConnection = wsConnectionRef.current;
+    function dispathMessangerServiceOutcomingEvent(connectionEvent: IMessangerService.OutcomingEvent.Any) {
+        const MessangerServiceConnection = MessangerServiceConnectionRef.current;
 
-        if (!wsConnection) {
+        if (!MessangerServiceConnection) {
             throw new Error(`Messanger Serivce connection isn't established`);
         }
 
         switch (connectionEvent.event) {
             case "send-message":
-                const sendMessageEvent: MessangerService.Event.SendMessage = {
+                const sendMessageEvent: IMessangerService.OutcomingEvent.SendMessage = {
                     chatID: connectionEvent.chatID,
                     event: "send-message",
                     payload: connectionEvent.payload,
@@ -103,14 +88,14 @@ export default function useMessangerService() {
 
                 lastEventRef.current = sendMessageEvent;
 
-                wsSend(wsConnection, sendMessageEvent);
+                MessangerServiceConnection.sendMessage(sendMessageEvent);
 
                 break;
             case "delete-message":
                 throw new Error("Not implemented");
             case "edite-message":
                 throw new Error("Not implemented");
-            case "update-message-read-status":
+            case "update-message-read-date":
                 throw new Error("Not implemented");
             default:
                 throw new Error("Wrong event type");
@@ -118,16 +103,21 @@ export default function useMessangerService() {
     }
 
     function closeConnection() {
-        const wsConnection = wsConnectionRef.current;
+        const MessangerServiceConnection = MessangerServiceConnectionRef.current;
 
-        if (!(wsConnection instanceof WebSocket)) {
+        if (!(MessangerServiceConnection instanceof MessangerService)) {
             console.warn("Messanger Service connection closing error: connection wasn't established");
             return;
         }
 
-        wsConnection.close();
-        wsConnectionRef.current = null;
+        MessangerServiceConnection.close();
+        MessangerServiceConnectionRef.current = null;
     }
 
-    return { dispathMessangerServiceEvent, closeConnection, wsConnectionRef };
+    return {
+        dispathMessangerServiceOutcomingEvent,
+        closeConnection,
+        MessangerServiceConnectionRef,
+        incomingEventState: [incomingEvent, setIncomingEvent],
+    };
 }

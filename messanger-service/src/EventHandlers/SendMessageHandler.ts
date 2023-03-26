@@ -1,62 +1,57 @@
-import { WebSocketServer } from "../server";
 import WebSocket from "ws";
 import http from "http";
 import MessangerServiceResponse from "../lib/MessangerServiceResponse";
+import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 
 import type { SendMessageEvent } from "../types/WebSocket/Events";
-import config from "../config";
 
-export default async function SendMessageEventHandler(event: SendMessageEvent, message: string, ws: WebSocket.WebSocket) {
-    const requestOptions: http.RequestOptions = {
-        host: config.TALKNET_API_HOST,
-        port: config.TALKNET_API_PORT,
-        path: "/chat/message/" + event.chatID,
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            authorization: "Bearer " + event.accessToken,
-        },
-    };
+export default async function SendMessageEventHandler(event: SendMessageEvent, ws: WebSocket.WebSocket) {
+    const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.chatID, "POST", event.accessToken);
 
+    // @ts-ignore
     const request = http.request(requestOptions, function (response) {
         response.setEncoding("utf-8");
-
-        const wsResponse = { ok: false, message: "Что-то пошло не так..." };
 
         response.on("data", function (chunk) {
             const responsePayload = JSON.parse(chunk);
 
+            // Checking access token
             if (response.statusCode === 401 && responsePayload.tokenExpired) {
-                wsResponse.ok = false;
-                ws.send(JSON.stringify(new MessangerServiceResponse(response.statusCode, responsePayload.message)));
+                ws.send(
+                    new MessangerServiceResponse(response.statusCode, "access-token-expired", {
+                        message: responsePayload.message,
+                    }).JSON()
+                );
+                return;
+            }
+
+            // If error
+            if (response.statusCode! >= 400) {
+                ws.send(
+                    new MessangerServiceResponse(response.statusCode!, "unexpected-error", {
+                        message: responsePayload.message,
+                    }).JSON()
+                );
                 return;
             }
 
             console.log(responsePayload);
 
-            wsResponse.ok = true;
-            wsResponse.message = responsePayload;
-
-            // console.log(responsePayload);
-            // console.log(`\nSend message event dispatched.\nRequest: ${JSON.stringify(event)}\n`);
+            // If success
+            ws.send(new MessangerServiceResponse(200, "send-message", responsePayload).JSON());
         });
 
-        response.on("end", function () {
-            if (wsResponse.ok) {
-                ws.send(JSON.stringify(new MessangerServiceResponse(200, wsResponse.message)));
-                return;
-            }
-
-            ws.send(JSON.stringify(new MessangerServiceResponse(500, wsResponse.message)));
-        });
+        // response.on("end", function () {});
 
         response.on("error", (err) => {
             console.error(err);
         });
     });
 
+    // sending request to the TalkNet API
     request.write(
         JSON.stringify({ senderID: event.userID, messageText: event.payload.message, sentDate: event.payload.sentDate })
     );
+
     request.end();
 }

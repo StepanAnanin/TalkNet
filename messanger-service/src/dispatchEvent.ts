@@ -11,16 +11,22 @@ export default async function dispatchEvent(message: string, ws: WebSocket.WebSo
     const validationResult = validateEvent(parsedMessage);
 
     if (!validationResult.ok) {
-        ws.send(JSON.stringify(new MessangerServiceResponse(400, `Validation Error: ${validationResult.message}`)));
+        ws.send(
+            JSON.stringify(
+                new MessangerServiceResponse(400, "validation-error", {
+                    message: `Validation Error: ${validationResult.message}`,
+                })
+            )
+        );
         return;
     }
 
     switch (parsedMessage.event) {
         case "send-message":
-            await sendMessageHandler(parsedMessage, message, ws);
+            await sendMessageHandler(parsedMessage, ws);
             break;
         default:
-            ws.send(JSON.stringify(new MessangerServiceResponse(400, "Wrong event")));
+            ws.send(JSON.stringify(new MessangerServiceResponse(400, "invalid-request", { message: "Wrong event" })));
             break;
     }
 }

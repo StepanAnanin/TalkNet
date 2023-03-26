@@ -20,7 +20,13 @@ WebSocketServer.on("connection", (ws) => {
 
     ws.on("error", (e) => ws.send(e.message));
 
-    ws.send(JSON.stringify(new MessangerServiceResponse(200, "Messanger Service connection established")));
+    ws.send(
+        JSON.stringify(
+            new MessangerServiceResponse(200, "establish-connection", {
+                message: "Messanger Service connection established",
+            })
+        )
+    );
 });
 
 server.listen(process.env.port, () => {

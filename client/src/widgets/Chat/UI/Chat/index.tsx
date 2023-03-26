@@ -20,9 +20,14 @@ export default function Chat(props: ChatProps) {
 
     const { user } = useTypedSelector((state) => state.auth);
     const messageInputRef = React.useRef<HTMLDivElement>(null);
-    const { dispathMessangerServiceEvent } = useMessangerService();
+    const { dispathMessangerServiceOutcomingEvent, incomingEventState } = useMessangerService();
+    const [incomingEvent, setIncomingEvent] = incomingEventState;
 
     // console.log("ChatID: " + chatID);
+
+    React.useEffect(() => {
+        // console.log(incomingEvent);
+    }, [incomingEvent]);
 
     const messages = [
         <DialogueMessage key={1} read style={{ paddingInline: "5px", marginBlock: "10px" }} sender="interlocutor">
@@ -54,7 +59,7 @@ export default function Chat(props: ChatProps) {
             return;
         }
 
-        dispathMessangerServiceEvent({
+        dispathMessangerServiceOutcomingEvent({
             chatID: chatID!,
             event: "send-message",
             payload: { message: inputedMessage, sentDate: Date.now() },
