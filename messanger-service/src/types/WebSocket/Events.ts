@@ -1,13 +1,13 @@
 import type SendMessageRequest from "../Requests/SendMessageRequest";
 
-export type defaultEvent = "send-message" | "establish-connection";
+export type incomingEvent = "send-message" | "establish-connection" | "get-chat-messages";
 
-export type errorEvent = "access-token-expired" | "unexpected-error" | "validation-error" | "invalid-request";
+export type outcomingEvent = "access-token-expired" | "unexpected-error" | "validation-error" | "invalid-request";
 
-export type event = defaultEvent | errorEvent;
+export type event = incomingEvent | outcomingEvent;
 
 // On changing this don't forget to change event validator
-interface ConnectionEvent<E extends defaultEvent, P extends object> {
+interface ConnectionEvent<E extends incomingEvent, P extends object> {
     accessToken: string;
     userID: string;
     event: E;
@@ -17,6 +17,8 @@ interface ConnectionEvent<E extends defaultEvent, P extends object> {
 
 export type SendMessageEvent = ConnectionEvent<"send-message", SendMessageRequest>;
 
-type AnyEvent = SendMessageEvent;
+export type GetChatMessagesEvent = ConnectionEvent<"get-chat-messages", { userID: string }>;
+
+type AnyEvent = SendMessageEvent | GetChatMessagesEvent;
 
 export default AnyEvent;

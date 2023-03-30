@@ -9,7 +9,8 @@ namespace IMessangerService {
         | "establish-connection"
         | "edite-message"
         | "delete-message"
-        | "update-message-read-date";
+        | "update-message-read-date"
+        | "get-chat-messages";
 
     /**
      * This events can be dispatched only by server and most of them are errors.
@@ -22,6 +23,9 @@ namespace IMessangerService {
         interface OutcomingEvent<E extends OutcomingEventName> {
             event: E;
             chatID: string;
+
+            // usedID is attached in MessangerService module (../src/shared/lib/MessangerService.ts)
+            // and exist only in request to the server, but not in the response
 
             /** Must be override */
             payload: object;
@@ -55,7 +59,11 @@ namespace IMessangerService {
             };
         }
 
-        export type Any = SendMessage | EditeMessage | DeleteMessage | UpdateMessageReadDate;
+        export interface GetChatMessages extends OutcomingEvent<"get-chat-messages"> {
+            payload: {};
+        }
+
+        export type Any = SendMessage | EditeMessage | DeleteMessage | UpdateMessageReadDate | GetChatMessages;
     }
 
     export namespace IncomingEvent {

@@ -5,7 +5,7 @@ class MessangerServiceEvent<E extends IMessangerService.AnyEvent> {
     public readonly event: IMessangerService.AnyEventName;
     public readonly userID: string;
     public readonly chatID: string;
-    public readonly payload: object;
+    public readonly payload: E["payload"]; // TODO fix typesation for payload, now doesn't work like should
 
     public JSON() {
         return JSON.stringify(this);
@@ -19,8 +19,12 @@ class MessangerServiceEvent<E extends IMessangerService.AnyEvent> {
     }
 }
 
-export class MessangerServiceOutcomingEvent extends MessangerServiceEvent<IMessangerService.OutcomingEvent.Any> {
-    public readonly accessToken = LocalStorageController.accessToken.get();
+export class MessangerServiceOutcomingEvent<
+    E extends IMessangerService.OutcomingEvent.Any = IMessangerService.OutcomingEvent.Any
+> extends MessangerServiceEvent<E> {
+    public accessToken = LocalStorageController.accessToken.get();
 }
 
-export class MessangerServiceIncomingEvent extends MessangerServiceEvent<IMessangerService.IncomingEvent.Any> {}
+export class MessangerServiceIncomingEvent<
+    E extends IMessangerService.IncomingEvent.Any = IMessangerService.IncomingEvent.Any
+> extends MessangerServiceEvent<E> {}

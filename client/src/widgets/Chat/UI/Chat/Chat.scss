@@ -17,6 +17,8 @@
     background-position: center;
 
     &-content {
+        height: calc(100% - 45px);
+
         display: flex;
         flex-direction: column;
 
@@ -38,6 +40,7 @@
     &-messages {
         @include custom-scrollbar(10px, transparent, rgba(50, 50, 50, 0.5));
 
+        height: 100%;
         width: 100%;
         min-width: 450px;
 

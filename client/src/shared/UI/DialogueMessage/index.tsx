@@ -12,11 +12,20 @@ interface DialogueMessageProps extends UiComponentProps<HTMLDivElement> {
     changed?: boolean;
     sendError?: boolean;
     senderName?: string; //Not implemented
-    sendDate?: number; // or already parsed string??
+    sentDate: number; // or already parsed string??
 }
 
 export default function DialogueMessage(props: DialogueMessageProps) {
-    const { className = "", sender, read = false, sendError = false, changed = false, children, ...otherProps } = props;
+    const {
+        className = "",
+        sender,
+        read = false,
+        sendError = false,
+        changed = false,
+        children,
+        sentDate,
+        ...otherProps
+    } = props;
 
     const classes = [
         "TNUI-DialogueMessage",
@@ -24,6 +33,8 @@ export default function DialogueMessage(props: DialogueMessageProps) {
         read ? "" : "TNUI-DialogueMessage-unread",
         className,
     ].join(" ");
+
+    const parsedSentDate = new Date(sentDate);
 
     return (
         <div className={classes} {...otherProps}>
@@ -65,7 +76,9 @@ export default function DialogueMessage(props: DialogueMessageProps) {
                             />
                         )}
                     </span>
-                    <span className="TNUI-DialogueMessage-send-date">08:00</span>
+                    <span className="TNUI-DialogueMessage-send-date">
+                        {parsedSentDate.getHours()}:{parsedSentDate.getMinutes()}
+                    </span>
                 </div>
             </div>
         </div>

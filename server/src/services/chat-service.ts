@@ -17,14 +17,8 @@ class ChatService {
         });
     }
 
-    protected async verifyUserPremission(userID: string, chatID: string) {
-        const requestedChat = await ChatModel.findOne({ _id: chatID });
-
-        if (!requestedChat) {
-            throw new HTTPError(404, "Запрошеный чат не был найден");
-        }
-
-        for (const user of requestedChat.members) {
+    protected async verifyUserPremission(userID: string, chat: IChat) {
+        for (const user of chat.members) {
             if ((user.userID as any) === userID) {
                 return false;
             }
@@ -33,18 +27,48 @@ class ChatService {
         return true;
     }
 
-    public async getChatInfo(chatID: string) {
+    public async getChatInfo(chatID: string, userID: string) {
         if (!ObjectId.isValid(chatID)) {
+            throw new HTTPError(400, "Requested ID has incorrect format");
+        }
+
+        if (!ObjectId.isValid(userID)) {
             throw new HTTPError(400, "Requested ID has incorrect format");
         }
 
         const chat = await ChatModel.findById(chatID);
 
         if (!chat) {
-            throw new HTTPError(404, "Requested chat wasn't found");
+            throw new HTTPError(404, "Запрошеный чат не был найден");
         }
 
-        return this.createChatDTO(chat);
+        if (!this.verifyUserPremission(userID, chat)) {
+            throw new HTTPError(403, "Доступ заблокирован. Недостаточно прав.");
+        }
+
+        return this.createChatDTO(chat!);
+    }
+
+    public async getChatMessages(chatID: string, userID: string) {
+        if (!ObjectId.isValid(chatID)) {
+            throw new HTTPError(400, "Requested ID has incorrect format");
+        }
+
+        if (!ObjectId.isValid(userID)) {
+            throw new HTTPError(400, "Requested ID has incorrect format");
+        }
+
+        const chat = await ChatModel.findById(chatID);
+
+        if (!chat) {
+            throw new HTTPError(404, "Запрошеный чат не был найден");
+        }
+
+        if (!this.verifyUserPremission(userID, chat)) {
+            throw new HTTPError(403, "Доступ заблокирован. Недостаточно прав.");
+        }
+
+        return chat.messages;
     }
 
     public async createDialogueChat(chatName: string, firstUserID: string, secondUserID: string) {
@@ -85,7 +109,7 @@ class ChatService {
             throw new HTTPError(404, "Запрошеный чат не был найден");
         }
 
-        const hasPremission = this.verifyUserPremission(requesterID, chatID);
+        const hasPremission = this.verifyUserPremission(requesterID, requestedChat);
 
         if (!hasPremission) {
             throw new HTTPError(
@@ -108,7 +132,7 @@ class ChatService {
             throw new HTTPError(404, "Запрошеный чат не был найден");
         }
 
-        const hasPremission = this.verifyUserPremission(senderID, chatID);
+        const hasPremission = this.verifyUserPremission(senderID, requestedChat);
 
         if (!hasPremission) {
             throw new HTTPError(403, "Только участники чата могут отправлять в него сообщения.");

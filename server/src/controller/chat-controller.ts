@@ -12,6 +12,12 @@ class ChatController {
         res.setHeader("Accept-Charset", "utf-8");
 
         const requestedID = req.params.id;
+        const userID = req.body.userID;
+
+        if (typeof userID !== "string") {
+            res.status(400).json({ message: "user ID is missing" });
+            return;
+        }
 
         if (!requestedID) {
             res.status(400).json({ message: "Chat ID is missing" });
@@ -19,9 +25,43 @@ class ChatController {
         }
 
         try {
-            const chatInfo = await ChatService.getChatInfo(requestedID);
+            const chatInfo = await ChatService.getChatInfo(requestedID, userID);
 
             res.status(200).json(chatInfo);
+        } catch (err: any) {
+            if (err instanceof HTTPError) {
+                res.status(err.errorCode).json({ message: err.message });
+                return;
+            }
+
+            res.status(500).json({ message: "Что-то пошло не так..." });
+        }
+    }
+
+    public async getChatMessages(req: Request<{ id: string }>, res: Response) {
+        if (res.headersSent) {
+            return;
+        }
+
+        res.setHeader("Accept-Charset", "utf-8");
+
+        const requestedID = req.params.id;
+        const userID = req.body.userID;
+
+        if (typeof userID !== "string") {
+            res.status(400).json({ message: "user ID is missing" });
+            return;
+        }
+
+        if (!requestedID) {
+            res.status(400).json({ message: "Chat ID is missing" });
+            return;
+        }
+
+        try {
+            const chatMessages = await ChatService.getChatMessages(requestedID, userID);
+
+            res.status(200).json(chatMessages);
         } catch (err: any) {
             if (err instanceof HTTPError) {
                 res.status(err.errorCode).json({ message: err.message });
