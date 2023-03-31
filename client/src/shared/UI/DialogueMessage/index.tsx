@@ -5,6 +5,7 @@ import SentAndReadIcon from "@mui/icons-material/DoneAllOutlined";
 import FailedToSendIcon from "@mui/icons-material/CancelOutlined";
 
 import type { UiComponentProps } from "../../types/UI/UiComponentProps";
+import FormatedDate from "../../lib/helpers/FormatedDate";
 
 interface DialogueMessageProps extends UiComponentProps<HTMLDivElement> {
     sender: "user" | "interlocutor";
@@ -34,7 +35,7 @@ export default function DialogueMessage(props: DialogueMessageProps) {
         className,
     ].join(" ");
 
-    const parsedSentDate = new Date(sentDate);
+    const formatedSentDate = new FormatedDate(sentDate);
 
     return (
         <div className={classes} {...otherProps}>
@@ -76,9 +77,7 @@ export default function DialogueMessage(props: DialogueMessageProps) {
                             />
                         )}
                     </span>
-                    <span className="TNUI-DialogueMessage-send-date">
-                        {parsedSentDate.getHours()}:{parsedSentDate.getMinutes()}
-                    </span>
+                    <span className="TNUI-DialogueMessage-send-date">{formatedSentDate.getTime()}</span>
                 </div>
             </div>
         </div>

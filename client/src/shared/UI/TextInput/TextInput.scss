@@ -33,7 +33,6 @@
 
         border: none;
         // background-color: transparent;
-        background-color: $darkGrey;
 
         // Autofill ruins input's background colour
         // https://stackoverflow.com/questions/61083813/how-to-avoid-internal-autofill-selected-style-to-be-applied
@@ -90,33 +89,47 @@
 
 .TNUI-InputWrapper-small .TNUI-InputWrapper {
     &-placeholder {
-        font-size: 16px;
+        font-size: 14px !important;
     }
 }
 
 .TNUI-InputWrapper-medium .TNUI-InputWrapper {
     &-placeholder {
-        font-size: 18px;
+        font-size: 16px !important;
     }
 }
 
 .TNUI-InputWrapper-large .TNUI-InputWrapper {
     &-placeholder {
-        font-size: 20px;
+        font-size: 18px !important;
     }
 }
 
 // =========== Variant style ===========
 
 .TNUI-InputWrapper-default {
-    height: 2rem;
+    &.TNUI-InputWrapper-small {
+        height: 2.25rem;
+    }
 
-    justify-content: flex-end;
+    &.TNUI-InputWrapper-medium {
+        height: 2.5rem;
+    }
+
+    &.TNUI-InputWrapper-large {
+        height: 2.75rem;
+    }
+
+    align-items: flex-end;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.7);
 
     .TNUI-InputWrapper-placeholder {
         color: white;
+    }
+
+    .TNUI-TextInput {
+        background-color: $darkGrey;
     }
 
     &:hover {
@@ -128,9 +141,23 @@
     border-bottom: 2px solid $lightPrimary;
 
     .TNUI-InputWrapper-placeholder {
-        margin: 0 0 25px 5px;
+        margin: 0 0 20px 5px;
 
         color: $lightPrimary;
+    }
+
+    // &.TNUI-InputWrapper-small {}
+
+    &.TNUI-InputWrapper-medium {
+        .TNUI-InputWrapper-placeholder {
+            margin: 0 0 23px 5px;
+        }
+    }
+
+    &.TNUI-InputWrapper-large {
+        .TNUI-InputWrapper-placeholder {
+            margin: 0 0 24px 5px;
+        }
     }
 }
 
@@ -141,7 +168,7 @@
 
     padding: 5px;
 
-    justify-content: flex-end;
+    align-items: flex-end;
 
     background-color: $primaryTransperant0;
 
@@ -150,9 +177,12 @@
     border-top-right-radius: 5px;
 
     .TNUI-InputWrapper-placeholder {
+        font-size: 18px !important;
         color: white;
+    }
 
-        font-size: 22px;
+    .TNUI-TextInput {
+        background-color: transparent;
     }
 }
 
@@ -175,6 +205,10 @@
     border: 1px solid grey;
     border-radius: 5px;
 
+    .TNUI-TextInput {
+        background-color: $darkGrey;
+    }
+
     .TNUI-InputWrapper-placeholder {
         color: rgba(255, 255, 255, 0.7);
     }
@@ -184,11 +218,17 @@
     border-color: $lightPrimary;
 
     .TNUI-InputWrapper-placeholder {
-        margin: -20px 0 0 5px;
+        margin: -45px 0 0 5px;
         padding-inline: 5px;
 
         color: rgba(255, 255, 255, 0.7);
 
         background-color: $darkGrey;
+    }
+
+    &.TNUI-InputWrapper-small {
+        .TNUI-InputWrapper-placeholder {
+            margin-top: -40px;
+        }
     }
 }

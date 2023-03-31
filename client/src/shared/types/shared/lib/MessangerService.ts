@@ -1,26 +1,17 @@
 import HTTPStatusCode from "./HTTPStatusCode";
 
 namespace IMessangerService {
-    /**
-     * This events are dispatching by client. Response on this event will have the same event type.
-     */
-    export type OutcomingEventName =
-        | "send-message"
-        | "establish-connection"
-        | "edite-message"
-        | "delete-message"
-        | "update-message-read-date"
-        | "get-chat-messages";
+    export type OutcomingEventName = OutcomingEvent.Any["event"];
 
-    /**
-     * This events can be dispatched only by server and most of them are errors.
-     */
-    export type IncomingEventName = "access-token-expired" | "validation-error" | "invalid-request" | "unexpected-error";
+    export type IncomingEventName = IncomingEvent.Any["event"];
 
     export type AnyEventName = OutcomingEventName | IncomingEventName;
 
+    /**
+     * This events are dispatching by client. Response on this event will have the same event type.
+     */
     export namespace OutcomingEvent {
-        interface OutcomingEvent<E extends OutcomingEventName> {
+        interface OutcomingEvent<E extends string> {
             event: E;
             chatID: string;
 
@@ -63,9 +54,22 @@ namespace IMessangerService {
             payload: {};
         }
 
-        export type Any = SendMessage | EditeMessage | DeleteMessage | UpdateMessageReadDate | GetChatMessages;
+        export interface EstablishConnection extends OutcomingEvent<"establish-connection"> {
+            payload: {};
+        }
+
+        export type Any =
+            | SendMessage
+            | EditeMessage
+            | DeleteMessage
+            | UpdateMessageReadDate
+            | GetChatMessages
+            | EstablishConnection;
     }
 
+    /**
+     * This events can be dispatched only by server and most of them are errors.
+     */
     export namespace IncomingEvent {
         interface IncomingEvent<P extends object, E extends IncomingEventName> {
             code: HTTPStatusCode;

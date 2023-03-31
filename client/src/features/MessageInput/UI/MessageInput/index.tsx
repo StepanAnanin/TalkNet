@@ -6,14 +6,13 @@ import SendIcon from "@mui/icons-material/SendOutlined";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
-import TextInput from "../../../../shared/UI/TextInput";
 import TextField from "../../../../shared/UI/TextField";
 
 interface MessageInputProps extends UiComponentProps<HTMLDivElement> {
     onSendButtonClick?: (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }
 
-// BUG now has incorrect behavior. Should act like text area html tag, not like input
+// TODO add prop for message size limit
 export default React.forwardRef(function MessageInput(props: MessageInputProps, ref: React.ForwardedRef<HTMLDivElement>) {
     const { className = "", onSendButtonClick, ...otherProps } = props;
 
@@ -21,7 +20,7 @@ export default React.forwardRef(function MessageInput(props: MessageInputProps, 
 
     return (
         <div className={classes} {...otherProps}>
-            <TextField className="TNUI-MessageInput-input" ref={ref}>
+            <TextField className="TNUI-MessageInput-input" wrapperClassName="TNUI-Message-input-wrapper" ref={ref}>
                 <EmojiIcon className="TNUI-MessageInput-input_button" />
             </TextField>
             <SendIcon className="TNUI-MessageInput-send-button" onClick={onSendButtonClick} />

@@ -21,6 +21,7 @@
 
         display: flex;
         flex-direction: column;
+        align-items: center;
 
         flex-grow: 1;
 
@@ -53,8 +54,13 @@
     }
 
     &-message-input {
-        // height: 75px;
+        max-width: 1000px;
 
         margin-bottom: 5px;
+
+        .TNUI-Message-input-wrapper {
+            // 40px — width of send message button (30px) + it's total value of inline margin (10px)
+            width: calc(100% - 40px);
+        }
     }
 }
