@@ -1,10 +1,29 @@
+interface ParsedDate {
+    day: number;
+    month: number;
+    year: number;
+}
+
 export default class FormatedDate {
     protected readonly rawDate: number;
     protected readonly date: Date;
 
+    public readonly parsedDate: ParsedDate;
+
+    public static dayDifference(date1: number, date2: number) {
+        return Math.trunc((date1 - date2) / 1000 / 60 / 60 / 24);
+    }
+
     constructor(date: number) {
         this.rawDate = date;
+
         this.date = new Date(date);
+
+        this.parsedDate = {
+            day: this.date.getDay(),
+            month: this.date.getMonth(),
+            year: this.date.getFullYear(),
+        };
     }
 
     public getTime() {

@@ -49,6 +49,20 @@ class ChatService {
         return this.createChatDTO(chat!);
     }
 
+    public async getUserChatsInfo(userID: string) {
+        if (!ObjectId.isValid(userID)) {
+            throw new HTTPError(400, "Requested userID has incorrect format");
+        }
+
+        const userChats = await ChatModel.find({ members: { $elemMatch: { userID } } });
+
+        if (!userChats) {
+            throw new HTTPError(404, "Не удалось найти информацию о чатах пользователя");
+        }
+
+        return userChats.map((chat) => this.createChatDTO(chat));
+    }
+
     public async getChatMessages(chatID: string, userID: string) {
         if (!ObjectId.isValid(chatID)) {
             throw new HTTPError(400, "Requested ID has incorrect format");

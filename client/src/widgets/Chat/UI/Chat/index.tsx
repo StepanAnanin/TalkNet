@@ -31,6 +31,10 @@ export default function Chat(props: ChatProps) {
     // console.log("ChatID: " + chatID);
 
     React.useEffect(() => {
+        if (!chatID) {
+            return;
+        }
+
         function handleGetChatMessages(e: MessangerServiceOutcomingEvent<IMessangerService.OutcomingEvent.Any>) {
             setMessages((e.payload as DialogueChatMessage[]).reverse());
         }
@@ -75,33 +79,41 @@ export default function Chat(props: ChatProps) {
 
     return (
         <div className={classes} {...otherProps}>
-            <ChatHeader />
-            <div className="TNUI-Chat-content">
-                {messages ? (
-                    <div className="TNUI-Chat-messages">
-                        {messages.map((message) => {
-                            return (
-                                <DialogueMessage
-                                    key={message._id}
-                                    read={!!message.readDate}
-                                    style={{ paddingInline: "5px", marginBlock: "10px" }}
-                                    sender={message.sentBy === user!.id ? "user" : "interlocutor"}
-                                    sentDate={message.sentDate}
-                                >
-                                    {message.data}
-                                </DialogueMessage>
-                            );
-                        })}
+            {chatID ? (
+                <>
+                    <ChatHeader />
+                    <div className="TNUI-Chat-content">
+                        {messages ? (
+                            <div className="TNUI-Chat-messages">
+                                {messages.map((message) => {
+                                    return (
+                                        <DialogueMessage
+                                            key={message._id}
+                                            read={!!message.readDate}
+                                            style={{ paddingInline: "5px", marginBlock: "10px" }}
+                                            sender={message.sentBy === user!.id ? "user" : "interlocutor"}
+                                            sentDate={message.sentDate}
+                                        >
+                                            {message.data}
+                                        </DialogueMessage>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div>no messages</div>
+                        )}
+                        <MessageInput
+                            className="TNUI-Chat-message-input"
+                            ref={messageInputRef}
+                            onSendButtonClick={sendButtonClickHandler}
+                        />
                     </div>
-                ) : (
-                    <div>no messages</div>
-                )}
-                <MessageInput
-                    className="TNUI-Chat-message-input"
-                    ref={messageInputRef}
-                    onSendButtonClick={sendButtonClickHandler}
-                />
-            </div>
+                </>
+            ) : (
+                <span style={{ color: "white", marginTop: "50px", fontSize: "24px", width: "100%", textAlign: "center" }}>
+                    No chat is currently open
+                </span>
+            )}
         </div>
     );
 }

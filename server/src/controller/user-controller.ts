@@ -5,6 +5,7 @@ import HTTPError from "../errors/HTTPError";
 import userModel from "../DB/models/User";
 import userService from "../services/user-service";
 import validateRequest from "../lib/validators/validateRequest";
+import chatService from "../services/chat-service";
 
 class UserContoller {
     public async registrate(req: Request, res: Response) {
@@ -148,6 +149,7 @@ class UserContoller {
         }
     }
 
+    // BUG Now not removing refresh token from cookies for some reason.
     public async logout(req: Request, res: Response) {
         if (res.headersSent) {
             return;
@@ -241,6 +243,36 @@ class UserContoller {
         }
     }
 
+    public async getUserChats(req: Request<{ id: string }>, res: Response) {
+        if (res.headersSent) {
+            return;
+        }
+
+        res.setHeader("Accept-Charset", "utf-8");
+
+        const userID = req.params.id;
+
+        if (typeof userID !== "string") {
+            res.status(400).json({ message: "Missing property 'userID'" });
+            return;
+        }
+
+        try {
+            const userChats = await chatService.getUserChatsInfo(userID);
+
+            res.status(200).json(userChats);
+        } catch (err: any) {
+            if (err instanceof HTTPError && err.errorCode === 401) {
+                res.status(err.errorCode).json({ message: `Требуется аутентификация` });
+                return;
+            }
+
+            res.status(500).json({ message: `Что-то пошло не так...` });
+            console.error(err);
+        }
+    }
+
+    // Require testing
     public async changePassword(req: Request, res: Response) {
         if (res.headersSent) {
             return;
@@ -278,6 +310,7 @@ class UserContoller {
         }
     }
 
+    // Require testing
     public async changeAvatar(req: Request, res: Response) {
         if (res.headersSent) {
             return;

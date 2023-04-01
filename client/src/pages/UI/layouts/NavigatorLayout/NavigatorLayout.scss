@@ -16,7 +16,8 @@ $transitionPrefrences: all 0.25s ease-in-out;
         margin-top: 50px; // Height of the header
 
         .TNUI-NavigatorLayout-navigator {
-            width: 375px;
+            // width: 375px;
+            min-width: 375px;
 
             transition: $transitionPrefrences;
         }
@@ -44,6 +45,7 @@ $transitionPrefrences: all 0.25s ease-in-out;
     &-open {
         .TNUI-NavigatorLayout-navigator {
             width: 0px !important;
+            min-width: 0px !important;
 
             * {
                 display: none;

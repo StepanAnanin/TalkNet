@@ -9,7 +9,7 @@ import chatController from "../controller/chat-controller";
 
 const ChatRouter = Router();
 
-ChatRouter.get("/info/:id", authMiddleware, ChatController.getChatInfo);
+ChatRouter.get("/info/:id", ChatController.getChatInfo);
 ChatRouter.post("/messages/:id", authMiddleware, chatController.getChatMessages);
 ChatRouter.post("/create/dialogue", authMiddleware, ChatController.createDialogueChat);
 ChatRouter.post("/message/:id", authMiddleware, ChatController.sendMessage);
