@@ -4,6 +4,7 @@ export default interface DialogueChat {
     id: string;
     type: "dialogue";
     lastMessage: DialogueChatMessage;
+    messageAmount: number;
     members: [DialogueChatMember, DialogueChatMember];
 }
 

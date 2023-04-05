@@ -48,8 +48,8 @@ export default React.forwardRef(function TextField(props: TextFieldProps, ref: R
     }
 
     return (
-        <div className={wrapperClasses} onClick={onWrapperClick} ref={ref}>
-            <div className={classes} onPaste={onPasteHandler} {...otherProps} role="textbox" contentEditable>
+        <div className={wrapperClasses} onClick={onWrapperClick}>
+            <div className={classes} onPaste={onPasteHandler} {...otherProps} role="textbox" contentEditable ref={ref}>
                 {defaultValue}
             </div>
             {children}

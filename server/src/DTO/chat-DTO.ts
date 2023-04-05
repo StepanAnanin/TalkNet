@@ -7,6 +7,7 @@ type constructorModel = {
     type: ChatType;
     members: ChatMember[];
     lastMessage: ChatMessage | null;
+    messageAmount: number;
 };
 
 export default class ChatDTO {
@@ -14,11 +15,13 @@ export default class ChatDTO {
     public type: ChatType;
     public members: ChatMember[];
     public lastMessage: ChatMessage | null;
+    public messageAmount: number;
 
     constructor(model: constructorModel) {
         this.id = model.id;
         this.type = model.type;
         this.members = model.members;
         this.lastMessage = model.lastMessage;
+        this.messageAmount = model.messageAmount;
     }
 }

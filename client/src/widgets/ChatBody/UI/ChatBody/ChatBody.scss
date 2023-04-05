@@ -2,7 +2,7 @@
 @import "../../../../app/styles/variables.scss";
 @import "../../../../app/styles/screen-breakpoints.scss";
 
-.TNUI-Chat {
+.TNUI-ChatBody {
     height: 100%;
     width: 100%;
 
@@ -17,7 +17,7 @@
     background-position: center;
 
     &-content {
-        height: calc(100% - 45px);
+        height: calc(100% - 50px);
 
         display: flex;
         flex-direction: column;

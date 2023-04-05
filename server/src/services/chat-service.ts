@@ -14,6 +14,7 @@ class ChatService {
             type: chat.type,
             members: chat.members,
             lastMessage: chat.messages.at(-1) ?? null,
+            messageAmount: chat.messages.length,
         });
     }
 
@@ -166,9 +167,9 @@ class ChatService {
         // BUG be careful with spreading mongoDB objects, it's work incorrectly. Use ".toObject()" method on it to prevent this.
         // This is supposed to be a mongoose problem.
         // https://stackoverflow.com/questions/48014504/es6-spread-operator-mongoose-result-copy
-        const { _id, ...messageData }: ChatMessage = requestedChat.messages.at(-1)!.toObject();
+        const messageData: ChatMessage = requestedChat.messages.at(-1)!.toObject();
 
-        return { id: _id, ...messageData };
+        return messageData;
     }
 }
 

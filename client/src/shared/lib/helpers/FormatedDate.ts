@@ -5,13 +5,30 @@ interface ParsedDate {
 }
 
 export default class FormatedDate {
-    protected readonly rawDate: number;
     protected readonly date: Date;
 
+    public readonly rawDate: number;
     public readonly parsedDate: ParsedDate;
 
     public static dayDifference(date1: number, date2: number) {
-        return Math.trunc((date1 - date2) / 1000 / 60 / 60 / 24);
+        const firstDate = new Date(date1);
+        const secondDate = new Date(date2);
+
+        firstDate.setHours(0, 0, 0, 0);
+        secondDate.setHours(0, 0, 0, 0);
+
+        return Math.trunc((firstDate.getTime() - secondDate.getTime()) / 1000 / 60 / 60 / 24);
+    }
+
+    public static isYesterday(rawTargetDate: number, rawCheckDate: number) {
+        const checkDate = new Date(rawCheckDate);
+        const yesterdayTargetDate = new Date(rawTargetDate);
+
+        checkDate.setHours(0, 0, 0, 0);
+        yesterdayTargetDate.setHours(0, 0, 0, 0);
+        yesterdayTargetDate.setDate(yesterdayTargetDate.getDate() - 1);
+
+        return checkDate.getTime() === yesterdayTargetDate.getTime();
     }
 
     constructor(date: number) {

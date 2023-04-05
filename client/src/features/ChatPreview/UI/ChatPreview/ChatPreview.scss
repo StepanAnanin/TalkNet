@@ -10,11 +10,17 @@ $ChatPreviewHeight: 70px;
     align-items: center;
     justify-content: center;
 
+    margin-bottom: 5px;
+
     border-radius: 10px;
+
+    background-color: #1f1f24;
 
     overflow: hidden;
 
     cursor: pointer;
+
+    transition: background-color 0.15s ease-in-out;
 
     &:hover {
         background-color: $darkGrey;
@@ -22,7 +28,6 @@ $ChatPreviewHeight: 70px;
 
     &.TNUI-ChatPreview-active {
         background-color: $darkestPrimary;
-        // background-color: $grey;
     }
 
     &-avatar {
@@ -35,14 +40,57 @@ $ChatPreviewHeight: 70px;
         display: flex;
         flex-direction: column;
 
-        &_chat-name {
-            margin-bottom: 5px;
+        margin-right: 10px;
 
-            color: white;
+        &-top {
+            display: flex;
+            margin-bottom: 2.5px;
 
-            font-size: 18px;
+            &_unread-messages {
+                max-width: 50px;
+                min-width: 25px;
+                height: 20px;
 
-            user-select: none;
+                display: flex;
+                align-self: center;
+                align-items: center;
+                justify-content: center;
+
+                margin-right: 5px;
+                padding-inline: 5px;
+
+                border-radius: 7px;
+
+                font-size: 15px;
+
+                background-color: white;
+                color: black;
+            }
+
+            &_chat-name {
+                flex-grow: 1;
+
+                color: white;
+
+                font-size: 16.5px;
+
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                user-select: none;
+            }
+
+            &_last-message-sent-date {
+                display: flex;
+                justify-content: flex-end;
+
+                min-width: 65px;
+
+                font-size: 12.5px;
+
+                color: rgba(255, 255, 255, 0.75);
+            }
         }
 
         &_last-message {

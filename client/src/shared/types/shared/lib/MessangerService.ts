@@ -1,5 +1,7 @@
 import HTTPStatusCode from "./HTTPStatusCode";
 
+// TODO need to add an additional property for events which will define is it request or response.
+// This needed cuz payloads of request and response are different
 namespace IMessangerService {
     export type OutcomingEventName = OutcomingEvent.Any["event"];
 

@@ -12,7 +12,7 @@ Entire application now consist of 3 main parts (services):
 
 -   `Messenger Service` is used to update info about messages and chats in real time by using WebSocket protocol.
 
-This services architecture:
+This services' architectures:
 
 > `Client` — Feature Sliced Design
 
@@ -23,7 +23,7 @@ This services architecture:
 ## Cross-Service data flow
 
 Was decided to don't give `Messenger Service` access to the data base.<br/>
-Because MongoDB doesn't provide data standardization, this decision excludes errors related to incorrect data formats in data base's documents cuz only `Main Server` has access to data base.<br/>
+Because MongoDB doesn't provide data standardization, this decision excludes errors related to incorrect data formats in data base's documents cuz only `Main Server` has access to the data base.<br/>
 This decision also increases speed of development and reliability.
 
 Doing so `Messenger Service` become acting like some type of proxy and this will have the same problems which have proxy technology, and the main of them is increasing the time to wait for a response from the server.
