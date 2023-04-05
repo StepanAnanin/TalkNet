@@ -7,7 +7,6 @@ dist/temp/*
 !dist/static
 !dist/README.txt
 !dist/temp
-!dist/.env
 
 /.pnp
 .pnp.js
