@@ -4,8 +4,9 @@ import MessangerServiceResponse from "../lib/MessangerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 
 import type { GetChatMessagesEvent } from "../types/WebSocket/Events";
+import { Socket } from "socket.io";
 
-export default async function GetChatMessagesEventHandler(event: GetChatMessagesEvent, ws: WebSocket.WebSocket) {
+export default async function GetChatMessagesEventHandler(event: GetChatMessagesEvent, socket: Socket<any, any, any, any>) {
     const requestOptions = new TalkNetAPIRequestOptions("/chat/messages/" + event.chatID, "POST", event.accessToken);
 
     // TODO move this to a new fuction or class method
@@ -18,7 +19,7 @@ export default async function GetChatMessagesEventHandler(event: GetChatMessages
 
             // Checking access token
             if (response.statusCode === 401 && responsePayload.tokenExpired) {
-                ws.send(
+                socket.send(
                     new MessangerServiceResponse(response.statusCode, "access-token-expired", {
                         message: responsePayload.message,
                     }).JSON()
@@ -28,7 +29,7 @@ export default async function GetChatMessagesEventHandler(event: GetChatMessages
 
             // If error
             if (response.statusCode! >= 400) {
-                ws.send(
+                socket.send(
                     new MessangerServiceResponse(response.statusCode!, "unexpected-error", {
                         message: responsePayload.message,
                     }).JSON()
@@ -36,8 +37,10 @@ export default async function GetChatMessagesEventHandler(event: GetChatMessages
                 return;
             }
 
+            // console.log(responsePayload);
+
             // If success
-            ws.send(new MessangerServiceResponse(200, "get-chat-messages", responsePayload).JSON());
+            socket.send(new MessangerServiceResponse(200, "get-chat-messages", responsePayload).JSON());
         });
 
         // response.on("end", function () {});

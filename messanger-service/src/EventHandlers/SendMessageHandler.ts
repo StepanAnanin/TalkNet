@@ -1,11 +1,12 @@
+import type { SendMessageEvent } from "../types/WebSocket/Events";
+
 import WebSocket from "ws";
 import http from "http";
 import MessangerServiceResponse from "../lib/MessangerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
+import { Socket } from "socket.io";
 
-import type { SendMessageEvent } from "../types/WebSocket/Events";
-
-export default async function SendMessageEventHandler(event: SendMessageEvent, ws: WebSocket.WebSocket) {
+export default async function SendMessageEventHandler(event: SendMessageEvent, socket: Socket<any, any, any, any>) {
     const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.chatID, "POST", event.accessToken);
 
     // @ts-ignore
@@ -17,7 +18,7 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, w
 
             // Checking access token
             if (response.statusCode === 401 && responsePayload.tokenExpired) {
-                ws.send(
+                socket.send(
                     new MessangerServiceResponse(response.statusCode, "access-token-expired", {
                         message: responsePayload.message,
                     }).JSON()
@@ -27,7 +28,7 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, w
 
             // If error
             if (response.statusCode! >= 400) {
-                ws.send(
+                socket.send(
                     new MessangerServiceResponse(response.statusCode!, "unexpected-error", {
                         message: responsePayload.message,
                     }).JSON()
@@ -38,7 +39,12 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, w
             console.log(responsePayload);
 
             // If success
-            ws.send(new MessangerServiceResponse(200, "send-message", responsePayload).JSON());
+            socket.send(new MessangerServiceResponse(200, "send-message", responsePayload).JSON());
+
+            // socket.broadcast.emit(
+            //     "receive-message",
+            //     new MessangerServiceResponse(200, "send-message", responsePayload).JSON()
+            // );
         });
 
         // response.on("end", function () {});

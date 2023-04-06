@@ -1,6 +1,6 @@
 {
     "name": "talk-net-client",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "private": true,
     "dependencies": {
         "@emotion/react": "^11.10.5",
@@ -23,6 +23,7 @@
         "react-scripts": "5.0.1",
         "redux": "^4.2.1",
         "sass": "^1.58.0",
+        "socket.io-client": "^4.6.1",
         "typescript": "^4.9.5",
         "web-vitals": "^2.1.4"
     },

@@ -4,15 +4,19 @@ import getChatMessagesHandler from "./EventHandlers/GetChatMessagesHandler";
 import validateEvent from "./lib/validators/ValidateEvent";
 
 import type AnyEvent from "./types/WebSocket/Events";
+import { Socket } from "socket.io";
 import MessangerServiceResponse from "./lib/MessangerServiceResponse";
 
-export default async function dispatchEvent(message: string, ws: WebSocket.WebSocket) {
+// socket generics are temp
+export default async function dispatchEvent(message: string, socket: Socket<any, any, any, any>) {
     const parsedMessage: AnyEvent = JSON.parse(message);
 
     const validationResult = validateEvent(parsedMessage);
 
+    // console.log(message);
+
     if (!validationResult.ok) {
-        ws.send(
+        socket.send(
             JSON.stringify(
                 new MessangerServiceResponse(400, "validation-error", {
                     message: `Validation Error: ${validationResult.message}`,
@@ -24,13 +28,13 @@ export default async function dispatchEvent(message: string, ws: WebSocket.WebSo
 
     switch (parsedMessage.event) {
         case "send-message":
-            await sendMessageHandler(parsedMessage, ws);
+            await sendMessageHandler(parsedMessage, socket);
             break;
         case "get-chat-messages":
-            await getChatMessagesHandler(parsedMessage, ws);
+            await getChatMessagesHandler(parsedMessage, socket);
             break;
         default:
-            ws.send(JSON.stringify(new MessangerServiceResponse(400, "invalid-request", { message: "Wrong event" })));
+            socket.send(JSON.stringify(new MessangerServiceResponse(400, "invalid-request", { message: "Wrong event" })));
             break;
     }
 }

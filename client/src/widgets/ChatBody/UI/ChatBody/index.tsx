@@ -111,6 +111,8 @@ export default function ChatBody(props: ChatProps) {
                         {messages ? (
                             <div className="TNUI-ChatBody-messages">
                                 {messages.map((message, index, arr) => {
+                                    // BUG There are error if no messages today
+
                                     // Keep in mind that this array is inverted.
                                     const nextMessage = arr[index - 1];
                                     const prevMessage = arr[index + 1];
