@@ -8,9 +8,18 @@ import { useChat } from "../../../../../../entities/Chat";
 
 export default function Chats() {
     const { user } = useTypedSelector((state) => state.auth);
-    const userChats = useChat();
+    const { userChats, connect, isChatsConnectionEstablised } = useChat();
     const location = useLocation();
+
     const currentChatID = new URLSearchParams(location.search).get("chat");
+
+    React.useEffect(() => {
+        if (!userChats || isChatsConnectionEstablised) {
+            return;
+        }
+
+        connect(userChats.map((chat) => chat.id));
+    }, [userChats]);
 
     if (!user) {
         throw new Error(`Необходима авторизация`);

@@ -4,27 +4,29 @@ import LocalStorageController from "./LocalStorageController";
 import { MessangerServiceOutcomingEvent } from "./MessangerServiceEvent";
 import { io, Socket } from "socket.io-client";
 
-export default class IOMessengerService {
-    public static readonly incomingEventMap: IMessangerService.IncomingEventName[] = [
+export default class IMessengerService {
+    public static readonly incomingEventMap: readonly IMessangerService.IncomingEventName[] = [
+        "receive-message",
         "access-token-expired",
         "invalid-request",
         "unexpected-error",
         "validation-error",
-    ];
+    ] as const;
 
-    public static readonly outcomingEventMap: IMessangerService.OutcomingEventName[] = [
+    public static readonly outcomingEventMap: readonly IMessangerService.OutcomingEventName[] = [
         "delete-message",
         "edite-message",
         "establish-connection",
+        "connect-to-chats",
         "get-chat-messages",
         "send-message",
         "update-message-read-date",
-    ];
+    ] as const;
 
-    public static readonly eventMap: IMessangerService.AnyEventName[] = [
+    public static readonly eventMap: readonly IMessangerService.AnyEventName[] = [
         ...this.incomingEventMap,
         ...this.outcomingEventMap,
-    ];
+    ] as const;
 
     protected readonly socket: ReturnType<typeof io>;
 
@@ -50,6 +52,12 @@ export default class IOMessengerService {
             }
             console.log("[Messenger Service] Код: " + event.code + " причина: " + event.reason);
         });
+
+        this.socket.on("connect-to-chats", function (event) {
+            const parsedEvent = JSON.parse(event);
+
+            console.log("[Messenger Service] " + parsedEvent.payload.message);
+        });
     }
 
     public close() {
@@ -70,7 +78,7 @@ export default class IOMessengerService {
 
         lastOutcomingEvent.accessToken = LocalStorageController.accessToken.get();
 
-        this.socket.emit("message", lastOutcomingEvent.JSON());
+        this.socket.emit(lastOutcomingEvent.event, lastOutcomingEvent.JSON());
 
         this.wasLastOutcomingEventRepeat = true;
     }
@@ -78,7 +86,7 @@ export default class IOMessengerService {
     protected emitEvent(event: IMessangerService.OutcomingEvent.Any) {
         const outcomingEvent = new MessangerServiceOutcomingEvent(this.user!.id, event);
 
-        this.socket.emit("message", outcomingEvent.JSON());
+        this.socket.emit(outcomingEvent.event, outcomingEvent.JSON());
 
         this.lastOutcomingEvent = outcomingEvent;
     }
@@ -87,100 +95,11 @@ export default class IOMessengerService {
         this.emitEvent(sendMessageEvent);
     }
 
+    public connectToChats(connectToChatsEvent: IMessangerService.OutcomingEvent.ConnectToChats) {
+        this.emitEvent(connectToChatsEvent);
+    }
+
     public getChatMessages(getChatMessagesEvent: IMessangerService.OutcomingEvent.GetChatMessages) {
         this.emitEvent(getChatMessagesEvent);
-    }
-}
-
-export class MessangerService extends WebSocket {
-    public static readonly incomingEventMap: IMessangerService.IncomingEventName[] = [
-        "access-token-expired",
-        "invalid-request",
-        "unexpected-error",
-        "validation-error",
-    ];
-
-    public static readonly outcomingEventMap: IMessangerService.OutcomingEventName[] = [
-        "delete-message",
-        "edite-message",
-        "establish-connection",
-        "get-chat-messages",
-        "send-message",
-        "update-message-read-date",
-    ];
-
-    public static readonly eventMap: IMessangerService.AnyEventName[] = [
-        ...this.incomingEventMap,
-        ...this.outcomingEventMap,
-    ];
-
-    protected user: User;
-
-    protected lastOutcomingEvent: MessangerServiceOutcomingEvent | null = null;
-
-    protected wasLastOutcomingEventRepeat = false;
-
-    constructor(url: string | URL, user: User, protocols?: string | string[]) {
-        super(url, protocols);
-
-        this.user = user;
-
-        this.onerror = function (err) {
-            console.error(err);
-        };
-
-        this.onclose = function (event) {
-            if (event.wasClean) {
-                console.log("Соединение закрыто чисто");
-            } else {
-                console.log("Обрыв соединения");
-            }
-            console.log("Код: " + event.code + " причина: " + event.reason);
-        };
-    }
-
-    public repeatLastOutcomingEvent() {
-        const lastOutcomingEvent = this.lastOutcomingEvent;
-
-        if (!lastOutcomingEvent) {
-            console.warn(`There are no previous outcoming events`);
-            return;
-        }
-
-        if (this.wasLastOutcomingEventRepeat) {
-            return;
-        }
-
-        if (this.readyState) {
-            lastOutcomingEvent.accessToken = LocalStorageController.accessToken.get();
-
-            this.send(lastOutcomingEvent.JSON());
-
-            this.wasLastOutcomingEventRepeat = true;
-
-            return;
-        }
-
-        setTimeout(() => this.repeatLastOutcomingEvent(), 50);
-    }
-
-    protected wsSend(event: IMessangerService.OutcomingEvent.Any) {
-        const outcomingEvent = new MessangerServiceOutcomingEvent(this.user!.id, event);
-
-        if (this.readyState) {
-            this.send(outcomingEvent.JSON());
-            this.lastOutcomingEvent = outcomingEvent;
-            return;
-        }
-
-        setTimeout(() => this.wsSend(event), 50);
-    }
-
-    public sendMessage(sendMessageEvent: IMessangerService.OutcomingEvent.SendMessage) {
-        this.wsSend(sendMessageEvent);
-    }
-
-    public getChatMessages(getChatMessagesEvent: IMessangerService.OutcomingEvent.GetChatMessages) {
-        this.wsSend(getChatMessagesEvent);
     }
 }

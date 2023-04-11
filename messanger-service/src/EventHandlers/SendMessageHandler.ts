@@ -36,15 +36,23 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, s
                 return;
             }
 
-            console.log(responsePayload);
+            const chatID = responsePayload.chatID;
+
+            if (typeof chatID !== "string") {
+                socket.send(
+                    new MessangerServiceResponse(response.statusCode!, "unexpected-error", {
+                        message: "[Messenger Service Internal Error] Не удалось получить ID чата",
+                    }).JSON()
+                );
+                return;
+            }
 
             // If success
             socket.send(new MessangerServiceResponse(200, "send-message", responsePayload).JSON());
 
-            // socket.broadcast.emit(
-            //     "receive-message",
-            //     new MessangerServiceResponse(200, "send-message", responsePayload).JSON()
-            // );
+            socket
+                .to(chatID)
+                .emit("receive-message", new MessangerServiceResponse(200, "receive-message", responsePayload).JSON());
         });
 
         // response.on("end", function () {});

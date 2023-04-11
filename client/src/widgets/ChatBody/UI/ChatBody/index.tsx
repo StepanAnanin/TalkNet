@@ -8,9 +8,9 @@ import MessageInput from "../../../../features/MessageInput";
 import DialogueMessage from "../../../../shared/UI/DialogueMessage";
 import ChatHeader from "../../../../features/ChatHeader";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import useMessangerService from "../../../../shared/model/hooks/useMessangerService";
+import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
 import IMessangerService from "../../../../shared/types/shared/lib/MessangerService";
-import { MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
+import { MessangerServiceIncomingEvent, MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
 import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
 import MessageBlockDateDivider from "../MessageBlockDateDivider";
 
@@ -29,7 +29,7 @@ export default function ChatBody(props: ChatProps) {
     const prevMessageSentDateDayDifferenceRef = React.useRef(0);
 
     const { user } = useTypedSelector((state) => state.auth);
-    const MessangerServiceConnection = useMessangerService();
+    const MessangerServiceConnection = useMessengerService();
 
     // console.log("ChatID: " + chatID);
 
@@ -49,19 +49,28 @@ export default function ChatBody(props: ChatProps) {
             setMessages((p) => [message, ...p]);
         }
 
+        function handleReceiveMessage(e: MessangerServiceIncomingEvent<IMessangerService.IncomingEvent.Any>) {
+            setMessages((p) => [e.payload as DialogueChatMessage, ...p]);
+        }
+
         MessangerServiceConnection.addOutcomingEventHandler("get-chat-messages", handleGetChatMessages);
 
         MessangerServiceConnection.addOutcomingEventHandler("send-message", handleSendMessage);
 
+        MessangerServiceConnection.addIncomingEventHandler("receive-message", handleReceiveMessage);
+
         MessangerServiceConnection.dispathOutcomingEvent({
-            chatID: chatID!,
+            chatID: null, //TODO remove this
             event: "get-chat-messages",
-            payload: {},
+            payload: {
+                chatID: chatID!,
+            },
         });
 
         return function () {
             MessangerServiceConnection.removeOutcomingEventHandler("get-chat-messages", handleGetChatMessages);
             MessangerServiceConnection.removeOutcomingEventHandler("send-message", handleSendMessage);
+            MessangerServiceConnection.removeIncomingEventHandler("receive-message", handleReceiveMessage);
             MessangerServiceConnection.closeConnection();
         };
     }, []);
@@ -80,9 +89,9 @@ export default function ChatBody(props: ChatProps) {
         }
 
         MessangerServiceConnection.dispathOutcomingEvent({
-            chatID: chatID!,
+            chatID: null, // TODO remove this
             event: "send-message",
-            payload: { message: inputedMessage, sentDate: Date.now() },
+            payload: { chatID: chatID!, message: inputedMessage, sentDate: Date.now() },
         });
 
         inputElement.innerText = "";
@@ -165,6 +174,7 @@ export default function ChatBody(props: ChatProps) {
                     </div>
                 </>
             ) : (
+                // TODO fix it
                 <span style={{ color: "white", marginTop: "50px", fontSize: "24px", width: "100%", textAlign: "center" }}>
                     No chat is currently open
                 </span>

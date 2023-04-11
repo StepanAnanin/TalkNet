@@ -1,3 +1,4 @@
+import DialogueChatMessage from "../DialogueChatMessage";
 import HTTPStatusCode from "./HTTPStatusCode";
 
 // TODO need to add an additional property for events which will define is it request or response.
@@ -13,9 +14,10 @@ namespace IMessangerService {
      * This events are dispatching by client. Response on this event will have the same event type.
      */
     export namespace OutcomingEvent {
+        // TODO remove chatID from there
         interface OutcomingEvent<E extends string> {
             event: E;
-            chatID: string;
+            chatID: string | null;
 
             // usedID is attached in MessangerService module (../src/shared/lib/MessangerService.ts)
             // and exist only in request to the server, but not in the response
@@ -26,6 +28,7 @@ namespace IMessangerService {
 
         export interface SendMessage extends OutcomingEvent<"send-message"> {
             payload: {
+                chatID: string;
                 message: string;
                 sentDate: number;
             };
@@ -52,8 +55,16 @@ namespace IMessangerService {
             };
         }
 
+        export interface ConnectToChats extends OutcomingEvent<"connect-to-chats"> {
+            payload: {
+                userChatsIDs: string[];
+            };
+        }
+
         export interface GetChatMessages extends OutcomingEvent<"get-chat-messages"> {
-            payload: {};
+            payload: {
+                chatID: string;
+            };
         }
 
         export interface EstablishConnection extends OutcomingEvent<"establish-connection"> {
@@ -66,6 +77,7 @@ namespace IMessangerService {
             | DeleteMessage
             | UpdateMessageReadDate
             | GetChatMessages
+            | ConnectToChats
             | EstablishConnection;
     }
 
@@ -80,6 +92,8 @@ namespace IMessangerService {
             payload: P;
         }
 
+        export type ReceiveMessage = IncomingEvent<DialogueChatMessage, "receive-message">;
+
         export type AccessTokenExpiredError<P extends object> = IncomingEvent<P, "access-token-expired">;
 
         export type InvalidRequest<P extends object> = IncomingEvent<P, "invalid-request">;
@@ -89,6 +103,7 @@ namespace IMessangerService {
         export type UnexpectedError<P extends object> = IncomingEvent<P, "unexpected-error">;
 
         export type Any =
+            | ReceiveMessage
             | AccessTokenExpiredError<object>
             | InvalidRequest<object>
             | ValidationError<object>

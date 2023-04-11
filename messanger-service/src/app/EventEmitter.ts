@@ -1,19 +1,22 @@
 import WebSocket from "ws";
-import sendMessageHandler from "./EventHandlers/SendMessageHandler";
-import getChatMessagesHandler from "./EventHandlers/GetChatMessagesHandler";
-import validateEvent from "./lib/validators/ValidateEvent";
+import sendMessageHandler from "../EventHandlers/SendMessageHandler";
+import getChatMessagesHandler from "../EventHandlers/GetChatMessagesHandler";
+import validateEvent from "../lib/validators/ValidateEvent";
+import MessangerServiceResponse from "../lib/MessangerServiceResponse";
 
-import type AnyEvent from "./types/WebSocket/Events";
-import { Socket } from "socket.io";
-import MessangerServiceResponse from "./lib/MessangerServiceResponse";
+import type AnyEvent from "../types/WebSocket/Events";
+import type { Socket } from "socket.io";
 
-// socket generics are temp
-export default async function dispatchEvent(message: string, socket: Socket<any, any, any, any>) {
+// TODO socket generics are temp
+export default async function EventEmitter(message: string, socket: Socket<any, any, any, any>) {
     const parsedMessage: AnyEvent = JSON.parse(message);
 
     const validationResult = validateEvent(parsedMessage);
 
-    // console.log(message);
+    // @ts-ignore
+    if (parsedMessage.event === "connect-to-chats") {
+        return;
+    }
 
     if (!validationResult.ok) {
         socket.send(

@@ -7,18 +7,6 @@ import Avatar from "../../shared/UI/Avatar";
 import Menu from "../../shared/UI/Menu";
 import MenuItem from "../../shared/UI/MenuItem";
 
-import { io } from "socket.io-client";
-import MessangerServiceURL from "../../shared/lib/URL/MessangerServiceURL";
-
-const IOMessengerService = io(MessangerServiceURL);
-
-IOMessengerService.on("connect", () => {
-    // console.log(1);
-    IOMessengerService.on("message", (m) => {
-        console.log(m);
-    });
-});
-
 export default function HomePage() {
     const { user } = useTypedSelector((state) => state.auth);
 

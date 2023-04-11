@@ -11,11 +11,17 @@ import MessangerService from "../../lib/MessangerService";
 import { MessangerServiceIncomingEvent, MessangerServiceOutcomingEvent } from "../../lib/MessangerServiceEvent";
 
 /**
+ * If move it inside of hook, then connection will be closed and open on each call of useMessengerService,
+ * this will ruin intended behavior of this hook
+ */
+const MessangerServiceConnectionRef: { current: MessangerService | null } = { current: null };
+
+/**
  * @returns `MessangerServiceConnection` object
  *
  * All error events are logged in console by default.
  */
-export default function useMessangerService() {
+export default function useMessengerService() {
     const { user } = useTypedSelector((state) => state.auth);
     const dispatch = useTypedDispatch();
 
@@ -24,11 +30,10 @@ export default function useMessangerService() {
     const [lastIncomingEvent, setLastIncomingEvent] = React.useState<MessangerServiceIncomingEvent | null>(null);
     const [lastOutcomingEvent, setLastOutcomingEvent] = React.useState<MessangerServiceOutcomingEvent | null>(null);
 
-    const MessangerServiceConnectionRef = React.useRef<MessangerService | null>(null);
     const lastEventRef = React.useRef<IMessangerService.OutcomingEvent.Any | null>(null);
 
     if (!user) {
-        throw new Error(`Messanger service connection require authorization`);
+        throw new Error(`[Messenger Service] Connection require authorization`);
     }
 
     if (!(MessangerServiceConnectionRef.current instanceof MessangerService)) {
@@ -37,19 +42,30 @@ export default function useMessangerService() {
 
     function establishConnection() {
         if (MessangerServiceConnectionRef.current instanceof MessangerService) {
-            console.warn("[Messender Service] Connection already established");
+            console.warn("[Messenger Service] Connection already established");
             return;
         }
 
         const socket = io(MessangerServiceURL);
 
+        // TODO temp
+        socket.on("receive-message", (m) => {
+            setLastIncomingEvent(new MessangerServiceIncomingEvent(user!.id, JSON.parse(m)));
+        });
+
+        // There are handled all events dispatched through '.send' method. (this is about server)
+        // Events that was dispatched through '.emit' must be handled like: socket.on("<event name>", <handler>)
+        // TODO Require refatoring: remove this, and dispatch all events only through '.emit'.
         socket.on("message", async function (rawEvent: string) {
             const messangerServiceConnection = MessangerServiceConnectionRef.current!;
 
             const parsedEvent: IMessangerService.AnyEvent = JSON.parse(rawEvent);
 
-            // Handling incoming errors
+            // Handling incoming events
             switch (parsedEvent.event) {
+                case "receive-message":
+                    // Handled above
+                    return;
                 case "access-token-expired":
                     console.log("[Messenger Service] Request error: Access token expired. Updating...");
 
@@ -124,6 +140,18 @@ export default function useMessangerService() {
                 throw new Error("Not implemented");
             case "update-message-read-date":
                 throw new Error("Not implemented");
+            case "connect-to-chats":
+                const connectToChatsEvent: IMessangerService.OutcomingEvent.ConnectToChats = {
+                    chatID: connectionEvent.chatID,
+                    event: "connect-to-chats",
+                    payload: connectionEvent.payload,
+                };
+
+                lastEventRef.current = connectToChatsEvent;
+
+                MessangerServiceConnection.connectToChats(connectToChatsEvent);
+
+                break;
             case "get-chat-messages":
                 const getChatMessagesEvent: IMessangerService.OutcomingEvent.GetChatMessages = {
                     chatID: connectionEvent.chatID,

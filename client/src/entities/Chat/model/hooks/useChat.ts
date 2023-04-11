@@ -3,23 +3,25 @@ import React from "react";
 import type IMessengerService from "../../../../shared/types/shared/lib/MessangerService";
 import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
-import useMessengerService from "../../../../shared/model/hooks/useMessangerService";
+import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import { MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
+import { MessangerServiceIncomingEvent, MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
 import DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
 
-/**
- * @returns Currently authorized user's chats or null, if loading.
- */
 export default function useChat() {
-    const [userChats, setUserChats] = React.useState<DialogueChat[] | null>(null);
+    const { user } = useTypedSelector((state) => state.auth);
+
+    if (!user) {
+        throw new Error(`useChat hook require authorization`);
+    }
 
     // This needed cuz userChats is enclosed, hence will have incorrect value in functions declared in this scope (like updateChatInfo).
     // This is a fucked way to fix that, but I didn’t come up with a better one.
     const userChatsRef = React.useRef<DialogueChat[] | null>(null);
 
-    const { user } = useTypedSelector((state) => state.auth);
+    const [userChats, setUserChats] = React.useState<DialogueChat[] | null>(null);
+    const [isChatsConnectionEstablised, setIsChatsConnectionEstablised] = React.useState(false);
 
     const messengerServiceConnection = useMessengerService();
 
@@ -27,18 +29,20 @@ export default function useChat() {
         userChatsRef.current = userChats;
     }, [userChats]);
 
-    if (!user) {
-        throw new Error(`useChat hook require authorization`);
-    }
-
     // TODO check is there a point to close messenger service connection
     React.useEffect(() => {
-        // Strange name, but it's very useful for debugging, cuz handler "handleSendMessage" already exist.
-        function updateMessageAmountOnSendMessage(e: MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>) {
-            updateChatInfo(e.chatID, e.payload as DialogueChatMessage);
+        function updateMessageAmount(
+            e:
+                | MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>
+                | MessangerServiceIncomingEvent<IMessengerService.IncomingEvent.Any>
+        ) {
+            updateChatInfo((e.payload as any).chatID, e.payload as DialogueChatMessage);
         }
 
-        messengerServiceConnection.addOutcomingEventHandler("send-message", updateMessageAmountOnSendMessage);
+        // function connectToChatsHandler(e: MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>) {}
+
+        messengerServiceConnection.addOutcomingEventHandler("send-message", updateMessageAmount);
+        messengerServiceConnection.addIncomingEventHandler("receive-message", updateMessageAmount);
 
         (async function () {
             const response = await TalkNetAPI.get(`/user/${user.id}/chats`);
@@ -47,7 +51,8 @@ export default function useChat() {
         })();
 
         return function () {
-            messengerServiceConnection.removeOutcomingEventHandler("send-message", updateMessageAmountOnSendMessage);
+            messengerServiceConnection.removeOutcomingEventHandler("send-message", updateMessageAmount);
+            messengerServiceConnection.removeIncomingEventHandler("receive-message", updateMessageAmount);
         };
     }, []);
 
@@ -72,9 +77,23 @@ export default function useChat() {
         setUserChats((p) => [...p!]);
     }
 
-    if (!userChats) {
-        return null;
+    /**
+     * Connecting to all user's chats
+     */
+    function connect(userChatsIDs: string[]) {
+        if (isChatsConnectionEstablised) {
+            console.warn("Connection to chats already established");
+            return;
+        }
+
+        messengerServiceConnection.dispathOutcomingEvent({
+            event: "connect-to-chats",
+            chatID: null, // TODO remove this
+            payload: { userChatsIDs: userChatsIDs },
+        });
+
+        setIsChatsConnectionEstablised(true);
     }
 
-    return userChats;
+    return { userChats, connect, isChatsConnectionEstablised };
 }
