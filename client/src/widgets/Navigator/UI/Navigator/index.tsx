@@ -44,7 +44,7 @@ export default function Navigator(props: NavigatorProps) {
 
     return (
         <div className={classes} {...otherProps}>
-            <NavigatorHeader />
+            <NavigatorHeader addButtonLabel={explorerTarget !== "settings" ? "Добавить" : undefined} />
             <NavigatorExplorer target={explorerTarget} />
         </div>
     );

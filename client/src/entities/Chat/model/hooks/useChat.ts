@@ -23,11 +23,7 @@ export default function useChat() {
     const [userChats, setUserChats] = React.useState<DialogueChat[] | null>(null);
     const [isChatsConnectionEstablised, setIsChatsConnectionEstablised] = React.useState(false);
 
-    const messengerServiceConnection = useMessengerService();
-
-    React.useEffect(() => {
-        userChatsRef.current = userChats;
-    }, [userChats]);
+    const MessengerServiceConnection = useMessengerService();
 
     // TODO check is there a point to close messenger service connection
     React.useEffect(() => {
@@ -39,10 +35,13 @@ export default function useChat() {
             updateChatInfo((e.payload as any).chatID, e.payload as DialogueChatMessage);
         }
 
-        // function connectToChatsHandler(e: MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>) {}
+        function connectToChatsHandler(e: MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>) {
+            setIsChatsConnectionEstablised(true);
+        }
 
-        messengerServiceConnection.addOutcomingEventHandler("send-message", updateMessageAmount);
-        messengerServiceConnection.addIncomingEventHandler("receive-message", updateMessageAmount);
+        MessengerServiceConnection.addOutcomingEventHandler("send-message", updateMessageAmount);
+        MessengerServiceConnection.addOutcomingEventHandler("connect-to-chats", connectToChatsHandler);
+        MessengerServiceConnection.addIncomingEventHandler("receive-message", updateMessageAmount);
 
         (async function () {
             const response = await TalkNetAPI.get(`/user/${user.id}/chats`);
@@ -51,10 +50,30 @@ export default function useChat() {
         })();
 
         return function () {
-            messengerServiceConnection.removeOutcomingEventHandler("send-message", updateMessageAmount);
-            messengerServiceConnection.removeIncomingEventHandler("receive-message", updateMessageAmount);
+            MessengerServiceConnection.removeOutcomingEventHandler("send-message", updateMessageAmount);
+            MessengerServiceConnection.removeOutcomingEventHandler("connect-to-chats", connectToChatsHandler);
+            MessengerServiceConnection.removeIncomingEventHandler("receive-message", updateMessageAmount);
         };
     }, []);
+
+    React.useEffect(() => {
+        userChatsRef.current = userChats;
+
+        /**
+         * Connecting to all user's chats
+         */
+        if (!userChats) {
+            return;
+        }
+
+        // If socket that already in room will try to join it again then it attemption will be ignored
+        // https://stackoverflow.com/questions/23930388/joining-same-room-more-then-once-and-clients-in-a-room
+        MessengerServiceConnection.dispathOutcomingEvent({
+            event: "connect-to-chats",
+            chatID: null, // TODO remove this
+            payload: { userChatsIDs: userChats.map((chat) => chat.id) },
+        });
+    }, [userChats]);
 
     function updateChatInfo(chatID: string, newLastMessage: DialogueChatMessage, lastMessageIndexIncrement: number = 1) {
         // Getting userChats from ref cuz state is enclosed and will have incorrect value (see note above userChatsRef declaration).
@@ -77,23 +96,9 @@ export default function useChat() {
         setUserChats((p) => [...p!]);
     }
 
-    /**
-     * Connecting to all user's chats
-     */
-    function connect(userChatsIDs: string[]) {
-        if (isChatsConnectionEstablised) {
-            console.warn("Connection to chats already established");
-            return;
-        }
-
-        messengerServiceConnection.dispathOutcomingEvent({
-            event: "connect-to-chats",
-            chatID: null, // TODO remove this
-            payload: { userChatsIDs: userChatsIDs },
-        });
-
-        setIsChatsConnectionEstablised(true);
+    function getCurrentChatID() {
+        return new URLSearchParams(window.location.search).get("chat");
     }
 
-    return { userChats, connect, isChatsConnectionEstablised };
+    return { userChats, isChatsConnectionEstablised, getCurrentChatID, MessengerServiceConnection };
 }

@@ -28,7 +28,7 @@ const config = {
         HOST_NAME: "smtp.gmail.com",
         USER_NAME: "talknetru@gmail.com",
         PORT: 587,
-        PASSWORD: process.env.SMTP_PASSWORD,
+        PASSWORD: process.env.SMTP_SPARE_PASSWORD, // BUG CRITICAL for some reason main password isn't work...
     } as SMTP_OPTIONS,
 
     USER_ACCESS_LEVELS: {

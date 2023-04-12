@@ -9,17 +9,17 @@ import WithGlobal from "./core/WithGlobal";
 
 function App() {
     return (
-        <WithErrorBoundary>
-            <WithStore>
-                <WithGlobal>
-                    <BrowserRouter>
+        <WithStore>
+            <WithGlobal>
+                <BrowserRouter>
+                    <WithErrorBoundary>
                         <WithAPI>
                             <WithRouter />
                         </WithAPI>
-                    </BrowserRouter>
-                </WithGlobal>
-            </WithStore>
-        </WithErrorBoundary>
+                    </WithErrorBoundary>
+                </BrowserRouter>
+            </WithGlobal>
+        </WithStore>
     );
 }
 

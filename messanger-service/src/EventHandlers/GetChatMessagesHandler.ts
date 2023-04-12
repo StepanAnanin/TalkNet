@@ -7,6 +7,11 @@ import type { GetChatMessagesEvent } from "../types/WebSocket/Events";
 import { Socket } from "socket.io";
 
 export default async function GetChatMessagesEventHandler(event: GetChatMessagesEvent, socket: Socket<any, any, any, any>) {
+    if (!socket.rooms.has(event.chatID)) {
+        socket.emit("access-denied", new MessangerServiceResponse(403, "access-denied", { message: null }).JSON());
+        return;
+    }
+
     const requestOptions = new TalkNetAPIRequestOptions("/chat/messages/" + event.chatID, "POST", event.accessToken);
 
     // TODO move this to a new fuction or class method

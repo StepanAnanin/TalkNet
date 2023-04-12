@@ -22,8 +22,7 @@ export default async function connectToChats(event: ConnectToChatsEvent, socket:
 
     socket.join(userChatsIDs);
 
-    socket.emit(
-        "connect-to-chats",
+    socket.send(
         new MessangerServiceResponse(200, "connect-to-chats", { message: "Connection to chats established" }).JSON()
     );
 }

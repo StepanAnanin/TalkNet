@@ -1,6 +1,22 @@
 @import "../../../../app/styles/variables.scss";
 
-$NavigatorHeaderHeight: 115px;
+$NavigatorHeaderHeight: 125px;
+
+// TODO transition isn't smooth, it's twitching and looks like has problem with interpolation
+@mixin pageListItemOpen() {
+    &-img-wrapper {
+        width: 50px;
+        height: 50px;
+    }
+
+    &-label {
+        opacity: 1;
+
+        top: 110px;
+
+        transform: scale(100%);
+    }
+}
 
 .TNUI-NavigatorHeader {
     height: $NavigatorHeaderHeight;
@@ -16,7 +32,7 @@ $NavigatorHeaderHeight: 115px;
 
     &-top {
         width: 100%;
-        height: $NavigatorHeaderHeight * 0.6875;
+        height: $NavigatorHeaderHeight * 0.675; //0.6875
 
         display: flex;
         align-items: center;
@@ -63,6 +79,8 @@ $NavigatorHeaderHeight: 115px;
 
                 &:hover {
                     .TNUI-NavigatorHeader-page-list_item {
+                        @include pageListItemOpen();
+
                         &-img-wrapper {
                             background-color: $grey;
                         }
@@ -75,6 +93,8 @@ $NavigatorHeaderHeight: 115px;
 
                 &.current {
                     .TNUI-NavigatorHeader-page-list_item {
+                        @include pageListItemOpen();
+
                         &-img-wrapper {
                             background-color: $grey;
 
@@ -88,14 +108,16 @@ $NavigatorHeaderHeight: 115px;
                 }
 
                 &-img-wrapper {
-                    width: 50px;
-                    height: 50px;
+                    width: 60px;
+                    height: 60px;
 
                     border-radius: 100%;
 
                     background-color: $darkGrey;
 
-                    transition: all 0.15s ease-in-out;
+                    z-index: 3;
+
+                    transition: all 0.2s ease-in-out;
                 }
 
                 &-img {
@@ -108,13 +130,23 @@ $NavigatorHeaderHeight: 115px;
                 }
 
                 &-label {
+                    position: absolute;
+
+                    top: 80px;
+
+                    transform: scale(25%);
+
+                    opacity: 0; // ***
+
                     color: rgba(255, 255, 255, 0.85);
 
                     font-size: 11px;
 
                     white-space: normal;
 
-                    transition: all 0.15s ease-in-out;
+                    z-index: 2;
+
+                    transition: all 0.2s ease-in-out;
                 }
             }
         }
@@ -122,10 +154,12 @@ $NavigatorHeaderHeight: 115px;
 
     &-bottom {
         width: 100%;
-        height: $NavigatorHeaderHeight * 0.3125;
+        height: $NavigatorHeaderHeight * 0.325; //0.3125
 
         display: flex;
         align-items: center;
+
+        padding-inline: 10px;
 
         .TNUI-NavigatorHeader-search {
             height: 30px;
@@ -134,7 +168,6 @@ $NavigatorHeaderHeight: 115px;
             display: flex;
             align-items: center;
 
-            margin-inline: 10px;
             padding-inline: 10px;
 
             border-radius: 15px;
@@ -151,11 +184,31 @@ $NavigatorHeaderHeight: 115px;
                 color: white;
                 background-color: transparent;
 
-                font-size: 16px;
+                font-size: 15.5px;
             }
 
             &_icon {
                 color: rgb(20, 20, 20, 0.6);
+            }
+        }
+
+        .TNUI-NavigatorHeader-add-button {
+            display: flex;
+            align-items: center;
+
+            margin-left: 7.5px;
+
+            padding-block: 3.5px;
+
+            &_icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            &_label {
+                // margin-bottom: 2.5px;
+
+                font-size: 13.5px;
             }
         }
     }

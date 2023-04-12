@@ -11,6 +11,7 @@ export default class IMessengerService {
         "invalid-request",
         "unexpected-error",
         "validation-error",
+        "access-denied",
     ] as const;
 
     public static readonly outcomingEventMap: readonly IMessangerService.OutcomingEventName[] = [
@@ -51,12 +52,6 @@ export default class IMessengerService {
                 console.log("[Messenger Service] Обрыв соединения");
             }
             console.log("[Messenger Service] Код: " + event.code + " причина: " + event.reason);
-        });
-
-        this.socket.on("connect-to-chats", function (event) {
-            const parsedEvent = JSON.parse(event);
-
-            console.log("[Messenger Service] " + parsedEvent.payload.message);
         });
     }
 

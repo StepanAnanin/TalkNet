@@ -29,12 +29,15 @@
 
         background-color: $black;
 
+        // 10px — width of scrollbar
         @media screen and (max-width: 1400px) and (min-width: $pc) {
-            margin-inline: 10%;
+            margin-right: 10%;
+            margin-left: calc(10% + 10px);
         }
 
         @media screen and (max-width: $pc) {
-            margin-inline: 0;
+            margin-right: 0;
+            margin-left: 10px;
         }
     }
 
@@ -59,8 +62,34 @@
         margin-bottom: 5px;
 
         .TNUI-Message-input-wrapper {
-            // 40px — width of send message button (30px) + it's total value of inline margin (10px)
+            // 40px — width of send message button (30px) + it's total inline margin (10px)
             width: calc(100% - 40px);
+        }
+    }
+
+    .TNUI-ChatBody-no-open-chat-alert {
+        width: 100%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        margin-top: 50px;
+
+        &_icon {
+            width: 50px;
+            height: 50px;
+
+            color: $lightPrimary;
+        }
+
+        &_label {
+            margin-left: 5px;
+            margin-bottom: 10px;
+
+            font-size: 24px;
+
+            color: white;
         }
     }
 }

@@ -1,25 +1,36 @@
+import "./Chats.scss";
 import React from "react";
 
+import NoChatsAlert from "@mui/icons-material/CommentsDisabledRounded";
+
 import { useTypedSelector } from "../../../../../../shared/model/hooks/useTypedSelector";
-import ChatPreview from "../../../../../../features/ChatPreview";
+import { ChatPreview, MemoChatPreview, ChatPreviewSkeleton } from "../../../../../../features/ChatPreview";
 import { useLocation } from "react-router-dom";
-import ChatPreviewSkeleton from "../../../../../../features/ChatPreview/UI/ChatPreviewSkeleton";
 import { useChat } from "../../../../../../entities/Chat";
 
 export default function Chats() {
     const { user } = useTypedSelector((state) => state.auth);
-    const { userChats, connect, isChatsConnectionEstablised } = useChat();
-    const location = useLocation();
+    const { userChats, isChatsConnectionEstablised, getCurrentChatID } = useChat();
+    const currentChatID = getCurrentChatID();
 
-    const currentChatID = new URLSearchParams(location.search).get("chat");
+    // BUG not working
+    // const parsedUserChats = React.useMemo(() => {
+    //     if (!userChats || !user) {
+    //         return null;
+    //     }
 
-    React.useEffect(() => {
-        if (!userChats || isChatsConnectionEstablised) {
-            return;
-        }
+    //     return userChats.map((chat) => {
+    //         const interluctor = chat.members.find((member) => member.userID !== user.id)!;
+    //         const userChatMember = chat.members.find((member) => member !== interluctor)!;
 
-        connect(userChats.map((chat) => chat.id));
-    }, [userChats]);
+    //         return {
+    //             active: chat.id === currentChatID,
+    //             chatName: interluctor.fullUserName,
+    //             lastReadMessageIndex: userChatMember.lastReadMessageIndex,
+    //             chat,
+    //         };
+    //     });
+    // }, [userChats, currentChatID]);
 
     if (!user) {
         throw new Error(`Необходима авторизация`);
@@ -41,6 +52,12 @@ export default function Chats() {
 
     return (
         <>
+            {userChats.length === 0 && (
+                <div className="TNUI-Chats-empty-chat-list-alert">
+                    <NoChatsAlert className="TNUI-Chats-empty-chat-list-alert_icon" />{" "}
+                    <span className="TNUI-Chats-empty-chat-list-alert_label">У вас нет сообщений</span>
+                </div>
+            )}
             {userChats.map((chat) => {
                 const interluctor = chat.members.find((member) => member.userID !== user.id)!;
                 const userChatMember = chat.members.find((member) => member !== interluctor)!;
@@ -56,6 +73,19 @@ export default function Chats() {
                     />
                 );
             })}
+            {/* Not working */}
+            {/* {parsedUserChats.map((parsedChat) => {
+                return (
+                    <MemoChatPreview
+                        key={parsedChat.chat.id}
+                        active={parsedChat.active}
+                        chatName={parsedChat.chatName}
+                        lastReadMessageIndex={parsedChat.lastReadMessageIndex}
+                        imgURL=""
+                        chat={parsedChat.chat}
+                    />
+                );
+            })} */}
         </>
     );
 }

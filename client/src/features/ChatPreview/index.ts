@@ -1,3 +1,4 @@
-import ChatPreview from "./UI/ChatPreview";
+import ChatPreview, { MemoChatPreview } from "./UI/ChatPreview";
+import ChatPreviewSkeleton from "./UI/ChatPreviewSkeleton";
 
-export default ChatPreview;
+export { ChatPreview, MemoChatPreview, ChatPreviewSkeleton };

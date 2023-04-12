@@ -36,9 +36,10 @@ export default class FormatedDate {
 
         this.date = new Date(date);
 
+        // There is a stupidest thing i've ever seen — method '.getMoth' counting from 0 ...
         this.parsedDate = {
             day: this.date.getDay(),
-            month: this.date.getMonth(),
+            month: this.date.getMonth() + 1,
             year: this.date.getFullYear(),
         };
     }
@@ -60,7 +61,7 @@ export default class FormatedDate {
 
     public getDate() {
         let day: number | string = this.date.getDate();
-        let month: number | string = this.date.getMonth();
+        let month: number | string = this.date.getMonth() + 1;
 
         if (day < 10) {
             day = "0" + day;

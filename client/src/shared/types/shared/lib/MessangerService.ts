@@ -102,12 +102,15 @@ namespace IMessangerService {
 
         export type UnexpectedError<P extends object> = IncomingEvent<P, "unexpected-error">;
 
+        export type AccessDenied = IncomingEvent<{ message: string | null }, "access-denied">;
+
         export type Any =
             | ReceiveMessage
             | AccessTokenExpiredError<object>
             | InvalidRequest<object>
             | ValidationError<object>
-            | UnexpectedError<object>;
+            | UnexpectedError<object>
+            | AccessDenied;
     }
 
     export type AnyEvent = OutcomingEvent.Any | IncomingEvent.Any;

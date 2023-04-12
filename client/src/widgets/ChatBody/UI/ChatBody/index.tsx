@@ -1,18 +1,20 @@
 import "./ChatBody.scss";
 import React from "react";
 
+import NoOpenChatIcon from "@mui/icons-material/ReviewsRounded";
+
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 import type DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
 
 import MessageInput from "../../../../features/MessageInput";
-import DialogueMessage from "../../../../shared/UI/DialogueMessage";
 import ChatHeader from "../../../../features/ChatHeader";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
 import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
 import IMessangerService from "../../../../shared/types/shared/lib/MessangerService";
 import { MessangerServiceIncomingEvent, MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
 import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
-import MessageBlockDateDivider from "../MessageBlockDateDivider";
+import { MemoChatFragment } from "../ChatFragment";
+import { useChat } from "../../../../entities/Chat";
 
 interface ChatProps extends UiComponentProps<HTMLDivElement> {
     chatID: string | null;
@@ -29,7 +31,7 @@ export default function ChatBody(props: ChatProps) {
     const prevMessageSentDateDayDifferenceRef = React.useRef(0);
 
     const { user } = useTypedSelector((state) => state.auth);
-    const MessangerServiceConnection = useMessengerService();
+    const { MessengerServiceConnection, userChats, getCurrentChatID } = useChat();
 
     // console.log("ChatID: " + chatID);
 
@@ -53,27 +55,53 @@ export default function ChatBody(props: ChatProps) {
             setMessages((p) => [e.payload as DialogueChatMessage, ...p]);
         }
 
-        MessangerServiceConnection.addOutcomingEventHandler("get-chat-messages", handleGetChatMessages);
+        MessengerServiceConnection.addOutcomingEventHandler("get-chat-messages", handleGetChatMessages);
 
-        MessangerServiceConnection.addOutcomingEventHandler("send-message", handleSendMessage);
+        MessengerServiceConnection.addOutcomingEventHandler("send-message", handleSendMessage);
 
-        MessangerServiceConnection.addIncomingEventHandler("receive-message", handleReceiveMessage);
+        MessengerServiceConnection.addIncomingEventHandler("receive-message", handleReceiveMessage);
 
-        MessangerServiceConnection.dispathOutcomingEvent({
+        return function () {
+            MessengerServiceConnection.removeOutcomingEventHandler("get-chat-messages", handleGetChatMessages);
+            MessengerServiceConnection.removeOutcomingEventHandler("send-message", handleSendMessage);
+            MessengerServiceConnection.removeIncomingEventHandler("receive-message", handleReceiveMessage);
+            MessengerServiceConnection.closeConnection();
+        };
+    }, []);
+
+    React.useEffect(() => {
+        if (!userChats || !chatID) {
+            return;
+        }
+
+        MessengerServiceConnection.dispathOutcomingEvent({
             chatID: null, //TODO remove this
             event: "get-chat-messages",
             payload: {
                 chatID: chatID!,
             },
         });
+    }, [userChats]);
 
-        return function () {
-            MessangerServiceConnection.removeOutcomingEventHandler("get-chat-messages", handleGetChatMessages);
-            MessangerServiceConnection.removeOutcomingEventHandler("send-message", handleSendMessage);
-            MessangerServiceConnection.removeIncomingEventHandler("receive-message", handleReceiveMessage);
-            MessangerServiceConnection.closeConnection();
-        };
-    }, []);
+    if (getIsUserHasAccessToRequested() === false) {
+        // throw new Error(`You haven't premission to view this chat`);
+    }
+
+    function getIsUserHasAccessToRequested() {
+        if (!userChats) {
+            return null;
+        }
+
+        const currentChatdID = getCurrentChatID();
+
+        for (const chat of userChats) {
+            if (chat.id === currentChatdID) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     function sendMessage() {
         const inputElement = messageInputRef.current;
@@ -88,7 +116,7 @@ export default function ChatBody(props: ChatProps) {
             return;
         }
 
-        MessangerServiceConnection.dispathOutcomingEvent({
+        MessengerServiceConnection.dispathOutcomingEvent({
             chatID: null, // TODO remove this
             event: "send-message",
             payload: { chatID: chatID!, message: inputedMessage, sentDate: Date.now() },
@@ -145,25 +173,21 @@ export default function ChatBody(props: ChatProps) {
                                     // otherwise this label will always show up when user scroll at the end of chat.
                                     // So i decided temporarily abandon this idea.
                                     return (
-                                        <React.Fragment key={message._id}>
-                                            {isBlockEnded && (!isLatestMessage || isPrevMessageLatest) && (
-                                                <MessageBlockDateDivider date={nextMessage.sentDate} />
-                                            )}
-                                            <DialogueMessage
-                                                read={!!message.readDate}
-                                                style={{ paddingInline: "5px", marginBlock: "10px" }}
-                                                sender={message.sentBy === user!.id ? "user" : "interlocutor"}
-                                                sentDate={message.sentDate}
-                                            >
-                                                {message.data}
-                                            </DialogueMessage>
-                                            {isLatestMessage && <MessageBlockDateDivider date={message.sentDate} />}
-                                        </React.Fragment>
+                                        <MemoChatFragment
+                                            key={message._id}
+                                            message={message}
+                                            nextMessage={nextMessage}
+                                            user={user!}
+                                            isLatestMessage={isLatestMessage}
+                                            isBlockEnded={isBlockEnded}
+                                            isPrevMessageLatest={isPrevMessageLatest}
+                                        />
                                     );
                                 })}
                             </div>
                         ) : (
-                            <div>no messages</div>
+                            // TODO fix it
+                            <div className="TNUI-ChatBody-no-messages-alert">No messages</div>
                         )}
                         <MessageInput
                             className="TNUI-ChatBody-message-input"
@@ -174,9 +198,9 @@ export default function ChatBody(props: ChatProps) {
                     </div>
                 </>
             ) : (
-                // TODO fix it
-                <span style={{ color: "white", marginTop: "50px", fontSize: "24px", width: "100%", textAlign: "center" }}>
-                    No chat is currently open
+                <span className="TNUI-ChatBody-no-open-chat-alert">
+                    <NoOpenChatIcon className="TNUI-ChatBody-no-open-chat-alert_icon" />
+                    <span className="TNUI-ChatBody-no-open-chat-alert_label">Ни один чат не открыт</span>
                 </span>
             )}
         </div>

@@ -8,19 +8,21 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import GroupChatIcon from "@mui/icons-material/Groups";
 import CommunitiesIcon from "@mui/icons-material/GridViewOutlined";
 import FriendsIcon from "@mui/icons-material/Group";
-import ChatIcon from "@mui/icons-material/ChatRounded";
+import AddIcon from "@mui/icons-material/AddRounded";
+import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
 import SettingsIcon from "@mui/icons-material/SettingsRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
 import { Link } from "react-router-dom";
+import Button from "../../../../shared/UI/Button";
 
 interface NavigatorHeaderProps extends UiComponentProps<HTMLDivElement> {
-    //
+    addButtonLabel?: string;
 }
 
 export default function NavigatorHeader(props: NavigatorHeaderProps) {
-    const { className = "", ...otherProps } = props;
+    const { className = "", addButtonLabel, ...otherProps } = props;
 
     const pageListRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -33,8 +35,6 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
         if (!(pageList instanceof HTMLDivElement)) {
             throw new Error(`NavigatorHeader: pageListRef is refrence to null.`);
         }
-
-        console.log(e.deltaY);
 
         pageList.scrollLeft += e.deltaY;
     }
@@ -95,6 +95,12 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
                     <input className="TNUI-NavigatorHeader-search_input" placeholder="Поиск" />
                     <SearchOutlinedIcon className="TNUI-NavigatorHeader-search_icon" />
                 </div>
+                {addButtonLabel && (
+                    <Button variant="contained" size="small" className="TNUI-NavigatorHeader-add-button">
+                        <AddIcon className="TNUI-NavigatorHeader-add-button_icon" />
+                        <span className="TNUI-NavigatorHeader-add-button_label">{addButtonLabel}</span>
+                    </Button>
+                )}
             </div>
         </div>
     );

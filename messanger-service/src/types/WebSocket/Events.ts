@@ -10,7 +10,8 @@ export type outcomingEvent =
     | "access-token-expired"
     | "unexpected-error"
     | "validation-error"
-    | "invalid-request";
+    | "invalid-request"
+    | "access-denied";
 
 export type event = incomingEvent | outcomingEvent;
 
@@ -31,6 +32,8 @@ export type ConnectToChatsEvent = ConnectionEvent<"connect-to-chats", { userChat
 
 export type ReceiveMessage = ConnectionEvent<"receive-message", ChatMessage>;
 
-type AnyEvent = SendMessageEvent | GetChatMessagesEvent | ConnectToChatsEvent | ReceiveMessage;
+export type AccessDenied = ConnectionEvent<"access-denied", { message: string | null }>;
+
+type AnyEvent = SendMessageEvent | GetChatMessagesEvent | ConnectToChatsEvent | ReceiveMessage | AccessDenied;
 
 export default AnyEvent;

@@ -1,4 +1,5 @@
 import "./DialogueMessage.scss";
+import React from "react";
 
 import SentIcon from "@mui/icons-material/DoneOutlined";
 import SentAndReadIcon from "@mui/icons-material/DoneAllOutlined";
@@ -39,6 +40,7 @@ export default function DialogueMessage(props: DialogueMessageProps) {
 
     return (
         <div className={classes} {...otherProps}>
+            {sender === "interlocutor" && <div className="TNUI-DialogueMessage-offside-shape" />}
             <div className="TNUI-DialogueMessage-body">
                 <p className="TNUI-DialogueMessage-text">
                     {children}
@@ -80,6 +82,9 @@ export default function DialogueMessage(props: DialogueMessageProps) {
                     <span className="TNUI-DialogueMessage-send-date">{formatedSentDate.getTime()}</span>
                 </div>
             </div>
+            {sender === "user" && <div className="TNUI-DialogueMessage-offside-shape" />}
         </div>
     );
 }
+
+export const MemoDialogueMessage = React.memo(DialogueMessage);

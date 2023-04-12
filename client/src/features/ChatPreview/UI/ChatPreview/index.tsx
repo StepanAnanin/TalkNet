@@ -1,4 +1,5 @@
 import "./ChatPreview.scss";
+import React from "react";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 import type DialogueChat from "../../../../shared/types/features/DialogueChat";
@@ -61,3 +62,5 @@ export default function ChatPreview(props: ChatProps) {
         </div>
     );
 }
+
+export const MemoChatPreview = React.memo(ChatPreview);

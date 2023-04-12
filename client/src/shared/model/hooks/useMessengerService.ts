@@ -29,8 +29,19 @@ export default function useMessengerService() {
     // Try to do something with this, not sure is it possible or not, cuz useEffect won't work without rerender;
     const [lastIncomingEvent, setLastIncomingEvent] = React.useState<MessangerServiceIncomingEvent | null>(null);
     const [lastOutcomingEvent, setLastOutcomingEvent] = React.useState<MessangerServiceOutcomingEvent | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
 
     const lastEventRef = React.useRef<IMessangerService.OutcomingEvent.Any | null>(null);
+
+    // I can't just throw error from socket.io event handler, so this is only way to do that... (cuz more likely it's wrapped in try catch and prevents any error from bubbling)
+    // (By the way most bugged shit so far, it's literally ruins app's architecture in some cases and force me to do that shit below, i must add an additional state and useEffect...)
+    React.useEffect(() => {
+        if (!error) {
+            return;
+        }
+
+        throw new Error(error);
+    }, [error]);
 
     if (!user) {
         throw new Error(`[Messenger Service] Connection require authorization`);
@@ -53,6 +64,10 @@ export default function useMessengerService() {
             setLastIncomingEvent(new MessangerServiceIncomingEvent(user!.id, JSON.parse(m)));
         });
 
+        socket.on("access-denied", (event) => {
+            setError(`Доступ запрещён`);
+        });
+
         // There are handled all events dispatched through '.send' method. (this is about server)
         // Events that was dispatched through '.emit' must be handled like: socket.on("<event name>", <handler>)
         // TODO Require refatoring: remove this, and dispatch all events only through '.emit'.
@@ -64,6 +79,9 @@ export default function useMessengerService() {
             // Handling incoming events
             switch (parsedEvent.event) {
                 case "receive-message":
+                    // Handled above
+                    return;
+                case "access-denied":
                     // Handled above
                     return;
                 case "access-token-expired":
