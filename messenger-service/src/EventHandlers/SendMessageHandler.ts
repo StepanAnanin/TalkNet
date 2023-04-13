@@ -2,12 +2,12 @@ import type { SendMessageEvent } from "../types/WebSocket/Events";
 
 import WebSocket from "ws";
 import http from "http";
-import MessangerServiceResponse from "../lib/MessangerServiceResponse";
+import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 import { Socket } from "socket.io";
 
-export default async function SendMessageEventHandler(event: SendMessageEvent, socket: Socket<any, any, any, any>) {
-    const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.chatID, "POST", event.accessToken);
+export default async function SendMessageHandler(event: SendMessageEvent, socket: Socket<any, any, any, any>) {
+    const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.payload.chatID, "POST", event.accessToken);
 
     // @ts-ignore
     const request = http.request(requestOptions, function (response) {
@@ -18,8 +18,9 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, s
 
             // Checking access token
             if (response.statusCode === 401 && responsePayload.tokenExpired) {
-                socket.send(
-                    new MessangerServiceResponse(response.statusCode, "access-token-expired", {
+                socket.emit(
+                    "access-token-expired",
+                    new MessengerServiceResponse(response.statusCode, "access-token-expired", {
                         message: responsePayload.message,
                     }).JSON()
                 );
@@ -28,8 +29,9 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, s
 
             // If error
             if (response.statusCode! >= 400) {
-                socket.send(
-                    new MessangerServiceResponse(response.statusCode!, "unexpected-error", {
+                socket.emit(
+                    "unexpected-error",
+                    new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
                         message: responsePayload.message,
                     }).JSON()
                 );
@@ -39,8 +41,9 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, s
             const chatID = responsePayload.chatID;
 
             if (typeof chatID !== "string") {
-                socket.send(
-                    new MessangerServiceResponse(response.statusCode!, "unexpected-error", {
+                socket.emit(
+                    "unexpected-error",
+                    new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
                         message: "[Messenger Service Internal Error] Не удалось получить ID чата",
                     }).JSON()
                 );
@@ -48,11 +51,11 @@ export default async function SendMessageEventHandler(event: SendMessageEvent, s
             }
 
             // If success
-            socket.send(new MessangerServiceResponse(200, "send-message", responsePayload).JSON());
+            socket.emit("send-message", new MessengerServiceResponse(200, "send-message", responsePayload).JSON());
 
             socket
                 .to(chatID)
-                .emit("receive-message", new MessangerServiceResponse(200, "receive-message", responsePayload).JSON());
+                .emit("receive-message", new MessengerServiceResponse(200, "receive-message", responsePayload).JSON());
         });
 
         // response.on("end", function () {});

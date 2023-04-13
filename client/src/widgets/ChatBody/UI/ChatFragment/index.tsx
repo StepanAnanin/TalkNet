@@ -8,7 +8,7 @@ import DialogueMessage from "../../../../shared/UI/DialogueMessage";
 
 interface ChatFragmentProps {
     message: DialogueChatMessage;
-    nextMessage: DialogueChatMessage;
+    nextMessage?: DialogueChatMessage;
     isBlockEnded: boolean;
     isLatestMessage: boolean;
     isPrevMessageLatest: boolean;
@@ -20,12 +20,11 @@ export default function ChatFragment(props: ChatFragmentProps) {
 
     return (
         <React.Fragment>
-            {isBlockEnded && (!isLatestMessage || isPrevMessageLatest) && (
+            {isBlockEnded && nextMessage && (!isLatestMessage || isPrevMessageLatest) && (
                 <MessageBlockDateDivider date={nextMessage.sentDate} />
             )}
             <DialogueMessage
                 read={!!message.readDate}
-                style={{ paddingInline: "5px", marginBlock: "10px" }}
                 sender={message.sentBy === user!.id ? "user" : "interlocutor"}
                 sentDate={message.sentDate}
             >

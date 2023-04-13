@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io";
 
 import EventEmitter from "./EventEmitter";
-import MessangerServiceResponse from "../lib/MessangerServiceResponse";
+import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import SendMessageHandler from "../EventHandlers/SendMessageHandler";
 import GetChatMessagesHandler from "../EventHandlers/GetChatMessagesHandler";
 import ConnectToChatsHandler from "../EventHandlers/ConnectToChatsHandler";
@@ -26,11 +26,10 @@ export default function EventController(socket: Socket<any, any, any, any>) {
 
     socket.on("error", (e) => socket.send(e.message));
 
-    socket.send(
-        JSON.stringify(
-            new MessangerServiceResponse(200, "establish-connection", {
-                message: "Messanger Service connection established",
-            })
-        )
+    socket.emit(
+        "establish-connection",
+        new MessengerServiceResponse(200, "establish-connection", {
+            message: "Messenger Service connection established",
+        }).JSON()
     );
 }

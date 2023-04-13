@@ -9,7 +9,6 @@ interface MessageBlockDateDividerProps extends UiComponentProps<HTMLDivElement> 
     date: number;
 }
 
-// BUG Today and yesterday label not work correctly, so currently disable them
 export default function MessageBlockDateDivider(props: MessageBlockDateDividerProps) {
     const { className = "", date, ...otherProps } = props;
 
@@ -17,8 +16,8 @@ export default function MessageBlockDateDivider(props: MessageBlockDateDividerPr
     today.setHours(0, 0, 0, 0);
 
     const formatedDate = new FormatedDate(date);
-    // const isDateYesterday = FormatedDate.isYesterday(Date.now(), date);
-    // const isDateToday = new Date().getDay() === new Date(date).getDay();
+    const isDateYesterday = FormatedDate.isYesterday(Date.now(), date);
+    const isDateToday = FormatedDate.isToday(Date.now(), date);
 
     const classes = ["TNUI-MessageBlockDateDivider", className ?? ""].join(" ");
 
@@ -26,6 +25,8 @@ export default function MessageBlockDateDivider(props: MessageBlockDateDividerPr
         <div className={classes} {...otherProps}>
             <span className="TNUI-MessageBlockDateDivider-date">
                 {/* 
+                    Construction with ternary operators below equal to this:
+
                     if (isDateToday) {
                         return 'Сегодня';
                     }
@@ -36,8 +37,7 @@ export default function MessageBlockDateDivider(props: MessageBlockDateDividerPr
 
                     return formatedDate.getDate()
                 */}
-                {/* {isDateToday ? "Сегодня" : isDateYesterday ? "Вчера" : formatedDate.getDate()} */}
-                {formatedDate.getDate()}
+                {isDateToday ? "Сегодня" : isDateYesterday ? "Вчера" : formatedDate.getDate()}
             </span>
         </div>
     );

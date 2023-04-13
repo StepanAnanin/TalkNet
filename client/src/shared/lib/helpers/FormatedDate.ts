@@ -31,6 +31,16 @@ export default class FormatedDate {
         return checkDate.getTime() === yesterdayTargetDate.getTime();
     }
 
+    public static isToday(rawTargetDate: number, rawCheckDate: number) {
+        const checkDate = new Date(rawCheckDate);
+        const yesterdayTargetDate = new Date(rawTargetDate);
+
+        checkDate.setHours(0, 0, 0, 0);
+        yesterdayTargetDate.setHours(0, 0, 0, 0);
+
+        return checkDate.getTime() === yesterdayTargetDate.getTime();
+    }
+
     constructor(date: number) {
         this.rawDate = date;
 

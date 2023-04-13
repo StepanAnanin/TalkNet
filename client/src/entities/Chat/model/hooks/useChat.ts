@@ -1,12 +1,15 @@
 import React from "react";
 
-import type IMessengerService from "../../../../shared/types/shared/lib/MessangerService";
+import type MessengerServiceModel from "../../../../shared/types/shared/lib/MessengerServiceModel";
 import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
 import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import { MessangerServiceIncomingEvent, MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
+import {
+    MessengerServiceIncomingEvent,
+    MessengerServiceOutcomingEventResponse,
+} from "../../../../shared/lib/MessengerServiceEvent";
 import DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
 
 export default function useChat() {
@@ -29,13 +32,15 @@ export default function useChat() {
     React.useEffect(() => {
         function updateMessageAmount(
             e:
-                | MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>
-                | MessangerServiceIncomingEvent<IMessengerService.IncomingEvent.Any>
+                | MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>
+                | MessengerServiceIncomingEvent<MessengerServiceModel.IncomingEvent.Any>
         ) {
             updateChatInfo((e.payload as any).chatID, e.payload as DialogueChatMessage);
         }
 
-        function connectToChatsHandler(e: MessangerServiceOutcomingEvent<IMessengerService.OutcomingEvent.Any>) {
+        function connectToChatsHandler(
+            e: MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>
+        ) {
             setIsChatsConnectionEstablised(true);
         }
 
@@ -70,7 +75,6 @@ export default function useChat() {
         // https://stackoverflow.com/questions/23930388/joining-same-room-more-then-once-and-clients-in-a-room
         MessengerServiceConnection.dispathOutcomingEvent({
             event: "connect-to-chats",
-            chatID: null, // TODO remove this
             payload: { userChatsIDs: userChats.map((chat) => chat.id) },
         });
     }, [userChats]);

@@ -20,13 +20,12 @@ interface ConnectionEvent<E extends incomingEvent | outcomingEvent, P extends ob
     accessToken: string;
     userID: string;
     event: E;
-    chatID: string;
     payload: P;
 }
 
 export type SendMessageEvent = ConnectionEvent<"send-message", SendMessageRequest>;
 
-export type GetChatMessagesEvent = ConnectionEvent<"get-chat-messages", { userID: string }>;
+export type GetChatMessagesEvent = ConnectionEvent<"get-chat-messages", { chatID: string }>;
 
 export type ConnectToChatsEvent = ConnectionEvent<"connect-to-chats", { userChatsIDs: string[] }>;
 

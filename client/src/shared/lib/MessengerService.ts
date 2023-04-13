@@ -1,11 +1,12 @@
-import User from "../types/entities/User";
-import type IMessangerService from "../types/shared/lib/MessangerService";
+import type User from "../types/entities/User";
+import type MessengerServiceModel from "../types/shared/lib/MessengerServiceModel";
+
 import LocalStorageController from "./LocalStorageController";
-import { MessangerServiceOutcomingEvent } from "./MessangerServiceEvent";
+import { MessengerServiceOutcomingEventRequest } from "./MessengerServiceEvent";
 import { io, Socket } from "socket.io-client";
 
-export default class IMessengerService {
-    public static readonly incomingEventMap: readonly IMessangerService.IncomingEventName[] = [
+export default class MessengerService {
+    public static readonly IncomingEventsMap: readonly MessengerServiceModel.IncomingEventName[] = [
         "receive-message",
         "access-token-expired",
         "invalid-request",
@@ -14,7 +15,7 @@ export default class IMessengerService {
         "access-denied",
     ] as const;
 
-    public static readonly outcomingEventMap: readonly IMessangerService.OutcomingEventName[] = [
+    public static readonly OutcomingEventsMap: readonly MessengerServiceModel.OutcomingEventName[] = [
         "delete-message",
         "edite-message",
         "establish-connection",
@@ -24,16 +25,16 @@ export default class IMessengerService {
         "update-message-read-date",
     ] as const;
 
-    public static readonly eventMap: readonly IMessangerService.AnyEventName[] = [
-        ...this.incomingEventMap,
-        ...this.outcomingEventMap,
+    public static readonly EventsMap: readonly MessengerServiceModel.AnyEventName[] = [
+        ...this.IncomingEventsMap,
+        ...this.OutcomingEventsMap,
     ] as const;
 
     protected readonly socket: ReturnType<typeof io>;
 
     protected user: User;
 
-    protected lastOutcomingEvent: MessangerServiceOutcomingEvent | null = null;
+    protected lastOutcomingEvent: MessengerServiceOutcomingEventRequest | null = null;
 
     protected wasLastOutcomingEventRepeat = false;
 
@@ -78,23 +79,23 @@ export default class IMessengerService {
         this.wasLastOutcomingEventRepeat = true;
     }
 
-    protected emitEvent(event: IMessangerService.OutcomingEvent.Any) {
-        const outcomingEvent = new MessangerServiceOutcomingEvent(this.user!.id, event);
+    protected emitEvent(event: MessengerServiceModel.OutcomingEvent.Request.Any) {
+        const outcomingEvent = new MessengerServiceOutcomingEventRequest(this.user!.id, event);
 
         this.socket.emit(outcomingEvent.event, outcomingEvent.JSON());
 
         this.lastOutcomingEvent = outcomingEvent;
     }
 
-    public sendMessage(sendMessageEvent: IMessangerService.OutcomingEvent.SendMessage) {
+    public sendMessage(sendMessageEvent: MessengerServiceModel.OutcomingEvent.Request.SendMessage) {
         this.emitEvent(sendMessageEvent);
     }
 
-    public connectToChats(connectToChatsEvent: IMessangerService.OutcomingEvent.ConnectToChats) {
+    public connectToChats(connectToChatsEvent: MessengerServiceModel.OutcomingEvent.Request.ConnectToChats) {
         this.emitEvent(connectToChatsEvent);
     }
 
-    public getChatMessages(getChatMessagesEvent: IMessangerService.OutcomingEvent.GetChatMessages) {
+    public getChatMessages(getChatMessagesEvent: MessengerServiceModel.OutcomingEvent.Request.GetChatMessages) {
         this.emitEvent(getChatMessagesEvent);
     }
 }

@@ -146,6 +146,8 @@ $NavigatorHeaderHeight: 125px;
 
                     z-index: 2;
 
+                    user-select: none;
+
                     transition: all 0.2s ease-in-out;
                 }
             }
@@ -185,6 +187,8 @@ $NavigatorHeaderHeight: 125px;
                 background-color: transparent;
 
                 font-size: 15.5px;
+
+                user-select: none;
             }
 
             &_icon {

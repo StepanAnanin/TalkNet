@@ -3,15 +3,29 @@ import "./ChatHeader.scss";
 import MenuIcon from "@mui/icons-material/MoreVertOutlined";
 
 import type { UiComponentProps } from "../../../shared/types/UI/UiComponentProps";
+import type DialogueChat from "../../../shared/types/features/DialogueChat";
 
 import Avatar from "../../../shared/UI/Avatar";
+import { useTypedSelector } from "../../../shared/model/hooks/useTypedSelector";
 
 interface ChatHeaderProps extends Omit<UiComponentProps<HTMLDivElement>, "children"> {
-    // chat: Chat //TODO implement this
+    chat: DialogueChat;
 }
 
 export default function ChatHeader(props: ChatHeaderProps) {
-    const { className = "", ...otherProps } = props;
+    const { className = "", chat, ...otherProps } = props;
+
+    const { user } = useTypedSelector((state) => state.auth);
+
+    if (!user) {
+        throw new Error("Необходима авторизация");
+    }
+
+    const interlocutor = chat.members.find((member) => member.userID !== user.id);
+
+    if (!interlocutor) {
+        throw new Error("Не удалось получать данные о собеседнике");
+    }
 
     const classes = ["TNUI-ChatHeader", className].join(" ");
 
@@ -20,7 +34,7 @@ export default function ChatHeader(props: ChatHeaderProps) {
             {/* TODO make it link */}
             <div className="TNUI-ChatHeader-chat-info">
                 <Avatar className="TNUI-ChatHeader-chat-info_avatar" />
-                <span className="TNUI-ChatHeader-chat-info_chat-name">Степан Ананьин</span>
+                <span className="TNUI-ChatHeader-chat-info_chat-name">{interlocutor.fullUserName}</span>
             </div>
             <div className="TNUI-ChatHeader-chat-control">
                 <MenuIcon className="TNUI-ChatHeader-chat-control_icon" />

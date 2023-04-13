@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import sendMessageHandler from "../EventHandlers/SendMessageHandler";
 import getChatMessagesHandler from "../EventHandlers/GetChatMessagesHandler";
 import validateEvent from "../lib/validators/ValidateEvent";
-import MessangerServiceResponse from "../lib/MessangerServiceResponse";
+import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 
 import type AnyEvent from "../types/WebSocket/Events";
 import type { Socket } from "socket.io";
@@ -21,7 +21,7 @@ export default async function EventEmitter(message: string, socket: Socket<any, 
     if (!validationResult.ok) {
         socket.send(
             JSON.stringify(
-                new MessangerServiceResponse(400, "validation-error", {
+                new MessengerServiceResponse(400, "validation-error", {
                     message: `Validation Error: ${validationResult.message}`,
                 })
             )
@@ -37,7 +37,7 @@ export default async function EventEmitter(message: string, socket: Socket<any, 
             await getChatMessagesHandler(parsedMessage, socket);
             break;
         default:
-            socket.send(JSON.stringify(new MessangerServiceResponse(400, "invalid-request", { message: "Wrong event" })));
+            socket.send(JSON.stringify(new MessengerServiceResponse(400, "invalid-request", { message: "Wrong event" })));
             break;
     }
 }

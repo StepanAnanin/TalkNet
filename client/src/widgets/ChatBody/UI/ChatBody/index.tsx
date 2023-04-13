@@ -9,9 +9,11 @@ import type DialogueChatMessage from "../../../../shared/types/shared/DialogueCh
 import MessageInput from "../../../../features/MessageInput";
 import ChatHeader from "../../../../features/ChatHeader";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
-import IMessangerService from "../../../../shared/types/shared/lib/MessangerService";
-import { MessangerServiceIncomingEvent, MessangerServiceOutcomingEvent } from "../../../../shared/lib/MessangerServiceEvent";
+import MessengerServiceModel from "../../../../shared/types/shared/lib/MessengerServiceModel";
+import {
+    MessengerServiceIncomingEvent,
+    MessengerServiceOutcomingEventResponse,
+} from "../../../../shared/lib/MessengerServiceEvent";
 import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
 import { MemoChatFragment } from "../ChatFragment";
 import { useChat } from "../../../../entities/Chat";
@@ -33,25 +35,27 @@ export default function ChatBody(props: ChatProps) {
     const { user } = useTypedSelector((state) => state.auth);
     const { MessengerServiceConnection, userChats, getCurrentChatID } = useChat();
 
-    // console.log("ChatID: " + chatID);
-
     React.useEffect(() => {
         if (!chatID) {
             return;
         }
 
         // BUG now "e" has a problem with typesation
-        function handleGetChatMessages(e: MessangerServiceOutcomingEvent<IMessangerService.OutcomingEvent.Any>) {
-            setMessages((e.payload as DialogueChatMessage[]).reverse());
+        function handleGetChatMessages(
+            e: MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>
+        ) {
+            setMessages((e.payload as any).reverse());
         }
 
-        function handleSendMessage(e: MessangerServiceOutcomingEvent<IMessangerService.OutcomingEvent.Any>) {
+        function handleSendMessage(
+            e: MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>
+        ) {
             const message = e.payload as DialogueChatMessage;
 
             setMessages((p) => [message, ...p]);
         }
 
-        function handleReceiveMessage(e: MessangerServiceIncomingEvent<IMessangerService.IncomingEvent.Any>) {
+        function handleReceiveMessage(e: MessengerServiceIncomingEvent<MessengerServiceModel.IncomingEvent.Any>) {
             setMessages((p) => [e.payload as DialogueChatMessage, ...p]);
         }
 
@@ -75,7 +79,6 @@ export default function ChatBody(props: ChatProps) {
         }
 
         MessengerServiceConnection.dispathOutcomingEvent({
-            chatID: null, //TODO remove this
             event: "get-chat-messages",
             payload: {
                 chatID: chatID!,
@@ -84,7 +87,7 @@ export default function ChatBody(props: ChatProps) {
     }, [userChats]);
 
     if (getIsUserHasAccessToRequested() === false) {
-        // throw new Error(`You haven't premission to view this chat`);
+        throw new Error(`You haven't premission to view this chat`);
     }
 
     function getIsUserHasAccessToRequested() {
@@ -117,7 +120,6 @@ export default function ChatBody(props: ChatProps) {
         }
 
         MessengerServiceConnection.dispathOutcomingEvent({
-            chatID: null, // TODO remove this
             event: "send-message",
             payload: { chatID: chatID!, message: inputedMessage, sentDate: Date.now() },
         });
@@ -143,7 +145,7 @@ export default function ChatBody(props: ChatProps) {
         <div className={classes} {...otherProps}>
             {chatID ? (
                 <>
-                    <ChatHeader />
+                    {userChats && <ChatHeader chat={userChats.find((chat) => chat.id === getCurrentChatID())!} />}
                     <div className="TNUI-ChatBody-content">
                         {messages ? (
                             <div className="TNUI-ChatBody-messages">

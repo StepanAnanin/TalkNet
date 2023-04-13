@@ -1,19 +1,19 @@
 import WebSocket from "ws";
 import http from "http";
-import MessangerServiceResponse from "../lib/MessangerServiceResponse";
+import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 
 import type { ConnectToChatsEvent } from "../types/WebSocket/Events";
 import type { Socket } from "socket.io";
 
 // TODO Not sure about security vulnerabilities
-export default async function connectToChats(event: ConnectToChatsEvent, socket: Socket<any, any, any, any>) {
+export default async function ConnectToChatsHandler(event: ConnectToChatsEvent, socket: Socket<any, any, any, any>) {
     const userChatsIDs = event.payload.userChatsIDs;
 
     if (!userChatsIDs) {
         socket.emit(
             "invalid-request",
-            new MessangerServiceResponse(400, "invalid-request", {
+            new MessengerServiceResponse(400, "invalid-request", {
                 message: "Chats IDs is missing",
             }).JSON()
         );
@@ -22,7 +22,8 @@ export default async function connectToChats(event: ConnectToChatsEvent, socket:
 
     socket.join(userChatsIDs);
 
-    socket.send(
-        new MessangerServiceResponse(200, "connect-to-chats", { message: "Connection to chats established" }).JSON()
+    socket.emit(
+        "connect-to-chats",
+        new MessengerServiceResponse(200, "connect-to-chats", { message: "Connection to chats established" }).JSON()
     );
 }

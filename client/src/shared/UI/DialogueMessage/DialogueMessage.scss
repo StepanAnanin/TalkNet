@@ -6,7 +6,9 @@ $DialogueMessage_body-border-radius: 15px;
     width: 100%;
 
     display: flex;
-    // align-items: center;
+
+    padding-inline: 5px;
+    margin-block: 10px;
 
     &-body {
         width: fit-content;
