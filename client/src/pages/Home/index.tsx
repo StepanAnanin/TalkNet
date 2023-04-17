@@ -4,14 +4,19 @@ import Button from "../../shared/UI/Button";
 import Header from "../../widgets/Header";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import Avatar from "../../shared/UI/Avatar";
-import Menu from "../../shared/UI/Menu";
-import MenuItem from "../../shared/UI/MenuItem";
+import { ConfirmModal } from "../../features/Modal";
 
 export default function HomePage() {
     const { user } = useTypedSelector((state) => state.auth);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
 
     function clickHandler() {
-        console.log(user);
+        setIsModalOpen((p) => !p);
+    }
+
+    function confirmHandler() {
+        console.log("confirm");
+        setIsModalOpen(false);
     }
 
     return (
@@ -21,15 +26,21 @@ export default function HomePage() {
                 <br />
                 <br />
                 <br />
-                <Button onClick={clickHandler}>Log Auth Data</Button>
+                <Button onClick={clickHandler}>Button</Button>
                 <Avatar alt="C" />
-                <Menu>
-                    <MenuItem>Abaxoth</MenuItem>
-                    <MenuItem>Test</MenuItem>
-                    <MenuItem>Тест</MenuItem>
-                    <MenuItem>Выход</MenuItem>
-                </Menu>
             </div>
+            {isModalOpen && (
+                <ConfirmModal
+                    header="Подтвердите действие"
+                    variant="outlined"
+                    closeButtonLabel="Отмена"
+                    onConfirm={confirmHandler}
+                    setIsOpen={setIsModalOpen}
+                    hideCloseIcon
+                >
+                    Вы уверены что хотите выйти из аккаунта?
+                </ConfirmModal>
+            )}
         </Page>
     );
 }

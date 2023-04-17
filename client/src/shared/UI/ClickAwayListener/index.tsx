@@ -49,11 +49,11 @@ export default function ClickAwayListener(props: ClickAwayListenerProps) {
         // clicking away from targeted element for ClickAwayListener and this calling clickAwayHandler.
         // This timeout prevent this behavior and not ruins work for all other components which isn't working like that.
         setTimeout(() => {
-            document.addEventListener("click", clickAwayHandler);
+            document.addEventListener("mousedown", clickAwayHandler);
         }, 5);
 
         return function () {
-            document.removeEventListener("click", clickAwayHandler);
+            document.removeEventListener("mousedown", clickAwayHandler);
         };
     }, []);
 

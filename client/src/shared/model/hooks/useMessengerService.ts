@@ -88,7 +88,7 @@ export default function useMessengerService() {
 
             await dispatch(addRefresh());
 
-            MessengerServiceConnection.repeatLastOutcomingEvent();
+            MessengerServiceConnection.repeatLastOutcomingEventRequest();
         });
 
         socket.on("invalid-request", (e) => {

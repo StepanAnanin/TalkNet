@@ -1,0 +1,42 @@
+@import "../../../../app/styles/variables.scss";
+@import "../../../../app/styles/mixins.scss";
+
+.TNUI-ModalWrapper {
+    min-width: 100px;
+    min-height: 100px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 5px;
+    margin-inline: 10px;
+
+    background-color: $darkGrey;
+
+    border-radius: 4px;
+
+    &-default {
+        //
+    }
+
+    &-outlined {
+        border: 1px solid $darkPrimary;
+        box-shadow: 0px 0px 10px 6px $primaryTransperant1;
+    }
+
+    & .TNUI-Modal-body {
+        @include custom-scrollbar(5px, transperant);
+
+        flex-grow: 1;
+
+        margin-block: 15px;
+        padding-inline: 5px;
+
+        color: white;
+
+        font-size: 18px;
+
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+}

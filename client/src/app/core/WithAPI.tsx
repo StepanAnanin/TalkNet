@@ -14,7 +14,7 @@ interface WithAPIProps {
 /**
  * This component adds necessary interceptors from API instance and updating auth data on page loading.
  *
- * Must be placed only in `App.tsx` between `<WithStore/>` and `<WithRouter/>`
+ * Must be placed only in `App.tsx` between `<WithErrorBoundary/>` and `<WithRouter/>`
  *
  * (cuz inside it's used state from global store)
  */

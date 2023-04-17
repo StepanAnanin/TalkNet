@@ -1,3 +1,3 @@
-import MessageInput from "./UI/MessageInput";
+import MessageInput, { MemoMessageInput } from "./UI/MessageInput";
 
-export default MessageInput;
+export { MessageInput, MemoMessageInput };

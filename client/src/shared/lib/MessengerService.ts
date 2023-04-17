@@ -34,9 +34,9 @@ export default class MessengerService {
 
     protected user: User;
 
-    protected lastOutcomingEvent: MessengerServiceOutcomingEventRequest | null = null;
+    protected lastOutcomingEventRequest: MessengerServiceOutcomingEventRequest | null = null;
 
-    protected wasLastOutcomingEventRepeat = false;
+    protected wasLastOutcomingEventRequestRepeat = false;
 
     constructor(user: User, socket: ReturnType<typeof io>) {
         this.user = user;
@@ -60,15 +60,15 @@ export default class MessengerService {
         this.socket.close();
     }
 
-    public repeatLastOutcomingEvent() {
-        const lastOutcomingEvent = this.lastOutcomingEvent;
+    public repeatLastOutcomingEventRequest() {
+        const lastOutcomingEvent = this.lastOutcomingEventRequest;
 
         if (!lastOutcomingEvent) {
             console.warn(`There are no previous outcoming events`);
             return;
         }
 
-        if (this.wasLastOutcomingEventRepeat) {
+        if (this.wasLastOutcomingEventRequestRepeat) {
             return;
         }
 
@@ -76,7 +76,7 @@ export default class MessengerService {
 
         this.socket.emit(lastOutcomingEvent.event, lastOutcomingEvent.JSON());
 
-        this.wasLastOutcomingEventRepeat = true;
+        this.wasLastOutcomingEventRequestRepeat = true;
     }
 
     protected emitEvent(event: MessengerServiceModel.OutcomingEvent.Request.Any) {
@@ -84,7 +84,8 @@ export default class MessengerService {
 
         this.socket.emit(outcomingEvent.event, outcomingEvent.JSON());
 
-        this.lastOutcomingEvent = outcomingEvent;
+        this.lastOutcomingEventRequest = outcomingEvent;
+        this.wasLastOutcomingEventRequestRepeat = false;
     }
 
     public sendMessage(sendMessageEvent: MessengerServiceModel.OutcomingEvent.Request.SendMessage) {

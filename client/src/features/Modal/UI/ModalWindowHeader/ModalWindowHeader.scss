@@ -1,0 +1,40 @@
+@import "../../../../app/styles/variables.scss";
+
+.TNUI-ModalHeader {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-inline: 5px;
+
+    &_label {
+        height: 30px;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        color: $lightPrimary;
+
+        font-size: 24px;
+    }
+
+    &_close-icon {
+        width: 40px !important;
+        height: 40px !important;
+
+        color: $primary;
+
+        cursor: pointer;
+
+        &:hover {
+            color: $lightestPrimary;
+        }
+
+        * {
+            transition: all 0.2s ease-in-out;
+        }
+    }
+}

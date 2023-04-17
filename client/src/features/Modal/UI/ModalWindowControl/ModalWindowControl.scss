@@ -1,0 +1,22 @@
+.TNUI-ModalControl {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-inline: 5px;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    &_confirm-button {
+        min-width: 75px;
+
+        margin-left: auto;
+    }
+
+    &_close-button {
+        min-width: 75px;
+    }
+}

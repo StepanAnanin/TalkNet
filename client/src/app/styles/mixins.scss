@@ -1,3 +1,5 @@
+@import "../styles/variables.scss";
+
 @mixin custom-scrollbar($width, $backgroundColour: $darkGrey, $thumbColour: $grey) {
     &::-webkit-scrollbar {
         background-color: $backgroundColour;
