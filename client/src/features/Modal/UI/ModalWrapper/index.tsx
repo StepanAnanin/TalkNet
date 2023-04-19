@@ -13,7 +13,14 @@ const defaultModalWindowZ_Index = 1000;
 
 // TODO CSS properties transition works correctly only on open, but not on close
 export default function ModalWrapper(props: ModalWindowsProps.AnyModal) {
-    const { className, variant = "default", notCloseOnClickAway = false, priority = 0, setIsOpen, children } = props;
+    const {
+        className,
+        variant = "default",
+        dontCloseOnClickAway: notCloseOnClickAway = false,
+        priority = 0,
+        setIsOpen,
+        children,
+    } = props;
 
     const modalsRootElement = document.getElementById("modals-root");
 

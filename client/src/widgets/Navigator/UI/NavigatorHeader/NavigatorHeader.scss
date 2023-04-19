@@ -195,26 +195,6 @@ $NavigatorHeaderHeight: 125px;
                 color: rgb(20, 20, 20, 0.6);
             }
         }
-
-        .TNUI-NavigatorHeader-add-button {
-            display: flex;
-            align-items: center;
-
-            margin-left: 7.5px;
-
-            padding-block: 3.5px;
-
-            &_icon {
-                width: 20px;
-                height: 20px;
-            }
-
-            &_label {
-                // margin-bottom: 2.5px;
-
-                font-size: 13.5px;
-            }
-        }
     }
 
     &-icon {

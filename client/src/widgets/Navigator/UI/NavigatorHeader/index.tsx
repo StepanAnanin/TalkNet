@@ -11,18 +11,21 @@ import FriendsIcon from "@mui/icons-material/Group";
 import AddIcon from "@mui/icons-material/AddRounded";
 import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
 import SettingsIcon from "@mui/icons-material/SettingsRounded";
+import SearchIcon from "@mui/icons-material/SearchRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
+import type ExplorerTarget from "../../types/ExplorerTarget";
 
 import { Link } from "react-router-dom";
 import Button from "../../../../shared/UI/Button";
 
 interface NavigatorHeaderProps extends UiComponentProps<HTMLDivElement> {
-    addButtonLabel?: string;
+    target: ExplorerTarget;
+    hideAddButton?: boolean;
 }
 
 export default function NavigatorHeader(props: NavigatorHeaderProps) {
-    const { className = "", addButtonLabel, ...otherProps } = props;
+    const { className = "", hideAddButton = false, target, ...otherProps } = props;
 
     const pageListRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -43,7 +46,10 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
         <div className={classes} {...otherProps}>
             <div className="TNUI-NavigatorHeader-top">
                 <div className="TNUI-NavigatorHeader-page-list" onWheel={pageListWheelHandler} ref={pageListRef}>
-                    <Link to="#" className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "m" ? "current" : "")}>
+                    <Link
+                        to="/m"
+                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "m" ? "current" : "")}
+                    >
                         <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
                             <ChatIcon
                                 className="TNUI-NavigatorHeader-page-list_item-img"
@@ -77,6 +83,18 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
                         <span className="TNUI-NavigatorHeader-page-list_item-label">Друзья</span>
                     </Link>
                     <Link
+                        to="/search"
+                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "search" ? "current" : "")}
+                    >
+                        <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
+                            <SearchIcon
+                                className="TNUI-NavigatorHeader-page-list_item-img"
+                                id="TNUI-NavigatorHeader-page-list_item-messages-img"
+                            />
+                        </div>
+                        <span className="TNUI-NavigatorHeader-page-list_item-label">Поиск</span>
+                    </Link>
+                    <Link
                         to="/settings"
                         className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "friends" ? "current" : "")}
                     >
@@ -95,12 +113,6 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
                     <input className="TNUI-NavigatorHeader-search_input" placeholder="Поиск" />
                     <SearchOutlinedIcon className="TNUI-NavigatorHeader-search_icon" />
                 </div>
-                {addButtonLabel && (
-                    <Button variant="contained" size="small" className="TNUI-NavigatorHeader-add-button">
-                        <AddIcon className="TNUI-NavigatorHeader-add-button_icon" />
-                        <span className="TNUI-NavigatorHeader-add-button_label">{addButtonLabel}</span>
-                    </Button>
-                )}
             </div>
         </div>
     );

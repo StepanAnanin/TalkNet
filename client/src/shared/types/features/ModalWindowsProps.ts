@@ -1,5 +1,6 @@
 import React from "react";
 
+import type TextInputType from "../UI/TextInputType";
 import type { UiComponentProps } from "../UI/UiComponentProps";
 
 // TODO require refactoring, need to remove this
@@ -9,7 +10,7 @@ namespace ModalWindowsProps {
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
         variant?: "outlined" | "default";
         priority?: number; // This is about z-index (Maybe get rid of it?)
-        notCloseOnClickAway?: boolean;
+        dontCloseOnClickAway?: boolean;
         hideCloseIcon?: boolean;
         hideCloseButton?: boolean;
         hideHeader?: boolean;
@@ -25,7 +26,9 @@ namespace ModalWindowsProps {
     }
 
     export interface InputModal extends UnspecifiedModal {
-        inputRef: React.MutableRefObject<HTMLInputElement>;
+        inputPlaceholder?: string;
+        inputClassName?: string;
+        type?: TextInputType;
     }
 
     export interface ConfirmModal extends UnspecifiedModal {
@@ -35,7 +38,7 @@ namespace ModalWindowsProps {
     /**
      * Content of this modal must be passed as children
      */
-    export interface CustomModal extends Omit<UnspecifiedModal, "onConfirm"> {
+    export interface CustomModal extends UnspecifiedModal {
         //
     }
 

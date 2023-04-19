@@ -7,7 +7,7 @@ import type UiComponentProperties from "./UiComponentProperties";
  *
  * @Examples page, form, section, etc.
  */
-export type UiComponentProps<T extends HTMLElement> = React.DetailedHTMLProps<React.HTMLAttributes<T>, T>;
+export type UiComponentProps<T extends HTMLElement> = Omit<React.DetailedHTMLProps<React.HTMLAttributes<T>, T>, "ref">;
 
 /**
  * Represent UI component which has size options but ins't variable

@@ -17,7 +17,7 @@ interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
 // TODO
 // add React.forwardRef, after this components which used TextInput
 // and read it through DOM will require refactoring, need to replace selection via DOM to refs
-export default function TextInput(props: TextInputProps) {
+export default React.forwardRef(function TextInput(props: TextInputProps, ref: React.ForwardedRef<HTMLInputElement>) {
     const {
         children,
         className,
@@ -71,8 +71,8 @@ export default function TextInput(props: TextInputProps) {
                     {required && <span className="red-text">*</span>}
                 </span>
             )}
-            <input className={inputClasses} {...otherProps} required />
+            <input className={inputClasses} ref={ref} {...otherProps} required />
             {children}
         </div>
     );
-}
+});

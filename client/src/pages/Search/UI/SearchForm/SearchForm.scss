@@ -1,0 +1,179 @@
+@import "../../../../app/styles/variables.scss";
+@import "../../../../app/styles/screen-breakpoints.scss";
+
+.TNUI-ChatSearch {
+    height: 95%;
+
+    display: flex;
+
+    margin-inline: 17.5%;
+    margin-top: 20px;
+
+    border: 1px solid $lightGrey;
+    border-radius: 10px;
+
+    @media screen and (max-width: 1400px) {
+        margin-inline: 10%;
+    }
+
+    @media screen and (max-width: $pc) {
+        margin-inline: 15px;
+    }
+
+    @media screen and (max-width: $laptop) {
+        border: none;
+        border-radius: 0;
+        height: 100%;
+        margin: 0;
+    }
+
+    &-content {
+        width: 80%;
+
+        padding-inline: 10px;
+
+        border-top-left-radius: inherit;
+        border-bottom-left-radius: inherit;
+    }
+
+    &-header {
+        width: 100%;
+        height: 35px;
+
+        display: flex;
+        align-items: center;
+
+        &_icon {
+            height: 27.5px !important;
+            width: 27.5px !important;
+
+            margin-top: 2px;
+            margin-right: 5px;
+
+            color: $lightestPrimary;
+
+            cursor: pointer;
+        }
+
+        &_label {
+            color: $lightPrimary;
+
+            font-size: 26px;
+        }
+    }
+
+    &-body {
+        height: calc(100% - 100px);
+
+        margin-top: 5px;
+
+        &-input-block {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+        }
+
+        &_search-input {
+            width: 100%;
+
+            flex-grow: 1;
+        }
+
+        &_search-button {
+            height: 40px;
+            width: 100px;
+
+            margin-left: 10px;
+
+            font-size: 17.5px;
+        }
+
+        &_search-result-list {
+            width: 100%;
+            height: 100%;
+
+            margin-top: 5px;
+
+            &-item {
+                //
+            }
+        }
+    }
+
+    &-sidebar {
+        width: 20%;
+        min-width: 175px;
+
+        background-color: $darkGrey;
+
+        padding-block: 5px;
+
+        border-left: 1px solid $lightGrey;
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
+
+        &_header {
+            margin-bottom: 5px;
+
+            text-align: center;
+
+            color: white;
+
+            font-size: 16px;
+
+            user-select: none;
+        }
+
+        &_content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        &-search-in-block {
+            width: 100%;
+
+            border-top: 1px solid $lightGrey;
+
+            &_item {
+                width: 100%;
+                height: 35px;
+
+                display: flex;
+                align-items: center;
+
+                padding-inline: 5px;
+
+                border-bottom: 1px solid $lightGrey;
+
+                color: rgb(230, 230, 230);
+                background-color: $grey;
+
+                font-size: 17px;
+
+                user-select: none;
+
+                cursor: pointer;
+
+                transition: all 0.2s ease-in-out;
+
+                &.current {
+                    background-color: $primaryTransperant4 !important;
+                }
+
+                &:hover {
+                    background-color: $primaryTransperant0;
+                }
+
+                &-icon {
+                    color: $lightestPrimary;
+                }
+
+                &-label {
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
+}

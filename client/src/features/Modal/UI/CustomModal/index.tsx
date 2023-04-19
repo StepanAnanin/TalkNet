@@ -1,20 +1,17 @@
 import React from "react";
 
-import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 import type ModalWindowsProps from "../../../../shared/types/features/ModalWindowsProps";
 
-interface CustomModalProps extends UiComponentProps<HTMLDivElement> {
-    model: ModalWindowsProps.CustomModal;
-}
+import ModalWrapper from "../ModalWrapper";
 
-export default function CustomModal(props: CustomModalProps) {
+export default function CustomModal(props: ModalWindowsProps.CustomModal) {
     const { className, children, ...otherProps } = props;
 
     const classes = ["TNUI-CustomModal", className ?? ""].join(" ");
 
     return (
-        <div className={classes} {...otherProps}>
+        <ModalWrapper className={classes} {...otherProps}>
             {children}
-        </div>
+        </ModalWrapper>
     );
 }

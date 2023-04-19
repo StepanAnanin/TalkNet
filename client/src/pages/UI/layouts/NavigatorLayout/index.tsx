@@ -11,10 +11,11 @@ import { laptopLayout } from "../../../../shared/lib/helpers/WindowLayoutBreakPo
 interface NavigatorLayoutProps extends UiComponentProps<HTMLDivElement> {
     /** Works only when NavigatorLayout minified */
     closed?: boolean;
+    hideAddButton?: boolean;
 }
 
 export default function NavigatorLayout(props: NavigatorLayoutProps) {
-    const { className = "", closed = false, children, ...otherProps } = props;
+    const { className = "", closed = false, hideAddButton = false, children, ...otherProps } = props;
 
     const currentWindowLayout = useTypedSelector((state) => state.windowLayout);
 
@@ -44,7 +45,7 @@ export default function NavigatorLayout(props: NavigatorLayoutProps) {
         <div className={classes} {...otherProps}>
             <Header />
             <div className="TNUI-NavigatorLayout-body">
-                <Navigator className="TNUI-NavigatorLayout-navigator" />
+                <Navigator className="TNUI-NavigatorLayout-navigator" hideAddButton={hideAddButton} />
                 <div className="TNUI-NavigatorLayout-content">{children}</div>
             </div>
         </div>

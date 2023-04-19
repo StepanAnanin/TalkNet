@@ -3,7 +3,7 @@ import "./MessagesPage.scss";
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
 import Page from "../../../../shared/UI/Page";
-import { Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
 import ChatBody from "../../../../widgets/ChatBody";
 import NavigatorLayout from "../../../UI/layouts/NavigatorLayout";

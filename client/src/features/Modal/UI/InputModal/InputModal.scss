@@ -1,0 +1,21 @@
+.TNUI-InputModal {
+    width: 100%;
+    height: fit-content;
+
+    max-width: 550px;
+    max-height: 375px;
+
+    *.TNUI-Modal-body {
+        display: flex;
+        flex-direction: column;
+
+        .TNUI-InputModal_decription {
+            margin: 0 0 10px 0;
+        }
+
+        .TNUI-InputModal_input {
+            width: 100%;
+            margin-inline: auto;
+        }
+    }
+}
