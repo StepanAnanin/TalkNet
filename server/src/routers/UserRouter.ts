@@ -16,6 +16,8 @@ UserRouter.post("/logout", userController.logout);
 
 UserRouter.post("/refresh", userController.updateRefreshToken);
 
+UserRouter.patch("/friend", userController.addUserToFriendList);
+
 UserRouter.get("/:id/chats", userController.getUserChats);
 
 UserRouter.get("/activate/:link", userController.activateAccount);

@@ -11,4 +11,6 @@ const ChatSchema = new Schema<IChat, Model<IChat>>({
     messages: [ChatMessageSchema],
 });
 
-export default model<IChat>(`Chat`, ChatSchema);
+const ChatModel = model<IChat>(`Chat`, ChatSchema);
+
+export default ChatModel;

@@ -7,6 +7,7 @@ import type TextInputType from "../../types/UI/TextInputType";
 interface TextInputProps extends VariableUiComponentProps<HTMLInputElement> {
     theme?: "dark" | "light";
     placeholder?: string;
+    staticPlaceholder?: string;
     inputClassName?: string;
     placeholderClassName?: string;
     type?: TextInputType;
@@ -27,6 +28,7 @@ export default React.forwardRef(function TextInput(props: TextInputProps, ref: R
         size = "medium",
         variant = "outlined",
         placeholder,
+        staticPlaceholder,
         required = false,
         ...otherProps
     } = props;
@@ -71,7 +73,7 @@ export default React.forwardRef(function TextInput(props: TextInputProps, ref: R
                     {required && <span className="red-text">*</span>}
                 </span>
             )}
-            <input className={inputClasses} ref={ref} {...otherProps} required />
+            <input className={inputClasses} ref={ref} placeholder={staticPlaceholder} {...otherProps} required />
             {children}
         </div>
     );

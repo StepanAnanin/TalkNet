@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import UserRouter from "./routers/UserRouter";
 import ChatRouter from "./routers/ChatRouter";
+import SearchRouter from "./routers/SearchRouter";
 
 const app = express();
 const port = process.env.SERVER_PORT;
@@ -15,6 +16,7 @@ app.use(cookieParser());
 app.use(cors(config.CORS_OPTIONS));
 app.use("/user", UserRouter);
 app.use("/chat", ChatRouter);
+app.use("/search", SearchRouter);
 app.use("/static", express.static(`${__dirname}/static`));
 
 async function start() {

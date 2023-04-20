@@ -76,15 +76,18 @@
 
         &_search-input {
             width: 100%;
+            height: 35px;
+
+            margin-right: 5px;
 
             flex-grow: 1;
         }
 
         &_search-button {
-            height: 40px;
+            height: 35px;
             width: 100px;
 
-            margin-left: 10px;
+            margin-left: 5px;
 
             font-size: 17.5px;
         }
@@ -93,10 +96,55 @@
             width: 100%;
             height: 100%;
 
-            margin-top: 5px;
+            margin-top: 15px;
+
+            .TNUI-ChatSearch-body_nothing-found-alert {
+                width: 100%;
+
+                display: flex;
+                justify-content: center;
+
+                margin-top: 25px;
+
+                color: white;
+
+                font-size: 20px;
+            }
 
             &-item {
-                //
+                width: 100%;
+                height: 60px;
+
+                display: flex;
+                align-items: center;
+
+                padding-inline: 10px;
+
+                border: 1px solid $lightGrey;
+                border-radius: 10px;
+
+                transition: all 0.2s ease-in-out;
+
+                &:hover {
+                    background-color: $darkGrey;
+                }
+
+                &-avatar {
+                    //
+                }
+
+                &-full-user-name {
+                    margin-left: 10px;
+                    margin-bottom: 5px;
+
+                    font-size: 24px;
+
+                    color: white;
+                }
+
+                &-add-button {
+                    margin-left: auto;
+                }
             }
         }
     }

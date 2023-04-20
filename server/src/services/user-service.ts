@@ -15,6 +15,7 @@ import HTTPError from "../errors/HTTPError";
 import emailService from "./email-service";
 import multer from "multer";
 import tokenModel from "../DB/models/Token";
+import { ObjectId } from "mongodb";
 
 /**
  * @IMPORTANT Right now user can login in system only from 1 device at once
@@ -235,6 +236,123 @@ class UserService {
         }
 
         return user.accessLevel === config.USER_ACCESS_LEVELS.bannedUser;
+    }
+
+    // TODO try to make it more compact (i just didn't want to fuck with mongodb queries which are implemented as shit)
+    public async searchForUser(page: number, name?: string, surname?: string, patronymic?: string) {
+        if (page < 1) {
+            throw new HTTPError(400, "Page must be equal or greater than 1");
+        }
+
+        page = page - 1;
+
+        // if all
+        if (typeof name === "string" && typeof surname === "string" && typeof patronymic === "string") {
+            return await userModel.find(
+                {
+                    name: new RegExp("^" + name + "$", "i"),
+                    surname: new RegExp("^" + surname + "$", "i"),
+                    patronymic: new RegExp("^" + patronymic + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+
+        // if name & surname
+        if (typeof name === "string" && typeof surname === "string") {
+            return await userModel.find(
+                {
+                    name: new RegExp("^" + name + "$", "i"),
+                    surname: new RegExp("^" + surname + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+
+        // if name & patronymic
+        if (typeof name === "string" && typeof patronymic === "string") {
+            return await userModel.find(
+                {
+                    name: new RegExp("^" + name + "$", "i"),
+                    patronymic: new RegExp("^" + patronymic + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+
+        // if surname & patronymic
+        if (typeof surname === "string" && typeof patronymic === "string") {
+            return await userModel.find(
+                {
+                    surname: new RegExp("^" + surname + "$", "i"),
+                    patronymic: new RegExp("^" + patronymic + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+
+        // if only surname
+        if (typeof surname === "string") {
+            return await userModel.find(
+                {
+                    surname: new RegExp("^" + surname + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+
+        // if only name
+        if (typeof name === "string") {
+            console.log(1);
+            return await userModel.find(
+                {
+                    name: new RegExp("^" + name + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+
+        // if only patronymic
+        if (typeof patronymic === "string") {
+            return await userModel.find(
+                {
+                    patronymic: new RegExp("^" + patronymic + "$", "i"),
+                },
+                {},
+                { skip: 20 * page, limit: 20 }
+            );
+        }
+    }
+
+    public async addUserToFriendList(targetID: string, initiatorID: string) {
+        if (!ObjectId.isValid(targetID)) {
+            throw new HTTPError(400, "Targeted user has incorrect id format");
+        }
+
+        if (!ObjectId.isValid(initiatorID)) {
+            throw new HTTPError(400, "Initiator user has incorrect id format");
+        }
+
+        const targetedUser = await userModel.findOne({ _id: targetID });
+        const initiatorUser = await userModel.findOne({ _id: initiatorID });
+
+        if (!targetedUser) {
+            throw new HTTPError(404, "Targeted user wasn't found");
+        }
+
+        if (!initiatorUser) {
+            throw new HTTPError(404, "Initiator user wasn't found");
+        }
+
+        initiatorUser.friends.push(targetID);
+
+        await initiatorUser.save();
     }
 }
 
