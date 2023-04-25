@@ -1,7 +1,10 @@
+@import "../../../../app/styles/mixins.scss";
 @import "../../../../app/styles/variables.scss";
 @import "../../../../app/styles/screen-breakpoints.scss";
 
 .TNUI-ChatSearch {
+    @include custom-scrollbar(10px, transparent);
+
     height: 95%;
 
     display: flex;
@@ -11,6 +14,13 @@
 
     border: 1px solid $lightGrey;
     border-radius: 10px;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    @media screen and (max-width: 1600px) {
+        margin-inline: 12.5%;
+    }
 
     @media screen and (max-width: 1400px) {
         margin-inline: 10%;
@@ -27,10 +37,14 @@
         margin: 0;
     }
 
-    &-content {
-        width: 80%;
+    @media screen and (max-width: $tablet) {
+        &-header {
+            margin-block: 10px;
+        }
+    }
 
-        padding-inline: 10px;
+    &-content {
+        width: 100%;
 
         border-top-left-radius: inherit;
         border-bottom-left-radius: inherit;
@@ -42,6 +56,8 @@
 
         display: flex;
         align-items: center;
+
+        padding-inline: 5px;
 
         &_icon {
             height: 27.5px !important;
@@ -67,36 +83,241 @@
 
         margin-top: 5px;
 
-        &-input-block {
-            width: 100%;
-
+        .TNUI-ChatSearch-search-params {
             display: flex;
-            align-items: center;
-        }
+            flex-wrap: wrap;
 
-        &_search-input {
-            width: 100%;
-            height: 35px;
+            background-color: transparent;
 
-            margin-right: 5px;
+            &_header {
+                padding-inline: 10px;
 
-            flex-grow: 1;
-        }
+                border-radius: inherit;
 
-        &_search-button {
-            height: 35px;
-            width: 100px;
+                &-icon {
+                    color: $lightestPrimary;
+                }
 
-            margin-left: 5px;
+                &-label {
+                    margin-left: 5px;
+                }
+            }
 
-            font-size: 17.5px;
+            &-root {
+                width: calc(100% - 10px);
+
+                margin-inline: 5px;
+
+                border: 1px solid $lightGrey;
+
+                border-radius: 10px;
+            }
+
+            &-target-list {
+                width: 100%;
+
+                display: flex;
+                flex-direction: column;
+
+                margin-inline: 5px;
+
+                &_header {
+                    margin-block: 5px;
+
+                    color: $lightPrimary;
+
+                    font-size: 20px;
+                }
+
+                &_body {
+                    display: flex;
+                    justify-content: space-evenly;
+                }
+
+                &_item {
+                    width: 32%;
+                    height: 35px;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    padding-inline: 5px;
+                    margin-bottom: 5px;
+
+                    color: rgb(230, 230, 230);
+                    background-color: $grey;
+
+                    border-radius: 5px;
+
+                    font-size: 17px;
+
+                    user-select: none;
+
+                    cursor: pointer;
+
+                    transition: all 0.2s ease-in-out;
+
+                    &.current {
+                        background-color: $primaryTransperant4 !important;
+                    }
+
+                    &:hover {
+                        background-color: $primaryTransperant0;
+                    }
+
+                    &-icon {
+                        color: $lightestPrimary;
+                    }
+
+                    &-label {
+                        margin-left: 5px;
+                    }
+                }
+            }
+
+            &-input-block {
+                width: 100%;
+
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+
+                margin-inline: 5px;
+
+                &_header {
+                    width: 100%;
+
+                    margin-bottom: 5px;
+
+                    color: $lightPrimary;
+
+                    font-size: 20px;
+                }
+            }
+
+            &_search-input {
+                width: 100%;
+                height: 35px;
+                max-height: 35px;
+
+                margin-top: 5px;
+                margin-bottom: 5px;
+
+                flex-grow: 1;
+            }
+
+            &-search-button {
+                height: 35px;
+                width: 60%;
+
+                margin-top: 10px;
+                margin-bottom: 10px;
+                margin-inline: auto;
+
+                font-size: 17.5px;
+            }
+
+            @media screen and (max-width: $laptop) {
+                flex-direction: row;
+                flex-wrap: wrap;
+
+                padding-inline: 30px;
+
+                &-root {
+                    width: calc(100% - 40px) !important;
+                    margin-inline: 20px !important;
+                }
+
+                &-target-list {
+                    width: 300px;
+                    margin-right: 10px !important;
+
+                    &_body {
+                        flex-direction: column;
+                        justify-content: unset;
+                    }
+
+                    &_item {
+                        width: 100%;
+                        margin-bottom: 10px;
+                    }
+                }
+
+                &-input-block {
+                    width: 300px !important;
+                }
+
+                &_search-input {
+                    margin-bottom: 5px;
+                }
+
+                &-search-button {
+                    width: 100%;
+
+                    margin-top: 15px;
+                    margin-bottom: 10px;
+                }
+            }
+
+            @media screen and (max-width: $tablet) {
+                justify-content: space-between;
+
+                &-root {
+                    width: calc(100% - 10px) !important;
+
+                    margin-inline: 5px !important;
+                }
+
+                &-target-list {
+                    margin: 0px !important;
+                }
+            }
+
+            @media screen and (max-width: 715px) {
+                padding-inline: 25px !important;
+            }
+
+            @media screen and (max-width: 681px) {
+                padding-inline: 10px !important;
+            }
+
+            @media screen and (max-width: 651px) {
+                &-target-list {
+                    width: 100%;
+                }
+
+                &-input-block {
+                    width: 100% !important;
+                }
+
+                &-search-button {
+                    width: 100% !important;
+
+                    margin-inline: 5px;
+                }
+            }
         }
 
         &_search-result-list {
             width: 100%;
-            height: 100%;
+            height: fit-content;
 
             margin-top: 15px;
+            padding-inline: 10px;
+            padding-bottom: 5px;
+
+            &_header {
+                width: 100%;
+
+                text-align: center;
+
+                margin-bottom: 5px;
+
+                color: $lightestPrimary;
+
+                font-size: 20px;
+            }
 
             .TNUI-ChatSearch-body_nothing-found-alert {
                 width: 100%;
@@ -104,7 +325,7 @@
                 display: flex;
                 justify-content: center;
 
-                margin-top: 25px;
+                margin-top: 15px;
 
                 color: white;
 
@@ -118,6 +339,7 @@
                 display: flex;
                 align-items: center;
 
+                margin-bottom: 10px;
                 padding-inline: 10px;
 
                 border: 1px solid $lightGrey;
@@ -140,86 +362,14 @@
                     font-size: 24px;
 
                     color: white;
+
+                    @media screen and (max-width: $mobile) {
+                        font-size: 18px;
+                    }
                 }
 
                 &-add-button {
                     margin-left: auto;
-                }
-            }
-        }
-    }
-
-    &-sidebar {
-        width: 20%;
-        min-width: 175px;
-
-        background-color: $darkGrey;
-
-        padding-block: 5px;
-
-        border-left: 1px solid $lightGrey;
-        border-top-right-radius: inherit;
-        border-bottom-right-radius: inherit;
-
-        &_header {
-            margin-bottom: 5px;
-
-            text-align: center;
-
-            color: white;
-
-            font-size: 16px;
-
-            user-select: none;
-        }
-
-        &_content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        &-search-in-block {
-            width: 100%;
-
-            border-top: 1px solid $lightGrey;
-
-            &_item {
-                width: 100%;
-                height: 35px;
-
-                display: flex;
-                align-items: center;
-
-                padding-inline: 5px;
-
-                border-bottom: 1px solid $lightGrey;
-
-                color: rgb(230, 230, 230);
-                background-color: $grey;
-
-                font-size: 17px;
-
-                user-select: none;
-
-                cursor: pointer;
-
-                transition: all 0.2s ease-in-out;
-
-                &.current {
-                    background-color: $primaryTransperant4 !important;
-                }
-
-                &:hover {
-                    background-color: $primaryTransperant0;
-                }
-
-                &-icon {
-                    color: $lightestPrimary;
-                }
-
-                &-label {
-                    margin-left: 5px;
                 }
             }
         }

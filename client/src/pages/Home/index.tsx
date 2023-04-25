@@ -5,6 +5,7 @@ import Header from "../../widgets/Header";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import Avatar from "../../shared/UI/Avatar";
 import { ConfirmModal, CustomModal, InputModal } from "../../features/Modal";
+import Accordion from "../../shared/UI/Accordion";
 
 export default function HomePage() {
     const { user } = useTypedSelector((state) => state.auth);
@@ -49,6 +50,11 @@ export default function HomePage() {
                     Вы уверены что хотите выйти из аккаунта?
                 </CustomModal>
             )}
+            <Accordion header={"Параметры поиска"}>
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Corporis ullam consequatur sequi ut fuga labore eos
+                voluptatibus, ratione debitis necessitatibus perspiciatis vitae eaque asperiores, quas earum hic id,
+                cupiditate in?
+            </Accordion>
         </Page>
     );
 }

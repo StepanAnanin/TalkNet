@@ -6,6 +6,7 @@ import OpenIcon from "@mui/icons-material/ArrowBack";
 import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
 import UserIcon from "@mui/icons-material/Group";
 import CommunityIcon from "@mui/icons-material/GridViewOutlined";
+import TuneIcon from "@mui/icons-material/TuneRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
@@ -15,6 +16,7 @@ import Button from "../../../../shared/UI/Button";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import Avatar from "../../../../shared/UI/Avatar";
 import { Navigate } from "react-router-dom";
+import Accordion from "../../../../shared/UI/Accordion";
 
 interface ChatSearchProps extends UiComponentProps<HTMLDivElement> {
     isOpen?: boolean;
@@ -26,15 +28,29 @@ const searchTargetTypeMap: readonly SearchTarget[] = ["chat", "user", "community
 
 const searchInItemIdOrigin = "search-page_search-target-";
 
+interface SearchResult {
+    page: number;
+    payload: Friend[];
+}
+
+interface Friend {
+    id: string;
+    name: string;
+    surname: string | null;
+    patronymic: string | null;
+}
+
 // TODO require decomposition
+// TODO add loader for search result
 export default function ChatSearch(props: ChatSearchProps) {
     const { className = "", isOpen = false, ...otherProps } = props;
 
     const windowLayout = useTypedSelector((state) => state.windowLayout);
     const { user } = useTypedSelector((state) => state.auth);
 
-    const [searchTarget, setSearchTarget] = React.useState<SearchTarget>("community");
-    const [searchResult, setSearchResult] = React.useState<any[]>([]);
+    const [searchTarget, setSearchTarget] = React.useState<SearchTarget>("user");
+    const [searchResult, setSearchResult] = React.useState<SearchResult>({ page: 1, payload: [] });
+    const [searchResultPage, setSearchResultPage] = React.useState(1);
 
     const firstSearchElementRef = React.useRef<HTMLInputElement>(null);
     const secondSearchElementRef = React.useRef<HTMLInputElement>(null);
@@ -56,7 +72,7 @@ export default function ChatSearch(props: ChatSearchProps) {
             return;
         }
 
-        setSearchResult([]);
+        setSearchResult({ page: 1, payload: [] });
         setSearchTarget(target as SearchTarget);
     }
 
@@ -109,7 +125,8 @@ export default function ChatSearch(props: ChatSearchProps) {
         try {
             const response = await TalkNetAPI.get("/search/user" + stringifiedQueryParams);
 
-            setSearchResult(response.data);
+            // TODO change page dynamicaly
+            setSearchResult({ page: 1, payload: response.data });
         } catch (err) {
             console.log(err);
         }
@@ -130,6 +147,8 @@ export default function ChatSearch(props: ChatSearchProps) {
         }
     }
 
+    console.log(searchResult);
+
     const classes = ["TNUI-ChatSearch", className].join(" ");
 
     return (
@@ -146,97 +165,337 @@ export default function ChatSearch(props: ChatSearchProps) {
                     <span className="TNUI-ChatSearch-header_label">Поиск</span>
                 </div>
                 <div className="TNUI-ChatSearch-body">
-                    <div className="TNUI-ChatSearch-body-input-block">
-                        <TextInput
-                            className="TNUI-ChatSearch-body_search-input"
-                            ref={firstSearchElementRef}
-                            type="search"
-                            staticPlaceholder="Имя"
-                        />
-                        {searchTarget === "user" && (
+                    <Accordion
+                        header={
+                            <>
+                                <TuneIcon className="TNUI-ChatSearch-search-params_header-icon" />
+                                <span className="TNUI-ChatSearch-search-params_header-label">Параметры поиска</span>
+                            </>
+                        }
+                        className="TNUI-ChatSearch-search-params-root"
+                        headerClassName="TNUI-ChatSearch-search-params_header"
+                        bodyClassName="TNUI-ChatSearch-search-params"
+                        defaultOpen
+                    >
+                        <div className="TNUI-ChatSearch-search-params-target-list">
+                            <div className="TNUI-ChatSearch-search-params-target-list_header">Искать:</div>
+                            <div className="TNUI-ChatSearch-search-params-target-list_body">
+                                <div
+                                    className={
+                                        "TNUI-ChatSearch-search-params-target-list_item" +
+                                        (searchTarget === "community" ? " current" : "")
+                                    }
+                                    id={searchInItemIdOrigin + "community"}
+                                    onClick={onSearchInItemClick}
+                                >
+                                    <CommunityIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
+                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">Сообщества</span>
+                                </div>
+                                <div
+                                    className={
+                                        "TNUI-ChatSearch-search-params-target-list_item" +
+                                        (searchTarget === "user" ? " current" : "")
+                                    }
+                                    id={searchInItemIdOrigin + "user"}
+                                    onClick={onSearchInItemClick}
+                                >
+                                    <UserIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
+                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">
+                                        Пользователей
+                                    </span>
+                                </div>
+                                <div
+                                    className={
+                                        "TNUI-ChatSearch-search-params-target-list_item" +
+                                        (searchTarget === "chat" ? " current" : "")
+                                    }
+                                    id={searchInItemIdOrigin + "chat"}
+                                    onClick={onSearchInItemClick}
+                                >
+                                    <ChatIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
+                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">Чаты</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="TNUI-ChatSearch-search-params-input-block">
+                            <div className="TNUI-ChatSearch-search-params-input-block_header">Запрос:</div>
                             <TextInput
-                                className="TNUI-ChatSearch-body_search-input"
-                                ref={secondSearchElementRef}
+                                className="TNUI-ChatSearch-search-params_search-input"
+                                ref={firstSearchElementRef}
                                 type="search"
-                                staticPlaceholder="Фамилия"
+                                staticPlaceholder="Имя"
                             />
-                        )}
-                        {searchTarget === "user" && (
-                            <TextInput
-                                className="TNUI-ChatSearch-body_search-input"
-                                ref={thirdSearchElementRef}
-                                type="search"
-                                staticPlaceholder="Отчество"
-                            />
-                        )}
+                            {searchTarget === "user" && (
+                                <TextInput
+                                    className="TNUI-ChatSearch-search-params_search-input"
+                                    ref={secondSearchElementRef}
+                                    type="search"
+                                    staticPlaceholder="Фамилия"
+                                />
+                            )}
+                            {searchTarget === "user" && (
+                                <TextInput
+                                    className="TNUI-ChatSearch-search-params_search-input"
+                                    ref={thirdSearchElementRef}
+                                    type="search"
+                                    staticPlaceholder="Отчество"
+                                />
+                            )}
+                        </div>
                         <Button
                             variant="contained"
-                            className="TNUI-ChatSearch-body_search-button"
+                            className="TNUI-ChatSearch-search-params-search-button"
                             onClick={handleSearchButtonClick}
                         >
-                            Найти
+                            Поиск
                         </Button>
-                    </div>
+                    </Accordion>
+
                     <div className="TNUI-ChatSearch-body_search-result-list">
-                        {searchResult.length === 0 && (
+                        <div className="TNUI-ChatSearch-body_search-result-list_header">
+                            Результат поиска по вашему запросу:
+                        </div>
+                        {searchResult.payload.length === 0 && searchResult.page === 1 && (
                             <div className="TNUI-ChatSearch-body_nothing-found-alert">Ничего не найдено</div>
                         )}
                         {/* TODO require refactoring */}
-                        {searchResult.map((item) => (
-                            <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
-                                <Avatar size="medium" className="TNUI-ChatSearch-body_search-result-list-item-avatar" />
-                                <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
-                                    {item.name} {item.surname} {item.patronymic}
-                                </span>
-                                <Button
-                                    variant="contained"
-                                    className="TNUI-ChatSearch-body_search-result-list-item-add-button"
-                                    // TODO temp???
-                                    id={item.id}
-                                    onClick={sendFriendRequest}
-                                >
-                                    Добавить
-                                </Button>
-                            </div>
+                        {searchResult.payload.map((item) => (
+                            <>
+                                <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <Avatar size="medium" className="TNUI-ChatSearch-body_search-result-list-item-avatar" />
+                                    <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                        {item.name} {item.surname} {item.patronymic}
+                                    </span>
+                                    <Button
+                                        variant="contained"
+                                        className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                        // TODO temp???
+                                        id={item.id}
+                                        onClick={sendFriendRequest}
+                                    >
+                                        Добавить
+                                    </Button>
+                                </div>
+                                <>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                        <Avatar
+                                            size="medium"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                        />
+                                        <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
+                                            {item.name} {item.surname} {item.patronymic}
+                                        </span>
+                                        <Button
+                                            variant="contained"
+                                            className="TNUI-ChatSearch-body_search-result-list-item-add-button"
+                                            // TODO temp???
+                                            id={item.id}
+                                            onClick={sendFriendRequest}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                </>
+                            </>
                         ))}
-                    </div>
-                </div>
-            </div>
-            <div className="TNUI-ChatSearch-sidebar">
-                <div className="TNUI-ChatSearch-sidebar_header">Параметры поиска</div>
-                <div className="TNUI-ChatSearch-sidebar_content">
-                    <div className="TNUI-ChatSearch-sidebar-search-in-block">
-                        <div
-                            className={
-                                "TNUI-ChatSearch-sidebar-search-in-block_item" +
-                                (searchTarget === "community" ? " current" : "")
-                            }
-                            id={searchInItemIdOrigin + "community"}
-                            onClick={onSearchInItemClick}
-                        >
-                            <CommunityIcon className="TNUI-ChatSearch-sidebar-search-in-block_item-icon" />
-                            <span className="TNUI-ChatSearch-sidebar-search-in-block_item-label">Сообщества</span>
-                        </div>
-                        <div
-                            className={
-                                "TNUI-ChatSearch-sidebar-search-in-block_item" + (searchTarget === "user" ? " current" : "")
-                            }
-                            id={searchInItemIdOrigin + "user"}
-                            onClick={onSearchInItemClick}
-                        >
-                            <UserIcon className="TNUI-ChatSearch-sidebar-search-in-block_item-icon" />
-                            <span className="TNUI-ChatSearch-sidebar-search-in-block_item-label">Пользователи</span>
-                        </div>
-                        <div
-                            className={
-                                "TNUI-ChatSearch-sidebar-search-in-block_item" + (searchTarget === "chat" ? " current" : "")
-                            }
-                            id={searchInItemIdOrigin + "chat"}
-                            onClick={onSearchInItemClick}
-                        >
-                            <ChatIcon className="TNUI-ChatSearch-sidebar-search-in-block_item-icon" />
-                            <span className="TNUI-ChatSearch-sidebar-search-in-block_item-label">Чаты</span>
-                        </div>
                     </div>
                 </div>
             </div>
