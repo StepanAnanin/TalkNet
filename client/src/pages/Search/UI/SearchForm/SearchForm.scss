@@ -1,21 +1,15 @@
-@import "../../../../app/styles/mixins.scss";
 @import "../../../../app/styles/variables.scss";
 @import "../../../../app/styles/screen-breakpoints.scss";
 
 .TNUI-ChatSearch {
-    @include custom-scrollbar(10px, transparent);
-
-    height: 95%;
+    height: fit-content;
 
     display: flex;
 
     margin-inline: 17.5%;
-    margin-top: 20px;
+    margin-top: 5px;
 
-    border: 1px solid $lightGrey;
-    border-radius: 10px;
-
-    overflow-y: scroll;
+    overflow-y: hidden;
     overflow-x: hidden;
 
     @media screen and (max-width: 1600px) {
@@ -33,7 +27,6 @@
     @media screen and (max-width: $laptop) {
         border: none;
         border-radius: 0;
-        height: 100%;
         margin: 0;
     }
 
@@ -216,6 +209,8 @@
                 margin-inline: auto;
 
                 font-size: 17.5px;
+
+                letter-spacing: 0.5px;
             }
 
             @media screen and (max-width: $laptop) {
@@ -308,15 +303,17 @@
             padding-bottom: 5px;
 
             &_header {
-                width: 100%;
+                width: fit-content;
 
-                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
 
-                margin-bottom: 5px;
+                margin-bottom: 10px;
 
                 color: $lightestPrimary;
 
-                font-size: 20px;
+                font-size: 24px;
             }
 
             .TNUI-ChatSearch-body_nothing-found-alert {
@@ -324,12 +321,25 @@
 
                 display: flex;
                 justify-content: center;
+                align-items: center;
 
                 margin-top: 15px;
 
-                color: white;
+                &_icon {
+                    width: 35px !important;
+                    height: 35px !important;
 
-                font-size: 20px;
+                    margin-right: 2.5px;
+
+                    // color: $lightPrimary;
+                    color: $lightRed;
+                }
+
+                &_label {
+                    color: white;
+
+                    font-size: 26px;
+                }
             }
 
             &-item {

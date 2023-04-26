@@ -14,6 +14,8 @@ const UserSchema = new Schema<IUser>({
     accessLevel: { type: Number, default: 5, required: true },
     activationState: { type: ActivationState, required: true },
     friends: [Schema.Types.ObjectId],
+    friendRequests: [Schema.Types.ObjectId],
+    blackList: [Schema.Types.ObjectId],
     settings: { type: UserSettings, default: {} },
 });
 

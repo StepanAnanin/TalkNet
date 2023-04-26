@@ -1,0 +1,22 @@
+@import "../../../../app/styles/mixins.scss";
+@import "../../../../app/styles/screen-breakpoints.scss";
+
+.TNUI-SearchPage {
+    &-content {
+        @include custom-scrollbar(10px, transparent);
+
+        width: 100%;
+        height: 100%;
+
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        @media screen and (max-width: $laptop) {
+            @include custom-scrollbar(7.5px, transparent);
+        }
+
+        @media screen and (max-width: $mobile) {
+            @include custom-scrollbar(5px, transparent);
+        }
+    }
+}

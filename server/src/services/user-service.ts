@@ -308,7 +308,6 @@ class UserService {
 
         // if only name
         if (typeof name === "string") {
-            console.log(1);
             return await userModel.find(
                 {
                     name: new RegExp("^" + name + "$", "i"),
@@ -330,29 +329,68 @@ class UserService {
         }
     }
 
-    public async addUserToFriendList(targetID: string, initiatorID: string) {
-        if (!ObjectId.isValid(targetID)) {
+    public async sendFriendRequest(to: string, from: string) {
+        if (!ObjectId.isValid(to)) {
             throw new HTTPError(400, "Targeted user has incorrect id format");
         }
 
-        if (!ObjectId.isValid(initiatorID)) {
+        if (!ObjectId.isValid(from)) {
             throw new HTTPError(400, "Initiator user has incorrect id format");
         }
 
-        const targetedUser = await userModel.findOne({ _id: targetID });
-        const initiatorUser = await userModel.findOne({ _id: initiatorID });
+        const targetedUser = await userModel.findOne({ _id: to });
+        const sender = await userModel.findOne({ _id: from });
 
         if (!targetedUser) {
             throw new HTTPError(404, "Targeted user wasn't found");
         }
 
-        if (!initiatorUser) {
-            throw new HTTPError(404, "Initiator user wasn't found");
+        if (!sender) {
+            throw new HTTPError(404, "Sender user wasn't found");
         }
 
-        initiatorUser.friends.push(targetID);
+        // from is already validated, see above
+        if (targetedUser.friendRequests.includes(from as any)) {
+            throw new HTTPError(409, "Заявка в друзья этому пользователю уже отправлена");
+        }
+        // console.log(from);
+        // console.log(targetedUser.friendRequests);
+        targetedUser.friendRequests.push(from);
+        // console.log("asd");
+        await targetedUser.save();
+    }
 
-        await initiatorUser.save();
+    public async acceptFriendRequest(to: string, from: string) {
+        if (!ObjectId.isValid(to)) {
+            throw new HTTPError(400, "Targeted user has incorrect id format");
+        }
+
+        if (!ObjectId.isValid(from)) {
+            throw new HTTPError(400, "Initiator user has incorrect id format");
+        }
+
+        const targetedUser = await userModel.findOne({ _id: to });
+        const sender = await userModel.findOne({ _id: from });
+
+        if (!targetedUser) {
+            throw new HTTPError(404, "Targeted user wasn't found");
+        }
+
+        if (!sender) {
+            throw new HTTPError(404, "Sender user wasn't found");
+        }
+
+        // from is already validated, see above
+        const friendRequestID = targetedUser.friendRequests.indexOf(from as any);
+
+        if (friendRequestID === -1) {
+            throw new HTTPError(404, "Не удалось найти заявку в друзья");
+        }
+
+        targetedUser.friendRequests.splice(friendRequestID, 1);
+        targetedUser.friends.push(from);
+
+        await targetedUser.save();
     }
 }
 

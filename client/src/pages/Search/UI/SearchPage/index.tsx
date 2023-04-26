@@ -14,16 +14,16 @@ interface SearchProps extends UiComponentProps<HTMLDivElement> {
 export default function SearchPage(props: SearchProps) {
     const { className = "", ...otherProps } = props;
 
-    const classes = ["TNUI-MessagesPage", className].join(" ");
+    const classes = ["TNUI-SearchPage", className].join(" ");
 
     return (
-        <Page>
-            <Page title="TalkNet | Добавить чат" className={classes} {...otherProps}>
-                {/* TODO add option for user to toggle is navigator closed or not */}
-                <NavigatorLayout closed={false} hideAddButton>
+        <Page title="TalkNet | Поиск" className={classes} {...otherProps}>
+            {/* TODO add option for user to toggle is navigator closed or not */}
+            <NavigatorLayout closed={false} hideAddButton>
+                <div className="TNUI-SearchPage-content">
                     <ChatSearch />
-                </NavigatorLayout>
-            </Page>
+                </div>
+            </NavigatorLayout>
         </Page>
     );
 }

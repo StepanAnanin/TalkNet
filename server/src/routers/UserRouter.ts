@@ -16,7 +16,9 @@ UserRouter.post("/logout", userController.logout);
 
 UserRouter.post("/refresh", userController.updateRefreshToken);
 
-UserRouter.patch("/friend", userController.addUserToFriendList);
+UserRouter.post("/friend-requests", userController.sendFriendRequest);
+
+UserRouter.patch("/friend-requests/accept", userController.acceptFriendRequest);
 
 UserRouter.get("/:id/chats", userController.getUserChats);
 

@@ -6,8 +6,9 @@ import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
 import Avatar from "../../../../shared/UI/Avatar";
 import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
+import { Link } from "react-router-dom";
 
-interface ChatProps extends Omit<UiComponentProps<HTMLDivElement>, "onClick"> {
+interface ChatProps extends Omit<UiComponentProps<HTMLAnchorElement>, "onClick"> {
     imgURL: string;
     chatName: string;
     chat: DialogueChat;
@@ -28,7 +29,7 @@ export default function ChatPreview(props: ChatProps) {
     const classes = ["TNUI-ChatPreview", active ? "TNUI-ChatPreview-active" : "", className].join(" ");
 
     return (
-        <div className={classes} {...otherProps} title={chatName}>
+        <Link to={"/m?chat=" + chat.id} className={classes} {...otherProps} title={chatName}>
             <Avatar src={imgURL} className="TNUI-ChatPreview-avatar" size="medium" />
             <div className="TNUI-ChatPreview-info">
                 <div className="TNUI-ChatPreview-info-top">
@@ -59,7 +60,7 @@ export default function ChatPreview(props: ChatProps) {
                 </div>
                 <span className="TNUI-ChatPreview-info_last-message">{lastMessage.data}</span>
             </div>
-        </div>
+        </Link>
     );
 }
 

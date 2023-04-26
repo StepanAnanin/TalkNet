@@ -316,17 +316,17 @@ class UserContoller {
         }
     }
 
-    public async addUserToFriendList(req: Request, res: Response) {
+    public async sendFriendRequest(req: Request, res: Response) {
         if (res.headersSent) {
             return;
         }
 
-        const initiatorID = req.body.initiatorID;
-        const targetID = req.body.targetID;
+        const from = req.body.from as string;
+        const to = req.body.to as string;
 
         const validationResult = validateRequest(req.body, [
-            { key: "initiatorID", type: "string" },
-            { key: "targetID", type: "string" },
+            { key: "from", type: "string" },
+            { key: "to", type: "string" },
         ]);
 
         if (!validationResult.ok) {
@@ -335,13 +335,60 @@ class UserContoller {
         }
 
         try {
-            userService.addUserToFriendList(targetID, initiatorID);
+            await userService.sendFriendRequest(to, from);
 
-            res.status(200).json({ message: "Заявка на добавление в друзья была отправлена" });
+            res.status(200).json({ message: "Заявка на добавление в друзья отправлена" });
         } catch (err: any) {
-            if (err instanceof HTTPError && err.errorCode === 401) {
-                res.status(err.errorCode).json({ message: `Требуется аутентификация` });
-                return;
+            if (err instanceof HTTPError) {
+                if (err.errorCode === 401) {
+                    res.status(err.errorCode).json({ message: `Требуется аутентификация` });
+                    return;
+                }
+
+                if (err.errorCode === 409) {
+                    res.status(err.errorCode).json({ message: err.message });
+                    return;
+                }
+            }
+
+            res.status(500).json({ message: `Что-то пошло не так...` });
+            console.error(err);
+        }
+    }
+
+    public async acceptFriendRequest(req: Request, res: Response) {
+        if (res.headersSent) {
+            return;
+        }
+
+        const from = req.body.from as string;
+        const to = req.body.to as string;
+
+        const validationResult = validateRequest(req.body, [
+            { key: "from", type: "string" },
+            { key: "to", type: "string" },
+        ]);
+
+        if (!validationResult.ok) {
+            res.status(400).json({ message: validationResult.message });
+            return;
+        }
+
+        try {
+            await userService.acceptFriendRequest(to, from);
+
+            res.status(200).json({ message: "Заявка на добавление в друзья принятна" });
+        } catch (err: any) {
+            if (err instanceof HTTPError) {
+                if (err.errorCode === 401) {
+                    res.status(err.errorCode).json({ message: `Требуется аутентификация` });
+                    return;
+                }
+
+                if (err.errorCode === 409) {
+                    res.status(err.errorCode).json({ message: err.message });
+                    return;
+                }
             }
 
             res.status(500).json({ message: `Что-то пошло не так...` });

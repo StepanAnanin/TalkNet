@@ -7,6 +7,7 @@ import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
 import UserIcon from "@mui/icons-material/Group";
 import CommunityIcon from "@mui/icons-material/GridViewOutlined";
 import TuneIcon from "@mui/icons-material/TuneRounded";
+import NoSearchResultIcon from "@mui/icons-material/SearchOffRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
@@ -17,6 +18,7 @@ import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import Avatar from "../../../../shared/UI/Avatar";
 import { Navigate } from "react-router-dom";
 import Accordion from "../../../../shared/UI/Accordion";
+import { AxiosError } from "axios";
 
 interface ChatSearchProps extends UiComponentProps<HTMLDivElement> {
     isOpen?: boolean;
@@ -40,8 +42,22 @@ interface Friend {
     patronymic: string | null;
 }
 
+function getSearchInpuPlaceholder(searchTarget: SearchTarget) {
+    switch (searchTarget) {
+        case "user":
+            return "Имя";
+        case "chat":
+            return "Название чата";
+        case "community":
+            return "Название сообщества";
+        default:
+            throw new TypeError("Invalid search target");
+    }
+}
+
 // TODO require decomposition
 // TODO add loader for search result
+// TODO fix add button responsivness when it's disabled
 export default function ChatSearch(props: ChatSearchProps) {
     const { className = "", isOpen = false, ...otherProps } = props;
 
@@ -50,7 +66,7 @@ export default function ChatSearch(props: ChatSearchProps) {
 
     const [searchTarget, setSearchTarget] = React.useState<SearchTarget>("user");
     const [searchResult, setSearchResult] = React.useState<SearchResult>({ page: 1, payload: [] });
-    const [searchResultPage, setSearchResultPage] = React.useState(1);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const firstSearchElementRef = React.useRef<HTMLInputElement>(null);
     const secondSearchElementRef = React.useRef<HTMLInputElement>(null);
@@ -62,9 +78,9 @@ export default function ChatSearch(props: ChatSearchProps) {
     }
 
     function onSearchInItemClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        const target = e.currentTarget.id.split(searchInItemIdOrigin)[1];
+        const target = e.currentTarget.id.split(searchInItemIdOrigin)[1] as SearchTarget;
 
-        if (!searchTargetTypeMap.includes) {
+        if (!searchTargetTypeMap.includes(target)) {
             throw new TypeError(`Search target has incorrect value: ${target}`);
         }
 
@@ -72,19 +88,24 @@ export default function ChatSearch(props: ChatSearchProps) {
             return;
         }
 
+        // Clean first input (cuz only he exist at any search target value)
+        if (firstSearchElementRef.current instanceof HTMLInputElement) {
+            firstSearchElementRef.current.value = "";
+        }
+
         setSearchResult({ page: 1, payload: [] });
         setSearchTarget(target as SearchTarget);
     }
 
-    function handleSearchButtonClick() {
+    function handleSearch() {
         // console.log(searchTarget);
         if (searchTarget === "user") {
-            handleSearchFriends();
+            searchFriends();
             return;
         }
     }
 
-    async function handleSearchFriends() {
+    async function searchFriends() {
         const nameInputElement = firstSearchElementRef.current!;
         const surnameInputElement = secondSearchElementRef.current!;
         const patronymicInputElement = thirdSearchElementRef.current!;
@@ -133,17 +154,39 @@ export default function ChatSearch(props: ChatSearchProps) {
     }
 
     async function sendFriendRequest(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        const targetID = e.currentTarget.id;
+        const addButtonElement = e.currentTarget;
+        const targetID = addButtonElement.id;
 
         try {
-            await TalkNetAPI.patch("/user/friend", {
-                initiatorID: user!.id,
-                targetID,
-            });
+            if (searchTarget === "user") {
+                // TODO temporarily disabled
+                await TalkNetAPI.patch("/user/friend-requests", {
+                    from: user!.id,
+                    to: targetID,
+                });
 
-            console.log("success");
+                addButtonElement.disabled = true;
+                addButtonElement.innerText = "Заявка отправленна";
+
+                console.log("success");
+
+                return;
+            }
+
+            throw new Error("NOT IMPLEMENTED");
         } catch (err) {
+            if (err instanceof AxiosError && err.response!.status === 409) {
+                // TODO temp, replace this
+                alert(err.response!.data.message ?? "xdd");
+            }
+
             console.log(err);
+        }
+    }
+
+    function submitSearchInputHandler(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.code === "Enter") {
+            handleSearch();
         }
     }
 
@@ -183,17 +226,6 @@ export default function ChatSearch(props: ChatSearchProps) {
                                 <div
                                     className={
                                         "TNUI-ChatSearch-search-params-target-list_item" +
-                                        (searchTarget === "community" ? " current" : "")
-                                    }
-                                    id={searchInItemIdOrigin + "community"}
-                                    onClick={onSearchInItemClick}
-                                >
-                                    <CommunityIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
-                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">Сообщества</span>
-                                </div>
-                                <div
-                                    className={
-                                        "TNUI-ChatSearch-search-params-target-list_item" +
                                         (searchTarget === "user" ? " current" : "")
                                     }
                                     id={searchInItemIdOrigin + "user"}
@@ -203,6 +235,17 @@ export default function ChatSearch(props: ChatSearchProps) {
                                     <span className="TNUI-ChatSearch-search-params-target-list_item-label">
                                         Пользователей
                                     </span>
+                                </div>
+                                <div
+                                    className={
+                                        "TNUI-ChatSearch-search-params-target-list_item" +
+                                        (searchTarget === "community" ? " current" : "")
+                                    }
+                                    id={searchInItemIdOrigin + "community"}
+                                    onClick={onSearchInItemClick}
+                                >
+                                    <CommunityIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
+                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">Сообщества</span>
                                 </div>
                                 <div
                                     className={
@@ -223,7 +266,8 @@ export default function ChatSearch(props: ChatSearchProps) {
                                 className="TNUI-ChatSearch-search-params_search-input"
                                 ref={firstSearchElementRef}
                                 type="search"
-                                staticPlaceholder="Имя"
+                                staticPlaceholder={getSearchInpuPlaceholder(searchTarget)}
+                                onKeyUp={submitSearchInputHandler}
                             />
                             {searchTarget === "user" && (
                                 <TextInput
@@ -231,6 +275,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                     ref={secondSearchElementRef}
                                     type="search"
                                     staticPlaceholder="Фамилия"
+                                    onKeyUp={submitSearchInputHandler}
                                 />
                             )}
                             {searchTarget === "user" && (
@@ -239,27 +284,38 @@ export default function ChatSearch(props: ChatSearchProps) {
                                     ref={thirdSearchElementRef}
                                     type="search"
                                     staticPlaceholder="Отчество"
+                                    onKeyUp={submitSearchInputHandler}
                                 />
                             )}
                         </div>
                         <Button
                             variant="contained"
                             className="TNUI-ChatSearch-search-params-search-button"
-                            onClick={handleSearchButtonClick}
+                            onClick={handleSearch}
                         >
                             Поиск
                         </Button>
                     </Accordion>
 
                     <div className="TNUI-ChatSearch-body_search-result-list">
-                        <div className="TNUI-ChatSearch-body_search-result-list_header">
-                            Результат поиска по вашему запросу:
-                        </div>
-                        {searchResult.payload.length === 0 && searchResult.page === 1 && (
-                            <div className="TNUI-ChatSearch-body_nothing-found-alert">Ничего не найдено</div>
+                        {searchTarget === "user" && (
+                            <div className="TNUI-ChatSearch-body_search-result-list_header">
+                                Результат поиска по вашему запросу:
+                            </div>
+                        )}
+                        {searchTarget !== "user" && (
+                            <div style={{ width: "100%", textAlign: "center", fontSize: "26px", color: "crimson" }}>
+                                Данная функция находится в процессе разработки
+                            </div>
+                        )}
+                        {searchTarget === "user" && searchResult.payload.length === 0 && searchResult.page === 1 && (
+                            <div className="TNUI-ChatSearch-body_nothing-found-alert">
+                                <NoSearchResultIcon className="TNUI-ChatSearch-body_nothing-found-alert_icon" />
+                                <span className="TNUI-ChatSearch-body_nothing-found-alert_label">Ничего не надено</span>
+                            </div>
                         )}
                         {/* TODO require refactoring */}
-                        {searchResult.payload.map((item) => (
+                        {searchResult.payload.map((item, index) => (
                             <>
                                 <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
                                     <Avatar size="medium" className="TNUI-ChatSearch-body_search-result-list-item-avatar" />
@@ -276,8 +332,9 @@ export default function ChatSearch(props: ChatSearchProps) {
                                         Добавить
                                     </Button>
                                 </div>
+                                {/* TODO Shit below is temp, only for testing */}
                                 <>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -295,7 +352,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -313,7 +370,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -331,7 +388,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -349,7 +406,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -367,7 +424,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -385,7 +442,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -403,7 +460,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -421,7 +478,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -439,7 +496,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -457,7 +514,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"
@@ -475,7 +532,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                             Добавить
                                         </Button>
                                     </div>
-                                    <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                    <div key={index} className="TNUI-ChatSearch-body_search-result-list-item">
                                         <Avatar
                                             size="medium"
                                             className="TNUI-ChatSearch-body_search-result-list-item-avatar"

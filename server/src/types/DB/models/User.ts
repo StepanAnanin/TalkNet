@@ -14,5 +14,7 @@ export default interface IUser extends Document {
     accessLevel: UserAccessLevelValue;
     activationState: I_ActivationState;
     friends: Types.Array<Types.ObjectId>;
+    friendRequests: Types.Array<Types.ObjectId>;
+    blackList: Types.Array<Types.ObjectId>;
     settings: UserSettings;
 }
