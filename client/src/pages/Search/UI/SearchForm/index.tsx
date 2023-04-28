@@ -3,9 +3,6 @@ import React from "react";
 
 import CloseIcon from "@mui/icons-material/StartOutlined";
 import OpenIcon from "@mui/icons-material/ArrowBack";
-import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
-import UserIcon from "@mui/icons-material/Group";
-import CommunityIcon from "@mui/icons-material/GridViewOutlined";
 import TuneIcon from "@mui/icons-material/TuneRounded";
 import NoSearchResultIcon from "@mui/icons-material/SearchOffRounded";
 
@@ -16,19 +13,17 @@ import TextInput from "../../../../shared/UI/TextInput";
 import Button from "../../../../shared/UI/Button";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import Avatar from "../../../../shared/UI/Avatar";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import Accordion from "../../../../shared/UI/Accordion";
 import { AxiosError } from "axios";
 
-interface ChatSearchProps extends UiComponentProps<HTMLDivElement> {
+interface SearchFormProps extends UiComponentProps<HTMLDivElement> {
     isOpen?: boolean;
 }
 
-type SearchTarget = "chat" | "user" | "community";
+type SearchTarget = "chats" | "users" | "communities";
 
-const searchTargetTypeMap: readonly SearchTarget[] = ["chat", "user", "community"] as const;
-
-const searchInItemIdOrigin = "search-page_search-target-";
+const searchTargetsMap: readonly SearchTarget[] = ["chats", "users", "communities"] as const;
 
 interface SearchResult {
     page: number;
@@ -44,11 +39,11 @@ interface Friend {
 
 function getSearchInpuPlaceholder(searchTarget: SearchTarget) {
     switch (searchTarget) {
-        case "user":
+        case "users":
             return "Имя";
-        case "chat":
+        case "chats":
             return "Название чата";
-        case "community":
+        case "communities":
             return "Название сообщества";
         default:
             throw new TypeError("Invalid search target");
@@ -58,13 +53,15 @@ function getSearchInpuPlaceholder(searchTarget: SearchTarget) {
 // TODO require decomposition
 // TODO add loader for search result
 // TODO fix add button responsivness when it's disabled
-export default function ChatSearch(props: ChatSearchProps) {
+export default function SearchForm(props: SearchFormProps) {
     const { className = "", isOpen = false, ...otherProps } = props;
 
-    const windowLayout = useTypedSelector((state) => state.windowLayout);
+    const [queryParams] = useSearchParams();
     const { user } = useTypedSelector((state) => state.auth);
+    const windowLayout = useTypedSelector((state) => state.windowLayout);
 
-    const [searchTarget, setSearchTarget] = React.useState<SearchTarget>("user");
+    const searchTarget = queryParams.get("target") as SearchTarget;
+
     const [searchResult, setSearchResult] = React.useState<SearchResult>({ page: 1, payload: [] });
     const [isLoading, setIsLoading] = React.useState(false);
 
@@ -73,33 +70,36 @@ export default function ChatSearch(props: ChatSearchProps) {
     const thirdSearchElementRef = React.useRef<HTMLInputElement>(null);
     const searchPageRef = React.useRef(1);
 
+    // This useEffect reset search result and first input value on search target chage.
+    // (first input exist for any value of search target, but not second and third inputs)
+    React.useEffect(() => {
+        const firstSearchElement = firstSearchElementRef.current;
+
+        if (!(firstSearchElement instanceof HTMLInputElement)) {
+            throw new TypeError("Failed to find first input element");
+        }
+
+        // This condition prevents at least 1 excess render. Cuz this useEffect will always be called on first render.
+        if (firstSearchElement.value === "" && searchResult.page === 1 && searchResult.payload.length === 0) {
+            return;
+        }
+
+        setSearchResult({ page: 1, payload: [] });
+
+        firstSearchElement.value = "";
+    }, [searchTarget]);
+
     if (!user) {
         return <Navigate to="/signin" />;
     }
 
-    function onSearchInItemClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        const target = e.currentTarget.id.split(searchInItemIdOrigin)[1] as SearchTarget;
-
-        if (!searchTargetTypeMap.includes(target)) {
-            throw new TypeError(`Search target has incorrect value: ${target}`);
-        }
-
-        if (target === searchTarget) {
-            return;
-        }
-
-        // Clean first input (cuz only he exist at any search target value)
-        if (firstSearchElementRef.current instanceof HTMLInputElement) {
-            firstSearchElementRef.current.value = "";
-        }
-
-        setSearchResult({ page: 1, payload: [] });
-        setSearchTarget(target as SearchTarget);
+    // If there are no target or it's not valid, then set search target to 'users'
+    if (!searchTargetsMap.includes(searchTarget)) {
+        return <Navigate to="/n/search?target=users" />;
     }
 
     function handleSearch() {
-        // console.log(searchTarget);
-        if (searchTarget === "user") {
+        if (searchTarget === "users") {
             searchFriends();
             return;
         }
@@ -158,7 +158,7 @@ export default function ChatSearch(props: ChatSearchProps) {
         const targetID = addButtonElement.id;
 
         try {
-            if (searchTarget === "user") {
+            if (searchTarget === "users") {
                 // TODO temporarily disabled
                 await TalkNetAPI.patch("/user/friend-requests", {
                     from: user!.id,
@@ -190,8 +190,6 @@ export default function ChatSearch(props: ChatSearchProps) {
         }
     }
 
-    console.log(searchResult);
-
     const classes = ["TNUI-ChatSearch", className].join(" ");
 
     return (
@@ -220,46 +218,6 @@ export default function ChatSearch(props: ChatSearchProps) {
                         bodyClassName="TNUI-ChatSearch-search-params"
                         defaultOpen
                     >
-                        <div className="TNUI-ChatSearch-search-params-target-list">
-                            <div className="TNUI-ChatSearch-search-params-target-list_header">Искать:</div>
-                            <div className="TNUI-ChatSearch-search-params-target-list_body">
-                                <div
-                                    className={
-                                        "TNUI-ChatSearch-search-params-target-list_item" +
-                                        (searchTarget === "user" ? " current" : "")
-                                    }
-                                    id={searchInItemIdOrigin + "user"}
-                                    onClick={onSearchInItemClick}
-                                >
-                                    <UserIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
-                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">
-                                        Пользователей
-                                    </span>
-                                </div>
-                                <div
-                                    className={
-                                        "TNUI-ChatSearch-search-params-target-list_item" +
-                                        (searchTarget === "community" ? " current" : "")
-                                    }
-                                    id={searchInItemIdOrigin + "community"}
-                                    onClick={onSearchInItemClick}
-                                >
-                                    <CommunityIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
-                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">Сообщества</span>
-                                </div>
-                                <div
-                                    className={
-                                        "TNUI-ChatSearch-search-params-target-list_item" +
-                                        (searchTarget === "chat" ? " current" : "")
-                                    }
-                                    id={searchInItemIdOrigin + "chat"}
-                                    onClick={onSearchInItemClick}
-                                >
-                                    <ChatIcon className="TNUI-ChatSearch-search-params-target-list_item-icon" />
-                                    <span className="TNUI-ChatSearch-search-params-target-list_item-label">Чаты</span>
-                                </div>
-                            </div>
-                        </div>
                         <div className="TNUI-ChatSearch-search-params-input-block">
                             <div className="TNUI-ChatSearch-search-params-input-block_header">Запрос:</div>
                             <TextInput
@@ -269,7 +227,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                 staticPlaceholder={getSearchInpuPlaceholder(searchTarget)}
                                 onKeyUp={submitSearchInputHandler}
                             />
-                            {searchTarget === "user" && (
+                            {searchTarget === "users" && (
                                 <TextInput
                                     className="TNUI-ChatSearch-search-params_search-input"
                                     ref={secondSearchElementRef}
@@ -278,7 +236,7 @@ export default function ChatSearch(props: ChatSearchProps) {
                                     onKeyUp={submitSearchInputHandler}
                                 />
                             )}
-                            {searchTarget === "user" && (
+                            {searchTarget === "users" && (
                                 <TextInput
                                     className="TNUI-ChatSearch-search-params_search-input"
                                     ref={thirdSearchElementRef}
@@ -296,19 +254,18 @@ export default function ChatSearch(props: ChatSearchProps) {
                             Поиск
                         </Button>
                     </Accordion>
-
                     <div className="TNUI-ChatSearch-body_search-result-list">
-                        {searchTarget === "user" && (
+                        {searchTarget === "users" && (
                             <div className="TNUI-ChatSearch-body_search-result-list_header">
                                 Результат поиска по вашему запросу:
                             </div>
                         )}
-                        {searchTarget !== "user" && (
+                        {searchTarget !== "users" && (
                             <div style={{ width: "100%", textAlign: "center", fontSize: "26px", color: "crimson" }}>
                                 Данная функция находится в процессе разработки
                             </div>
                         )}
-                        {searchTarget === "user" && searchResult.payload.length === 0 && searchResult.page === 1 && (
+                        {searchTarget === "users" && searchResult.payload.length === 0 && searchResult.page === 1 && (
                             <div className="TNUI-ChatSearch-body_nothing-found-alert">
                                 <NoSearchResultIcon className="TNUI-ChatSearch-body_nothing-found-alert_icon" />
                                 <span className="TNUI-ChatSearch-body_nothing-found-alert_label">Ничего не надено</span>

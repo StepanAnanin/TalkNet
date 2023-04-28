@@ -1,3 +1,3 @@
-import NavigatorExplorer from "./UI";
+import NavigatorExplorer from "./UI/NavigatorExplorer";
 
 export default NavigatorExplorer;

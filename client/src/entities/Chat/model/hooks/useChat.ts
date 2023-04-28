@@ -16,7 +16,7 @@ export default function useChat() {
     const { user } = useTypedSelector((state) => state.auth);
 
     if (!user) {
-        throw new Error(`useChat hook require authorization`);
+        throw new Error(`Authorization required`);
     }
 
     // This needed cuz userChats is enclosed, hence will have incorrect value in functions declared in this scope (like updateChatInfo).

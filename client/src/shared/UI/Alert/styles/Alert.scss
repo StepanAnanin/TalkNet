@@ -1,5 +1,7 @@
 @import "../../../../app/styles/variables.scss";
 
+$borderWidth: 10px;
+
 .TNUI-Alert {
     display: flex;
 
@@ -29,6 +31,7 @@
 
 .TNUI-Alert-Error {
     background-color: $darkCrimson;
+    border-left: $borderWidth solid crimson;
 
     .TNUI-Alert-icon {
         color: rgb(245, 0, 0);
@@ -41,6 +44,7 @@
 
 .TNUI-Alert-Warning {
     background-color: rgb(255, 220, 169);
+    border-left: $borderWidth solid rgb(255, 174, 53);
 
     .TNUI-Alert-icon {
         color: rgb(255, 153, 0);
@@ -53,6 +57,7 @@
 
 .TNUI-Alert-Info {
     background-color: $primaryTransperant5;
+    border-left: $borderWidth solid $lightPrimary;
 
     .TNUI-Alert-icon {
         color: $lightestPrimary;
@@ -65,6 +70,7 @@
 
 .TNUI-Alert-Success {
     background-color: $lightestGreen;
+    border-left: $borderWidth solid rgb(43, 177, 43);
 
     .TNUI-Alert-icon {
         color: $darkGreen;

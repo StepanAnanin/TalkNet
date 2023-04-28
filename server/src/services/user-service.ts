@@ -353,10 +353,9 @@ class UserService {
         if (targetedUser.friendRequests.includes(from as any)) {
             throw new HTTPError(409, "Заявка в друзья этому пользователю уже отправлена");
         }
-        // console.log(from);
-        // console.log(targetedUser.friendRequests);
+
         targetedUser.friendRequests.push(from);
-        // console.log("asd");
+
         await targetedUser.save();
     }
 

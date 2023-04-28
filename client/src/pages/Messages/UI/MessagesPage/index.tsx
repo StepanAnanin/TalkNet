@@ -12,7 +12,6 @@ interface MessagesPageProps extends UiComponentProps<HTMLDivElement> {
     //
 }
 
-// TODO create an additional layout for this type of pages.
 export default function MessagesPage(props: MessagesPageProps) {
     const { className = "", ...otherProps } = props;
 
@@ -26,11 +25,10 @@ export default function MessagesPage(props: MessagesPageProps) {
     const chatID = searchParams.get("chat");
     const classes = ["TNUI-MessagesPage", className].join(" ");
 
+    // TODO need to add navigator closing and opening
     return (
         <Page title="TalkNet | Сообщения" className={classes} {...otherProps}>
-            <NavigatorLayout closed={!chatID}>
-                <ChatBody chatID={chatID} />
-            </NavigatorLayout>
+            <ChatBody chatID={chatID} />
         </Page>
     );
 }

@@ -4,9 +4,9 @@ import React from "react";
 import NoChatsAlert from "@mui/icons-material/CommentsDisabledRounded";
 
 import { useTypedSelector } from "../../../../../../shared/model/hooks/useTypedSelector";
-import { ChatPreview, MemoChatPreview, ChatPreviewSkeleton } from "../../../../../../features/ChatPreview";
-import { useLocation } from "react-router-dom";
+import ChatPreview from "../ChatPreview";
 import { useChat } from "../../../../../../entities/Chat";
+import { NavigatorExplorerItemSkeleton } from "../../../../../../features/NavigatorExplorerItem";
 
 export default function Chats() {
     const { user } = useTypedSelector((state) => state.auth);
@@ -39,13 +39,13 @@ export default function Chats() {
     if (!userChats) {
         return (
             <>
-                <ChatPreviewSkeleton />
-                <ChatPreviewSkeleton />
-                <ChatPreviewSkeleton />
-                <ChatPreviewSkeleton />
-                <ChatPreviewSkeleton />
-                <ChatPreviewSkeleton />
-                <ChatPreviewSkeleton />
+                <NavigatorExplorerItemSkeleton />
+                <NavigatorExplorerItemSkeleton />
+                <NavigatorExplorerItemSkeleton />
+                <NavigatorExplorerItemSkeleton />
+                <NavigatorExplorerItemSkeleton />
+                <NavigatorExplorerItemSkeleton />
+                <NavigatorExplorerItemSkeleton />
             </>
         );
     }

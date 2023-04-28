@@ -1,3 +1,3 @@
-type target = "chat" | "communities" | "friends" | "search" | "settings";
+type target = "chats" | "communities" | "friends" | "search" | "settings";
 
 export default target;

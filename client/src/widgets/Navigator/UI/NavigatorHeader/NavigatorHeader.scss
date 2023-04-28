@@ -2,11 +2,12 @@
 
 $NavigatorHeaderHeight: 125px;
 
-// TODO transition isn't smooth, it's twitching and looks like has problem with interpolation
 @mixin pageListItemOpen() {
     &-img-wrapper {
         width: 50px;
         height: 50px;
+
+        background-color: $grey;
     }
 
     &-label {
@@ -39,7 +40,7 @@ $NavigatorHeaderHeight: 125px;
 
         background-color: $black;
 
-        .TNUI-NavigatorHeader-page-list {
+        .TNUI-NavigatorHeader-explorer-target-list {
             width: 100%;
             height: 100%;
 
@@ -64,26 +65,20 @@ $NavigatorHeaderHeight: 125px;
 
                 margin-inline: 5px;
 
-                // border: 1px dashed red;
-
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: space-between;
 
-                color: white;
-
-                text-decoration: none;
+                // text-decoration: none;
 
                 cursor: pointer;
 
                 &:hover {
-                    .TNUI-NavigatorHeader-page-list_item {
+                    .TNUI-NavigatorHeader-explorer-target-list_item {
                         @include pageListItemOpen();
 
-                        &-img-wrapper {
-                            background-color: $grey;
-                        }
+                        // &-img-wrapper {}
 
                         &-label {
                             color: $lightestPrimary;
@@ -92,12 +87,10 @@ $NavigatorHeaderHeight: 125px;
                 }
 
                 &.current {
-                    .TNUI-NavigatorHeader-page-list_item {
+                    .TNUI-NavigatorHeader-explorer-target-list_item {
                         @include pageListItemOpen();
 
                         &-img-wrapper {
-                            background-color: $grey;
-
                             box-shadow: 0px 0px 13px 1px $primaryTransperant3;
                         }
 
@@ -136,7 +129,7 @@ $NavigatorHeaderHeight: 125px;
 
                     transform: scale(25%);
 
-                    opacity: 0; // ***
+                    opacity: 0;
 
                     color: rgba(255, 255, 255, 0.85);
 
@@ -147,6 +140,10 @@ $NavigatorHeaderHeight: 125px;
                     z-index: 2;
 
                     user-select: none;
+
+                    // Without this property label of current item will be flicking on hovering other items.
+                    // https://stackoverflow.com/questions/10134935/weird-css3-transition-flickering
+                    backface-visibility: hidden;
 
                     transition: all 0.2s ease-in-out;
                 }

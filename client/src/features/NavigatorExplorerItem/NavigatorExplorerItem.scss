@@ -1,9 +1,60 @@
+@import "../../app/styles/variables.scss";
+
+$NavigatorExplorerItemDefaultHeight: 70px;
+
+.TNUI-NavigatorExplorerItem {
+    height: $NavigatorExplorerItemDefaultHeight;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 5px;
+
+    border-radius: 10px;
+
+    background-color: #1f1f24;
+
+    text-decoration: none;
+
+    color: white;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+        background-color: $darkGrey;
+    }
+
+    &.TNUI-NavigatorExplorerItem-active {
+        background-color: $darkestPrimary;
+    }
+
+    &-img {
+        margin-inline: 10px;
+    }
+
+    &-body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        margin-right: 10px;
+    }
+}
+
+// ===================== Skeleton styles =====================
+
 $darkBackgroundColour: rgba(75, 75, 75, 0.2);
 $lightBackgroundColour: rgba(85, 85, 85, 0.5);
 $animationProperties: flicking 1.75s infinite;
 
-.TNUI-ChatPreviewSkeleton {
-    height: 70px;
+.TNUI-NavigatorExplorerItemSkeleton {
+    height: $NavigatorExplorerItemDefaultHeight;
     width: 100%;
 
     display: flex;
@@ -15,7 +66,7 @@ $animationProperties: flicking 1.75s infinite;
 
     background-color: rgba(5, 5, 5, 0.2);
 
-    &-avatar {
+    &-img {
         width: 50px;
         height: 50px;
 
@@ -31,12 +82,12 @@ $animationProperties: flicking 1.75s infinite;
         animation: $animationProperties;
     }
 
-    &-info {
+    &-body {
         width: 100%;
 
         margin-right: 10px;
 
-        .TNUI-ChatPreviewSkeleton-top {
+        .TNUI-NavigatorExplorerItemSkeleton-top {
             height: 25px;
             width: 100%;
 
@@ -49,7 +100,7 @@ $animationProperties: flicking 1.75s infinite;
             animation: $animationProperties;
         }
 
-        .TNUI-ChatPreviewSkeleton-bottom {
+        .TNUI-NavigatorExplorerItemSkeleton-bottom {
             height: 15px;
             width: 100%;
 

@@ -1,16 +1,16 @@
-import "../styles/Loader.scss";
-import "../styles/DoubledLoader.scss";
+import "../Loader.scss";
+import "./DefaultLoader.scss";
 
-import type LoaderProps from "../types/LoaderProps";
+import type LoaderProps from "../../types/LoaderProps";
 
-export default function DoubledLoader(props: LoaderProps) {
+export default function DefaultLoader(props: LoaderProps) {
     const { className = "", size = "medium", spinnerColour = "primary", ...otherProps } = props;
 
     const classes = [
         "TNUI-Loader",
         "TNUI-Loader-spinner-colour_" + spinnerColour,
-        "TNUI-DoubledLoader",
-        "TNUI-DoubledLoader-" + size,
+        "TNUI-DefaultLoader",
+        "TNUI-DefaultLoader-" + size,
         className,
     ].join(" ");
 

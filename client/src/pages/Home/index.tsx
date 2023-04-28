@@ -6,6 +6,7 @@ import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import Avatar from "../../shared/UI/Avatar";
 import { ConfirmModal, CustomModal, InputModal } from "../../features/Modal";
 import Accordion from "../../shared/UI/Accordion";
+import NavigatorExplorerItem from "../../features/NavigatorExplorerItem";
 
 export default function HomePage() {
     const { user } = useTypedSelector((state) => state.auth);
@@ -55,6 +56,11 @@ export default function HomePage() {
                 voluptatibus, ratione debitis necessitatibus perspiciatis vitae eaque asperiores, quas earum hic id,
                 cupiditate in?
             </Accordion>
+            <div style={{ width: "500px" }}>
+                <NavigatorExplorerItem to="#" img={<Avatar size="medium" />}>
+                    <span>asd</span>
+                </NavigatorExplorerItem>
+            </div>
         </Page>
     );
 }

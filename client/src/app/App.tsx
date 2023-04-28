@@ -12,11 +12,11 @@ function App() {
         <WithStore>
             <WithGlobal>
                 <BrowserRouter>
-                    <WithErrorBoundary>
-                        <WithAPI>
+                    <WithAPI>
+                        <WithErrorBoundary>
                             <WithRouter />
-                        </WithAPI>
-                    </WithErrorBoundary>
+                        </WithErrorBoundary>
+                    </WithAPI>
                 </BrowserRouter>
             </WithGlobal>
         </WithStore>

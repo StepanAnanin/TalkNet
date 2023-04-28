@@ -1,0 +1,73 @@
+@import "../../../../../../app/styles/variables.scss";
+
+.TNUI-ChatPreview {
+    &.TNUI-ChatPreview-active {
+        background-color: $darkestPrimary !important;
+    }
+
+    &-top {
+        display: flex;
+        margin-bottom: 2.5px;
+
+        &_unread-messages {
+            max-width: 50px;
+            min-width: 25px;
+            height: 20px;
+
+            display: flex;
+            align-self: center;
+            align-items: center;
+            justify-content: center;
+
+            margin-right: 5px;
+            padding-inline: 5px;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            background-color: white;
+            color: black;
+        }
+
+        &_chat-name {
+            flex-grow: 1;
+
+            color: white;
+
+            font-size: 16.5px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            user-select: none;
+        }
+
+        &_last-message-sent-date {
+            display: flex;
+            justify-content: flex-end;
+
+            min-width: 65px;
+
+            font-size: 12.5px;
+
+            color: rgba(255, 255, 255, 0.75);
+        }
+    }
+
+    &_last-message {
+        width: 95%;
+        height: 20px;
+
+        color: rgb(175, 175, 175);
+
+        font-size: 14px;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        user-select: none;
+    }
+}

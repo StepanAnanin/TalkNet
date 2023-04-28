@@ -3,33 +3,35 @@ import React from "react";
 
 import OpenedIcon from "@mui/icons-material/StartOutlined";
 import ClosedIcon from "@mui/icons-material/ArrowBack";
-import TuneIcon from "@mui/icons-material/Tune";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import GroupChatIcon from "@mui/icons-material/Groups";
 import CommunitiesIcon from "@mui/icons-material/GridViewOutlined";
 import FriendsIcon from "@mui/icons-material/Group";
-import AddIcon from "@mui/icons-material/AddRounded";
 import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
 import SettingsIcon from "@mui/icons-material/SettingsRounded";
 import SearchIcon from "@mui/icons-material/SearchRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 import type ExplorerTarget from "../../types/ExplorerTarget";
-
-import { Link } from "react-router-dom";
-import Button from "../../../../shared/UI/Button";
+import { useSearchParams } from "react-router-dom";
 
 interface NavigatorHeaderProps extends UiComponentProps<HTMLDivElement> {
-    target: ExplorerTarget;
+    // target: ExplorerTarget;
+    targetState: [ExplorerTarget, React.Dispatch<React.SetStateAction<ExplorerTarget>>];
     hideAddButton?: boolean;
 }
 
+const explorerTargetMap: readonly ExplorerTarget[] = ["chats", "communities", "friends", "search", "settings"] as const;
+
+const explorerTargetItemElementIdRoot = "NavigatorHeader-explorerTarget-";
+
 export default function NavigatorHeader(props: NavigatorHeaderProps) {
-    const { className = "", hideAddButton = false, target, ...otherProps } = props;
+    const { className = "", hideAddButton = false, targetState, ...otherProps } = props;
+
+    const [navigatorTarget, setNavigatorTarget] = targetState;
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const pageListRef = React.useRef<HTMLDivElement | null>(null);
 
-    const currentPage = window.location.pathname.split("/")[1];
     const classes = ["TNUI-NavigatorHeader", className].join(" ");
 
     function pageListWheelHandler(e: React.WheelEvent<HTMLDivElement>) {
@@ -42,70 +44,111 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
         pageList.scrollLeft += e.deltaY;
     }
 
+    function explorerTargetItemClickHander(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        const newExplorerTarget = e.currentTarget.id.split(explorerTargetItemElementIdRoot)[1] as ExplorerTarget;
+
+        if (!explorerTargetMap.includes(newExplorerTarget)) {
+            throw new TypeError(`Incorrect explorer target: ${newExplorerTarget}`);
+        }
+
+        // This condition is probably unnecessary, but won't be redundant.
+        if (newExplorerTarget === navigatorTarget) {
+            return;
+        }
+
+        setSearchParams((p) => {
+            // nt — navigator target
+            p.delete("nt");
+            p.append("nt", newExplorerTarget);
+            return p;
+        });
+        setNavigatorTarget(newExplorerTarget);
+    }
+
     return (
         <div className={classes} {...otherProps}>
             <div className="TNUI-NavigatorHeader-top">
-                <div className="TNUI-NavigatorHeader-page-list" onWheel={pageListWheelHandler} ref={pageListRef}>
-                    <Link
-                        to="/m"
-                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "m" ? "current" : "")}
+                <div className="TNUI-NavigatorHeader-explorer-target-list" onWheel={pageListWheelHandler} ref={pageListRef}>
+                    <div
+                        id={explorerTargetItemElementIdRoot + "chats"}
+                        className={
+                            "TNUI-NavigatorHeader-explorer-target-list_item " +
+                            (navigatorTarget === "chats" ? "current" : "")
+                        }
+                        onClick={explorerTargetItemClickHander}
                     >
-                        <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
+                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
                             <ChatIcon
-                                className="TNUI-NavigatorHeader-page-list_item-img"
-                                id="TNUI-NavigatorHeader-page-list_item-messages-img"
+                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
+                                id="TNUI-NavigatorHeader-explorer-target-list_item-messages-img"
                             />
                         </div>
-                        <span className="TNUI-NavigatorHeader-page-list_item-label">Сообщения</span>
-                    </Link>
-                    <Link
-                        to="#"
-                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "communities" ? "current" : "")}
+                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Сообщения</span>
+                    </div>
+                    <div
+                        id={explorerTargetItemElementIdRoot + "communities"}
+                        className={
+                            "TNUI-NavigatorHeader-explorer-target-list_item " +
+                            (navigatorTarget === "communities" ? "current" : "")
+                        }
+                        onClick={explorerTargetItemClickHander}
                     >
-                        <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
+                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
                             <CommunitiesIcon
-                                className="TNUI-NavigatorHeader-page-list_item-img"
-                                id="TNUI-NavigatorHeader-page-list_item-messages-img"
+                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
+                                id="TNUI-NavigatorHeader-explorer-target-list_item-messages-img"
                             />
                         </div>
-                        <span className="TNUI-NavigatorHeader-page-list_item-label">Сообщества</span>
-                    </Link>
-                    <Link
-                        to="#"
-                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "friends" ? "current" : "")}
+                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Сообщества</span>
+                    </div>
+                    <div
+                        id={explorerTargetItemElementIdRoot + "friends"}
+                        className={
+                            "TNUI-NavigatorHeader-explorer-target-list_item " +
+                            (navigatorTarget === "friends" ? "current" : "")
+                        }
+                        onClick={explorerTargetItemClickHander}
                     >
-                        <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
+                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
                             <FriendsIcon
-                                className="TNUI-NavigatorHeader-page-list_item-img"
-                                id="TNUI-NavigatorHeader-page-list_item-messages-img"
+                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
+                                id="TNUI-NavigatorHeader-explorer-target-list_item-messages-img"
                             />
                         </div>
-                        <span className="TNUI-NavigatorHeader-page-list_item-label">Друзья</span>
-                    </Link>
-                    <Link
-                        to="/search"
-                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "search" ? "current" : "")}
+                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Друзья</span>
+                    </div>
+                    <div
+                        id={explorerTargetItemElementIdRoot + "search"}
+                        className={
+                            "TNUI-NavigatorHeader-explorer-target-list_item " +
+                            (navigatorTarget === "search" ? "current" : "")
+                        }
+                        onClick={explorerTargetItemClickHander}
                     >
-                        <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
+                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
                             <SearchIcon
-                                className="TNUI-NavigatorHeader-page-list_item-img"
-                                id="TNUI-NavigatorHeader-page-list_item-messages-img"
+                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
+                                id="TNUI-NavigatorHeader-explorer-target-list_item-messages-img"
                             />
                         </div>
-                        <span className="TNUI-NavigatorHeader-page-list_item-label">Поиск</span>
-                    </Link>
-                    <Link
-                        to="/settings"
-                        className={"TNUI-NavigatorHeader-page-list_item " + (currentPage === "friends" ? "current" : "")}
+                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Поиск</span>
+                    </div>
+                    <div
+                        id={explorerTargetItemElementIdRoot + "settings"}
+                        className={
+                            "TNUI-NavigatorHeader-explorer-target-list_item " +
+                            (navigatorTarget === "settings" ? "current" : "")
+                        }
+                        onClick={explorerTargetItemClickHander}
                     >
-                        <div className="TNUI-NavigatorHeader-page-list_item-img-wrapper">
+                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
                             <SettingsIcon
-                                className="TNUI-NavigatorHeader-page-list_item-img"
-                                id="TNUI-NavigatorHeader-page-list_item-settings-img"
+                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
+                                id="TNUI-NavigatorHeader-explorer-target-list_item-settings-img"
                             />
                         </div>
-                        <span className="TNUI-NavigatorHeader-page-list_item-label">Настройки</span>
-                    </Link>
+                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Настройки</span>
+                    </div>
                 </div>
             </div>
             <div className="TNUI-NavigatorHeader-bottom">

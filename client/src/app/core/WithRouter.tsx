@@ -2,12 +2,11 @@ import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import LoadingPage from "../../pages/Loading";
 import ErrorPage404 from "../../pages/Error404";
+import { NavigatorRouter } from "../../pages";
 
 const HomePage = lazy(() => import("../../pages/Home"));
 const SignUpPage = lazy(() => import("../../pages/SignUp"));
 const SignInPage = lazy(() => import("../../pages/SignIn"));
-const MessagesPage = lazy(() => import("../../pages/Messages"));
-const SearchPage = lazy(() => import("../../pages/Search"));
 
 export default function WithRouter() {
     return (
@@ -37,22 +36,10 @@ export default function WithRouter() {
                     </Suspense>
                 }
             />
-            <Route
-                path="/m"
-                element={
-                    <Suspense fallback={<LoadingPage />}>
-                        <MessagesPage />
-                    </Suspense>
-                }
-            />
-            <Route
-                path="/search"
-                element={
-                    <Suspense fallback={<LoadingPage />}>
-                        <SearchPage />
-                    </Suspense>
-                }
-            />
+
+            {/* <Route path="/m" element={<NavigatorRouter path="/m" />} /> */}
+            {/* <Route path="/search" element={<NavigatorRouter path="/search" />} /> */}
+            <Route path="/n/*" element={<NavigatorRouter />} />
         </Routes>
     );
 }

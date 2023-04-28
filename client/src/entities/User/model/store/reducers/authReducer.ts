@@ -26,16 +26,19 @@ const authSlice = createSlice({
             state.user = action.payload;
 
             state.request.status = "succeeded";
+            state.request.message = "Аутентификация успешна";
         },
         logout(state) {
             state.user = null;
 
             state.request.status = "succeeded";
+            state.request.message = "Деаутентификация успешна";
         },
         refresh(state, action: PayloadAction<User>) {
             state.user = action.payload;
 
             state.request.status = "succeeded";
+            state.request.message = "Токены обновлены";
         },
     },
 });
