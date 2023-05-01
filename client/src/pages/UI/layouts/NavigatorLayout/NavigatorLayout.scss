@@ -20,11 +20,16 @@ $transitionPrefrences: all 0.25s ease-in-out;
         margin-top: 50px; // Height of the header
 
         .TNUI-NavigatorLayout-navigator {
+            width: 385px;
             min-width: 385px;
 
             transition: $transitionPrefrences;
         }
 
+        // .........................
+        // ======== ВАЖНО ==========
+        // .........................
+        // TODO move this out of there
         .TNUI-NavigatorLayout-content {
             @include custom-scrollbar(10px, transparent);
 

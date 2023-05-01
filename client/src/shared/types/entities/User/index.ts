@@ -8,4 +8,11 @@ export default interface User {
     lastPasswordChange: number;
     isEmailChangeInProcess: boolean;
     isAccountDeletionInProcess: boolean;
+
+    // To be correct it's not "string[]" but "ObjectId[]",
+    // but this doesn't affect anything cuz ObjectId is one kind of string.
+    friends: string[];
+    incomingFriendRequests: string[];
+    outcomingFriendRequests: string[];
+    blackList: string[];
 }

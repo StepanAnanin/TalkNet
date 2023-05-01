@@ -7,14 +7,14 @@ import { useTypedSelector } from "./useTypedSelector";
 import MessengerServiceURL from "../../lib/URL/MessengerServiceURL";
 import { addRefresh } from "../../../entities/User";
 import { useTypedDispatch } from "./useTypedDispatch";
-import MessengerService from "../../lib/MessengerService";
+import MessengerServiceConnection from "../../lib/MessengerServiceConnection";
 import { MessengerServiceIncomingEvent, MessengerServiceOutcomingEventResponse } from "../../lib/MessengerServiceEvent";
 
 /**
  * If move it inside of hook, then connection will be closed and open on each call of useMessengerService,
  * this will ruin intended behavior of this hook
  */
-const MessengerServiceConnectionRef: { current: MessengerService | null } = { current: null };
+const MessengerServiceConnectionRef: { current: MessengerServiceConnection | null } = { current: null };
 
 /**
  * @returns `MessengerServiceConnection` object
@@ -49,28 +49,28 @@ export default function useMessengerService() {
         throw new Error(`[Messenger Service] Connection require authorization`);
     }
 
-    if (!(MessengerServiceConnectionRef.current instanceof MessengerService)) {
+    if (!(MessengerServiceConnectionRef.current instanceof MessengerServiceConnection)) {
         establishConnection();
     }
 
     function establishConnection() {
-        if (MessengerServiceConnectionRef.current instanceof MessengerService) {
+        if (MessengerServiceConnectionRef.current instanceof MessengerServiceConnection) {
             console.warn("[Messenger Service] Connection already established");
             return;
         }
 
         const socket = io(MessengerServiceURL);
 
-        MessengerServiceConnectionRef.current = new MessengerService(user!, socket);
+        MessengerServiceConnectionRef.current = new MessengerServiceConnection(user!, socket);
 
         addSocketIncomingEventHandlers(socket);
         addSocketOutcomingEventHandlers(socket);
     }
 
     function addSocketIncomingEventHandlers(socket: ReturnType<typeof io>) {
-        const MessengerServiceConnection = MessengerServiceConnectionRef.current;
+        const connection = MessengerServiceConnectionRef.current;
 
-        if (!(MessengerServiceConnection instanceof MessengerService)) {
+        if (!(connection instanceof MessengerServiceConnection)) {
             throw new Error("Messenger Service connection is missing");
         }
 
@@ -88,7 +88,7 @@ export default function useMessengerService() {
 
             await dispatch(addRefresh());
 
-            MessengerServiceConnection.repeatLastOutcomingEventRequest();
+            connection.repeatLastOutcomingEventRequest();
         });
 
         socket.on("invalid-request", (e) => {
@@ -125,7 +125,7 @@ export default function useMessengerService() {
             const parsedEvent = JSON.parse(event);
 
             // If event isn't outcoming
-            if (!MessengerService.OutcomingEventsMap.includes(parsedEvent.event)) {
+            if (!MessengerServiceConnection.OutcomingEventsMap.includes(parsedEvent.event)) {
                 return;
             }
 
@@ -135,6 +135,7 @@ export default function useMessengerService() {
 
     // There are some problem with typesation of payload, it's appears after i added Omit
     // TODO steel has problem with typesation of connectionEvent
+    // TODO move all logic inside of switch's cases to functions and then call them. This will make code more readable
     function dispathOutcomingEvent(ConnectionEvent: Omit<MessengerServiceModel.OutcomingEvent.Request.Any, "type">) {
         const MessengerServiceConnection = MessengerServiceConnectionRef.current;
 
@@ -191,14 +192,14 @@ export default function useMessengerService() {
     }
 
     function closeConnection() {
-        const MessengerServiceConnection = MessengerServiceConnectionRef.current;
+        const connection = MessengerServiceConnectionRef.current;
 
-        if (!(MessengerServiceConnection instanceof MessengerService)) {
+        if (!(connection instanceof MessengerServiceConnection)) {
             console.warn("[Messenger Service] Connection closing error: connection wasn't established");
             return;
         }
 
-        MessengerServiceConnection.close();
+        connection.close();
         MessengerServiceConnectionRef.current = null;
     }
 
@@ -243,6 +244,7 @@ export default function useMessengerService() {
 
 // ========================================= Events Handling =========================================
 // TODO Argument "e" on event handlers has problems with typesation, fix it.
+// TODO There are a lot of code duplicates, try to get rid of it.
 
 /**
  * There are two arrays for event handlers cuz outcoming events have request and response,
@@ -267,7 +269,7 @@ function addOutcomingEventHandler(
     event: MessengerServiceModel.OutcomingEventName,
     handler: (e: MessengerServiceOutcomingEventResponse) => void
 ) {
-    if (!MessengerService.OutcomingEventsMap.includes(event)) {
+    if (!MessengerServiceConnection.OutcomingEventsMap.includes(event)) {
         throw new TypeError(`Event must be OutcomingEvent`);
     }
 
@@ -278,7 +280,7 @@ function addIncomingEventHandler(
     event: MessengerServiceModel.IncomingEventName,
     handler: (e: MessengerServiceIncomingEvent) => void
 ) {
-    if (!MessengerService.IncomingEventsMap.includes(event)) {
+    if (!MessengerServiceConnection.IncomingEventsMap.includes(event)) {
         throw new TypeError(`Event must be IncomingEvent`);
     }
 

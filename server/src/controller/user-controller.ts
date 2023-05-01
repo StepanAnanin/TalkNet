@@ -9,10 +9,6 @@ import chatService from "../services/chat-service";
 
 class UserContoller {
     public async registrate(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const email = req.body.email;
@@ -105,10 +101,6 @@ class UserContoller {
     }
 
     public async login(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const email = req.body.email;
@@ -151,10 +143,6 @@ class UserContoller {
 
     // BUG Now not removing refresh token from cookies for some reason.
     public async logout(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const refreshToken = req.cookies.refreshToken;
@@ -173,10 +161,6 @@ class UserContoller {
     }
 
     public async activateAccount(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const activationLink = req.params.link;
@@ -205,10 +189,6 @@ class UserContoller {
     }
 
     public async updateRefreshToken(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const refreshToken = req.cookies.refreshToken;
@@ -244,10 +224,6 @@ class UserContoller {
     }
 
     public async getUserChats(req: Request<{ id: string }>, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const userID = req.params.id;
@@ -273,10 +249,6 @@ class UserContoller {
     }
 
     public async searchForUser(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         const page = parseInt(req.query.page as string);
 
         if (typeof page !== "number" || Number.isNaN(page)) {
@@ -317,10 +289,6 @@ class UserContoller {
     }
 
     public async sendFriendRequest(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         const from = req.body.from as string;
         const to = req.body.to as string;
 
@@ -357,10 +325,6 @@ class UserContoller {
     }
 
     public async acceptFriendRequest(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         const from = req.body.from as string;
         const to = req.body.to as string;
 
@@ -396,12 +360,64 @@ class UserContoller {
         }
     }
 
-    // Require testing
-    public async changePassword(req: Request, res: Response) {
-        if (res.headersSent) {
+    public async getParsedUserFriendRequests(req: Request, res: Response) {
+        const user = req.body.user;
+        const requestsType = req.query.type;
+
+        if (requestsType !== "incoming" && requestsType !== "outcoming") {
+            res.status(400).json({ message: "Query param `requestsType` is missing or has incorrect value" });
             return;
         }
 
+        if (!user) {
+            res.status(400).json({ message: "Не удалось получить данные пользователя" });
+            return;
+        }
+
+        try {
+            const parsedFriendRequests = await userService.getParsedUserFriendRequests(requestsType, user.id);
+
+            res.status(200).json(parsedFriendRequests);
+        } catch (err: any) {
+            if (err instanceof HTTPError) {
+                if (err.errorCode === 400 || err.errorCode === 404) {
+                    res.status(err.errorCode).json({ message: err.message });
+                    return;
+                }
+            }
+
+            res.status(500).json({ message: `Что-то пошло не так...` });
+            console.error(err);
+        }
+    }
+
+    public async getParsedUserFriends(req: Request, res: Response) {
+        const user = req.body.user;
+
+        if (!user) {
+            res.status(400).json({ message: "Не удалось получить данные пользователя" });
+            return;
+        }
+
+        try {
+            const parsedFriendRequests = await userService.getParsedUserFriends(user.id);
+
+            res.status(200).json(parsedFriendRequests);
+        } catch (err: any) {
+            if (err instanceof HTTPError) {
+                if (err.errorCode === 400 || err.errorCode === 404) {
+                    res.status(err.errorCode).json({ message: err.message });
+                    return;
+                }
+            }
+
+            res.status(500).json({ message: `Что-то пошло не так...` });
+            console.error(err);
+        }
+    }
+
+    // Require testing
+    public async changePassword(req: Request, res: Response) {
         res.setHeader("Accept-Charset", "utf-8");
 
         const email = req.body.email;
@@ -436,10 +452,6 @@ class UserContoller {
 
     // Require testing
     public async changeAvatar(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         if (!req.headers["content-type"]?.includes("multipart/form-data")) {
             res.status(400).send({ message: `Only requests of content-type 'multipart/form-data' supported` });
             return;

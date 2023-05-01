@@ -8,14 +8,15 @@ import NoSearchResultIcon from "@mui/icons-material/SearchOffRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
+import { Navigate, useSearchParams } from "react-router-dom";
+import { AxiosError } from "axios";
+import { laptopLayout } from "../../../../shared/lib/helpers/WindowLayoutBreakPoints";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
 import TextInput from "../../../../shared/UI/TextInput";
 import Button from "../../../../shared/UI/Button";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import Avatar from "../../../../shared/UI/Avatar";
-import { Navigate, useSearchParams } from "react-router-dom";
 import Accordion from "../../../../shared/UI/Accordion";
-import { AxiosError } from "axios";
 
 interface SearchFormProps extends UiComponentProps<HTMLDivElement> {
     isOpen?: boolean;
@@ -61,6 +62,7 @@ export default function SearchForm(props: SearchFormProps) {
     const windowLayout = useTypedSelector((state) => state.windowLayout);
 
     const searchTarget = queryParams.get("target") as SearchTarget;
+    const prevSearchTargetRef = React.useRef<SearchTarget>(searchTarget);
 
     const [searchResult, setSearchResult] = React.useState<SearchResult>({ page: 1, payload: [] });
     const [isLoading, setIsLoading] = React.useState(false);
@@ -73,6 +75,10 @@ export default function SearchForm(props: SearchFormProps) {
     // This useEffect reset search result and first input value on search target chage.
     // (first input exist for any value of search target, but not second and third inputs)
     React.useEffect(() => {
+        if (prevSearchTargetRef.current === searchTarget) {
+            return;
+        }
+
         const firstSearchElement = firstSearchElementRef.current;
 
         if (!(firstSearchElement instanceof HTMLInputElement)) {
@@ -159,8 +165,7 @@ export default function SearchForm(props: SearchFormProps) {
 
         try {
             if (searchTarget === "users") {
-                // TODO temporarily disabled
-                await TalkNetAPI.patch("/user/friend-requests", {
+                await TalkNetAPI.post("/user/friend-requests", {
                     from: user!.id,
                     to: targetID,
                 });
@@ -192,12 +197,17 @@ export default function SearchForm(props: SearchFormProps) {
 
     const classes = ["TNUI-ChatSearch", className].join(" ");
 
+    //=================================================================================================================
+    // debuging
+
+    console.log(user);
+
     return (
         <div className={classes} {...otherProps}>
             <div className="TNUI-ChatSearch-content">
                 <div className="TNUI-ChatSearch-header">
-                    {/* TODO replace one of this icon with more suitable for other */}
-                    {windowLayout.breakpoint <= 998 &&
+                    {windowLayout.breakpoint <= laptopLayout.breakpoint &&
+                        // TODO replace one of this icon with more suitable for other
                         (isOpen ? (
                             <CloseIcon className="TNUI-ChatSearch-header_icon" />
                         ) : (

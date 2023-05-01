@@ -4,7 +4,7 @@ import type I_ActivationState from "../../../types/DB/schemas/ActivationState";
 import type UserSettings from "../../../types/DB/schemas/UserSettings";
 import type { UserAccessLevelValue } from "../../../types/UserAccessLevel";
 
-export default interface IUser extends Document {
+export interface User {
     name: string;
     surname: string;
     patronymic: string | null;
@@ -14,7 +14,12 @@ export default interface IUser extends Document {
     accessLevel: UserAccessLevelValue;
     activationState: I_ActivationState;
     friends: Types.Array<Types.ObjectId>;
-    friendRequests: Types.Array<Types.ObjectId>;
+    incomingFriendRequests: Types.Array<Types.ObjectId>;
+    outcomingFriendRequests: Types.Array<Types.ObjectId>;
     blackList: Types.Array<Types.ObjectId>;
     settings: UserSettings;
 }
+
+type IUser = User & Document;
+
+export default IUser;

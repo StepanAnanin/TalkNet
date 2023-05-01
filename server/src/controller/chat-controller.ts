@@ -5,10 +5,6 @@ import validateRequest from "../lib/validators/validateRequest";
 
 class ChatController {
     public async getChatInfo(req: Request<{ id: string }>, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const requestedID = req.params.id;
@@ -39,10 +35,6 @@ class ChatController {
     }
 
     public async getChatMessages(req: Request<{ id: string }>, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const requestedID = req.params.id;
@@ -73,10 +65,6 @@ class ChatController {
     }
 
     public async createDialogueChat(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const chathName: string = req.body.chatName;
@@ -109,10 +97,6 @@ class ChatController {
     }
 
     public async deleteDialogueChat(req: Request, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const chatID: string = req.body.chatID;
@@ -143,10 +127,6 @@ class ChatController {
     }
 
     public async sendMessage(req: Request<{ id: string }>, res: Response) {
-        if (res.headersSent) {
-            return;
-        }
-
         res.setHeader("Accept-Charset", "utf-8");
 
         const chatID = req.params.id;

@@ -5,7 +5,7 @@ import LocalStorageController from "./LocalStorageController";
 import { MessengerServiceOutcomingEventRequest } from "./MessengerServiceEvent";
 import { io, Socket } from "socket.io-client";
 
-export default class MessengerService {
+export default class MessengerServiceConnection {
     public static readonly IncomingEventsMap: readonly MessengerServiceModel.IncomingEventName[] = [
         "receive-message",
         "access-token-expired",

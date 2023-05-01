@@ -1,4 +1,5 @@
 import "dotenv/config";
+// import type  "./types/index";
 import express from "express";
 import config from "./config";
 import cors from "cors";

@@ -8,6 +8,13 @@ type constructorModel = {
     lastPasswordChange: number;
     isEmailChangeInProcess: boolean;
     isAccountDeletionInProcess: boolean;
+
+    // To be correct it's not "string[]" but "ObjectId[]",
+    // but this doesn't affect anything cuz ObjectId is one kind of string.
+    friends: string[];
+    incomingFriendRequests: string[];
+    outcomingFriendRequests: string[];
+    blackList: string[];
 };
 
 export default class UserDTO {
@@ -20,6 +27,10 @@ export default class UserDTO {
     public lastPasswordChange: number;
     public isEmailChangeInProcess: boolean;
     public isAccountDeletionInProcess: boolean;
+    public friends: string[];
+    public incomingFriendRequests: string[];
+    public outcomingFriendRequests: string[];
+    public blackList: string[];
 
     constructor(model: constructorModel) {
         this.id = model.id;
@@ -31,5 +42,9 @@ export default class UserDTO {
         this.lastPasswordChange = model.lastPasswordChange;
         this.isEmailChangeInProcess = model.isEmailChangeInProcess;
         this.isAccountDeletionInProcess = model.isAccountDeletionInProcess;
+        this.friends = model.friends;
+        this.incomingFriendRequests = model.incomingFriendRequests;
+        this.outcomingFriendRequests = model.outcomingFriendRequests;
+        this.blackList = model.blackList;
     }
 }

@@ -21,6 +21,7 @@ import { ObjectId } from "mongodb";
  * @IMPORTANT Right now user can login in system only from 1 device at once
  */
 
+// TODO add protected method for userID validation
 class UserService {
     protected createUserDTO(user: IUser) {
         return new UserDTO({
@@ -33,7 +34,37 @@ class UserService {
             isActivated: user.activationState.isActivated,
             isAccountDeletionInProcess: user.settings.accountDeletionState.isInitialized,
             isEmailChangeInProcess: user.settings.emailChangeState.isInitialized,
+
+            // If cast "any" types to "string" there will be error.
+            // This doesn't affect anything, cuz ObjectId is string.
+            friends: user.friends as any[],
+            incomingFriendRequests: user.incomingFriendRequests as any[],
+            outcomingFriendRequests: user.outcomingFriendRequests as any[],
+            blackList: user.blackList as any[],
         });
+    }
+
+    protected getBaseUserInfo(user: IUser) {
+        return {
+            id: user._id,
+            name: user.name,
+            surname: user.surname,
+            patronymic: user.patronymic,
+        };
+    }
+
+    protected async getUserByID(userID: string) {
+        if (!ObjectId.isValid(userID)) {
+            throw new HTTPError(400, "User ID has incorrect format");
+        }
+
+        const user = await userModel.findById(userID);
+
+        if (!user) {
+            throw new HTTPError(404, "User wasn't found");
+        }
+
+        return user;
     }
 
     protected async verifyAuth(user: IUser, password: string) {
@@ -229,11 +260,7 @@ class UserService {
     }
 
     public async isUserBanned(userId: string) {
-        const user = await userModel.findOne({ _id: userId });
-
-        if (!user) {
-            throw new Error(`User wasn't found`);
-        }
+        const user = await this.getUserByID(userId);
 
         return user.accessLevel === config.USER_ACCESS_LEVELS.bannedUser;
     }
@@ -330,66 +357,65 @@ class UserService {
     }
 
     public async sendFriendRequest(to: string, from: string) {
-        if (!ObjectId.isValid(to)) {
-            throw new HTTPError(400, "Targeted user has incorrect id format");
-        }
+        const targetedUser = await this.getUserByID(to);
+        const sender = await this.getUserByID(from);
 
-        if (!ObjectId.isValid(from)) {
-            throw new HTTPError(400, "Initiator user has incorrect id format");
-        }
-
-        const targetedUser = await userModel.findOne({ _id: to });
-        const sender = await userModel.findOne({ _id: from });
-
-        if (!targetedUser) {
-            throw new HTTPError(404, "Targeted user wasn't found");
-        }
-
-        if (!sender) {
-            throw new HTTPError(404, "Sender user wasn't found");
-        }
-
-        // from is already validated, see above
-        if (targetedUser.friendRequests.includes(from as any)) {
+        // "from" is already validated, see above
+        if (targetedUser.incomingFriendRequests.includes(from as any)) {
             throw new HTTPError(409, "Заявка в друзья этому пользователю уже отправлена");
         }
 
-        targetedUser.friendRequests.push(from);
+        targetedUser.incomingFriendRequests.push(from);
+        sender.outcomingFriendRequests.push(to);
 
         await targetedUser.save();
+        await sender.save();
     }
 
     public async acceptFriendRequest(to: string, from: string) {
-        if (!ObjectId.isValid(to)) {
-            throw new HTTPError(400, "Targeted user has incorrect id format");
-        }
+        const targetedUser = await this.getUserByID(to);
+        const sender = await this.getUserByID(from);
 
-        if (!ObjectId.isValid(from)) {
-            throw new HTTPError(400, "Initiator user has incorrect id format");
-        }
+        // "from" and "to" is already validated in this.getUser
+        const incomingFriendRequestID = targetedUser.incomingFriendRequests.indexOf(from as any);
+        const outcomingFriendRequestID = sender.outcomingFriendRequests.indexOf(to as any);
 
-        const targetedUser = await userModel.findOne({ _id: to });
-        const sender = await userModel.findOne({ _id: from });
-
-        if (!targetedUser) {
-            throw new HTTPError(404, "Targeted user wasn't found");
-        }
-
-        if (!sender) {
-            throw new HTTPError(404, "Sender user wasn't found");
-        }
-
-        // from is already validated, see above
-        const friendRequestID = targetedUser.friendRequests.indexOf(from as any);
-
-        if (friendRequestID === -1) {
+        if (incomingFriendRequestID === -1) {
             throw new HTTPError(404, "Не удалось найти заявку в друзья");
         }
 
-        targetedUser.friendRequests.splice(friendRequestID, 1);
+        targetedUser.incomingFriendRequests.splice(incomingFriendRequestID, 1);
+        sender.outcomingFriendRequests.splice(outcomingFriendRequestID, 1);
+
         targetedUser.friends.push(from);
+        sender.friends.push(to);
 
         await targetedUser.save();
+        await sender.save();
+    }
+
+    /**
+     * In DB friend requests is just array of users id.
+     *
+     * This method return base info about users who sent/receive (depends on first argument)
+     * friend requests to/from user with id equal to second argument of this method.
+     */
+    public async getParsedUserFriendRequests(requestsType: "outcoming" | "incoming", userId: string) {
+        const user = await this.getUserByID(userId);
+
+        const rawResult = await userModel.find({
+            _id: { $in: requestsType === "outcoming" ? user.outcomingFriendRequests : user.incomingFriendRequests },
+        });
+
+        return rawResult.map((user) => this.getBaseUserInfo(user));
+    }
+
+    public async getParsedUserFriends(userId: string) {
+        const user = await this.getUserByID(userId);
+
+        const rawResult = await userModel.find({ _id: { $in: user.friends } });
+
+        return rawResult.map((user) => this.getBaseUserInfo(user));
     }
 }
 

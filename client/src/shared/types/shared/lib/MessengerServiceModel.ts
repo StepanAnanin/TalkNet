@@ -2,8 +2,6 @@ import DialogueChat from "../../features/DialogueChat";
 import DialogueChatMessage from "../DialogueChatMessage";
 import HTTPStatusCode from "./HTTPStatusCode";
 
-// TODO need to add an additional property for events which will define is it request or response.
-// This needed cuz payloads of request and response are different
 namespace MessengerServiceModel {
     export type OutcomingEventName = OutcomingEvent.Request.Any["event"];
 
@@ -15,7 +13,6 @@ namespace MessengerServiceModel {
      * This events are dispatching by client. Response on this event will have the same event type.
      */
     export namespace OutcomingEvent {
-        // TODO remove chatID from there
         // Unspecified in sense of is it request or response
         interface UnspecifiedOutcomingEvent<E extends string> {
             event: E;

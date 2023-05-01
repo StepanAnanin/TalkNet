@@ -9,8 +9,12 @@ import ChatController from "../controller/chat-controller";
 const ChatRouter = Router();
 
 ChatRouter.get("/info/:id", ChatController.getChatInfo);
-ChatRouter.post("/messages/:id", authMiddleware, ChatController.getChatMessages); // POST, cuz need to pass accessToken (GET don't have access to it)
+
+// POST, cuz need to pass accessToken (GET don't have access to it)
+ChatRouter.post("/messages/:id", authMiddleware, ChatController.getChatMessages);
+
 ChatRouter.post("/create/dialogue", authMiddleware, ChatController.createDialogueChat);
+
 ChatRouter.post("/message/:id", authMiddleware, ChatController.sendMessage);
 
 export default ChatRouter;

@@ -25,8 +25,14 @@ export default async function authMiddleware(req: Request, res: Response, next: 
             throw new HTTPError(401);
         }
 
-        // @ts-ignore
-        req.user = jwtUserData;
+        /**
+         * @IMPORTANT This property will exist only if this middleware was used previously.
+         *
+         * P.S. There are actualy 2 extra properties which is added by JWT, but i don't need them.
+         */
+        req.body.user = jwtUserData as any;
+
+        next();
     } catch (err) {
         if (err instanceof TokenExpiredError) {
             res.status(401).json({ tokenExpired: true, message: "Access token has expired" });
@@ -47,7 +53,5 @@ export default async function authMiddleware(req: Request, res: Response, next: 
 
         console.error(err);
         res.status(500).json({ message: "Что-то пошло не так..." });
-    } finally {
-        next();
     }
 }

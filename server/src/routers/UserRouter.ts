@@ -16,9 +16,13 @@ UserRouter.post("/logout", userController.logout);
 
 UserRouter.post("/refresh", userController.updateRefreshToken);
 
-UserRouter.post("/friend-requests", userController.sendFriendRequest);
+UserRouter.post("/friend-requests", authMiddleware, userController.sendFriendRequest);
 
-UserRouter.patch("/friend-requests/accept", userController.acceptFriendRequest);
+UserRouter.patch("/friend-requests/accept", authMiddleware, userController.acceptFriendRequest);
+
+UserRouter.get("/friend-requests", authMiddleware, userController.getParsedUserFriendRequests);
+
+UserRouter.get("/friends", authMiddleware, userController.getParsedUserFriends);
 
 UserRouter.get("/:id/chats", userController.getUserChats);
 

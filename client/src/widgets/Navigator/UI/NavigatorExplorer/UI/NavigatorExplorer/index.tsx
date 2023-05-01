@@ -8,6 +8,7 @@ import Chats from "../Chats";
 import SearchTarget from "../SearchTarget";
 import { useTypedSelector } from "../../../../../../shared/model/hooks/useTypedSelector";
 import { DefaultLoader } from "../../../../../../shared/UI/Loader";
+import Friends from "../Friends";
 
 interface NavigatorExplorerProps extends UiComponentProps<HTMLDivElement> {
     target: ExplorerTarget;
@@ -27,13 +28,18 @@ export default function NavigatorExplorer(props: NavigatorExplorerProps) {
     return (
         <div className={classes} {...otherProps}>
             {target === "chats" && <Chats />}
-            {target === "search" && (
-                <>
-                    <SearchTarget target="users" />
-                    <SearchTarget target="communities" />
-                    <SearchTarget target="chats" />
-                </>
-            )}
+            {target === "search" && <SearchOptions />}
+            {target === "friends" && <Friends />}
         </div>
+    );
+}
+
+function SearchOptions() {
+    return (
+        <>
+            <SearchTarget target="users" />
+            <SearchTarget target="communities" />
+            <SearchTarget target="chats" />
+        </>
     );
 }
