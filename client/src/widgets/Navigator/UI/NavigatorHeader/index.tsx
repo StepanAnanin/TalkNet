@@ -86,22 +86,6 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
                         <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Сообщения</span>
                     </div>
                     <div
-                        id={explorerTargetItemElementIdRoot + "communities"}
-                        className={
-                            "TNUI-NavigatorHeader-explorer-target-list_item " +
-                            (navigatorTarget === "communities" ? "current" : "")
-                        }
-                        onClick={explorerTargetItemClickHander}
-                    >
-                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
-                            <CommunitiesIcon
-                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
-                                id="TNUI-NavigatorHeader-explorer-target-list_item-messages-img"
-                            />
-                        </div>
-                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Сообщества</span>
-                    </div>
-                    <div
                         id={explorerTargetItemElementIdRoot + "friends"}
                         className={
                             "TNUI-NavigatorHeader-explorer-target-list_item " +
@@ -132,6 +116,22 @@ export default function NavigatorHeader(props: NavigatorHeaderProps) {
                             />
                         </div>
                         <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Поиск</span>
+                    </div>
+                    <div
+                        id={explorerTargetItemElementIdRoot + "communities"}
+                        className={
+                            "TNUI-NavigatorHeader-explorer-target-list_item " +
+                            (navigatorTarget === "communities" ? "current" : "")
+                        }
+                        onClick={explorerTargetItemClickHander}
+                    >
+                        <div className="TNUI-NavigatorHeader-explorer-target-list_item-img-wrapper">
+                            <CommunitiesIcon
+                                className="TNUI-NavigatorHeader-explorer-target-list_item-img"
+                                id="TNUI-NavigatorHeader-explorer-target-list_item-messages-img"
+                            />
+                        </div>
+                        <span className="TNUI-NavigatorHeader-explorer-target-list_item-label">Сообщества</span>
                     </div>
                     <div
                         id={explorerTargetItemElementIdRoot + "settings"}

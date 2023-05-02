@@ -4,11 +4,11 @@ import type { RequestState } from "../../../../../shared/types/common/RequestSta
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type UserState = {
-    user: User | null;
+    payload: User | null;
     request: RequestState;
 };
 
-const initialState: UserState = { user: null, request: { status: "idle", message: null } };
+const initialState: UserState = { payload: null, request: { status: "idle", message: null } };
 
 const authSlice = createSlice({
     name: "auth",
@@ -23,19 +23,19 @@ const authSlice = createSlice({
             state.request.message = action.payload;
         },
         login(state, action: PayloadAction<User>) {
-            state.user = action.payload;
+            state.payload = action.payload;
 
             state.request.status = "succeeded";
             state.request.message = "Аутентификация успешна";
         },
         logout(state) {
-            state.user = null;
+            state.payload = null;
 
             state.request.status = "succeeded";
             state.request.message = "Деаутентификация успешна";
         },
         refresh(state, action: PayloadAction<User>) {
-            state.user = action.payload;
+            state.payload = action.payload;
 
             state.request.status = "succeeded";
             state.request.message = "Токены обновлены";

@@ -20,6 +20,8 @@ UserRouter.post("/friend-requests", authMiddleware, userController.sendFriendReq
 
 UserRouter.patch("/friend-requests/accept", authMiddleware, userController.acceptFriendRequest);
 
+UserRouter.patch("/friend-requests/decline", authMiddleware, userController.declineFriendRequest);
+
 UserRouter.get("/friend-requests", authMiddleware, userController.getParsedUserFriendRequests);
 
 UserRouter.get("/friends", authMiddleware, userController.getParsedUserFriends);

@@ -7,7 +7,7 @@ import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelecto
 import { Navigate } from "react-router-dom";
 
 export default function LoginPage() {
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
 
     if (user) {
         return <Navigate to="/" />;

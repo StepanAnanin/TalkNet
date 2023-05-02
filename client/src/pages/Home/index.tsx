@@ -9,7 +9,7 @@ import Accordion from "../../shared/UI/Accordion";
 import NavigatorExplorerItem from "../../features/NavigatorExplorerItem";
 
 export default function HomePage() {
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
 

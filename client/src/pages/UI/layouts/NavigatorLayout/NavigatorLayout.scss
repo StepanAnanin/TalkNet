@@ -26,30 +26,13 @@ $transitionPrefrences: all 0.25s ease-in-out;
             transition: $transitionPrefrences;
         }
 
-        // .........................
-        // ======== ВАЖНО ==========
-        // .........................
-        // TODO move this out of there
         .TNUI-NavigatorLayout-content {
-            @include custom-scrollbar(10px, transparent);
-
             height: 100%;
             flex-grow: 1;
 
             transition: $transitionPrefrences;
 
             background-color: $black;
-
-            overflow-y: scroll;
-            overflow-x: hidden;
-
-            @media screen and (max-width: $laptop) {
-                @include custom-scrollbar(7.5px, transparent);
-            }
-
-            @media screen and (max-width: $mobile) {
-                @include custom-scrollbar(5px, transparent);
-            }
         }
     }
 }

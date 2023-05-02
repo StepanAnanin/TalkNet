@@ -18,7 +18,7 @@ interface HeaderProps extends UiComponentProps<HTMLElement> {
 
 export default function Header(props: HeaderProps) {
     const { className, hideSignInButton = false, ...otherProps } = props;
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
 
     // ================================== picking styles ==================================
 

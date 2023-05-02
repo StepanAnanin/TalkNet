@@ -13,14 +13,7 @@ const defaultModalWindowZ_Index = 1000;
 
 // TODO CSS properties transition works correctly only on open, but not on close
 export default function ModalWrapper(props: ModalWindowsProps.AnyModal) {
-    const {
-        className,
-        variant = "default",
-        dontCloseOnClickAway: notCloseOnClickAway = false,
-        priority = 0,
-        setIsOpen,
-        children,
-    } = props;
+    const { className, variant = "default", dontCloseOnClickAway = false, priority = 0, setIsOpen, children } = props;
 
     const modalsRootElement = document.getElementById("modals-root");
 
@@ -29,12 +22,12 @@ export default function ModalWrapper(props: ModalWindowsProps.AnyModal) {
     }
 
     function modalWrapperClickAwayHandler() {
-        if (notCloseOnClickAway) {
+        if (dontCloseOnClickAway) {
             return;
         }
 
         handleClose();
-        setIsOpen(false);
+        setIsOpen((p) => !p);
     }
 
     function handleClose() {
@@ -43,6 +36,11 @@ export default function ModalWrapper(props: ModalWindowsProps.AnyModal) {
 
     function handleConfirm() {
         props.onConfirm && props.onConfirm();
+    }
+
+    function handleReject() {
+        // @ts-ignore
+        props.onReject && props.onReject();
     }
 
     const classes = ["TNUI-ModalWrapper", "TNUI-ModalWrapper-" + variant, className ?? ""].join(" ");
@@ -64,6 +62,7 @@ export default function ModalWrapper(props: ModalWindowsProps.AnyModal) {
                     setIsOpen={props.setIsOpen}
                     onConfirm={handleConfirm}
                     onClose={handleClose}
+                    onReject={handleReject}
                     hideCloseButton={props.hideCloseButton}
                 />
             )}

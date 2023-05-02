@@ -11,6 +11,7 @@ interface ModalControlProps extends UiComponentProps<HTMLDivElement> {
     hideCloseButton?: boolean;
     onConfirm?: () => void;
     onClose?: () => void;
+    onReject?: () => void;
 }
 
 export default function ModalControl(props: ModalControlProps) {
@@ -19,6 +20,7 @@ export default function ModalControl(props: ModalControlProps) {
         setIsOpen,
         confirmButtonLabel,
         closeButtonLabel,
+        onReject,
         onClose,
         onConfirm,
         hideCloseButton,
@@ -26,6 +28,7 @@ export default function ModalControl(props: ModalControlProps) {
     } = props;
 
     function closeButtonClickHandler() {
+        onReject && onReject();
         onClose && onClose();
     }
 

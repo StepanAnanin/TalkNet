@@ -22,7 +22,7 @@ const MessengerServiceConnectionRef: { current: MessengerServiceConnection | nul
  * All error events are logged in console by default.
  */
 export default function useMessengerService() {
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
     const dispatch = useTypedDispatch();
 
     // TODO Now on each event will occur render, regardless is it handled or not.

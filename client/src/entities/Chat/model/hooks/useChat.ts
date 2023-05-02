@@ -13,7 +13,7 @@ import {
 import DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
 
 export default function useChat() {
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
 
     if (!user) {
         throw new Error(`Authorization required`);

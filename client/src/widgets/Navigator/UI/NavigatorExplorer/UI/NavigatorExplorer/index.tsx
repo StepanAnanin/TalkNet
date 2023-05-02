@@ -19,7 +19,7 @@ export default function NavigatorExplorer(props: NavigatorExplorerProps) {
 
     const auth = useTypedSelector((state) => state.auth);
 
-    if (!auth.user && (auth.request.status === "pending" || auth.request.status === "idle")) {
+    if (!auth.payload && (auth.request.status === "pending" || auth.request.status === "idle")) {
         return <DefaultLoader style={{ textAlign: "center", marginTop: "50px", marginInline: "auto" }} />;
     }
 
@@ -30,9 +30,25 @@ export default function NavigatorExplorer(props: NavigatorExplorerProps) {
             {target === "chats" && <Chats />}
             {target === "search" && <SearchOptions />}
             {target === "friends" && <Friends />}
+            {target === "communities" && (
+                <span
+                    style={{
+                        width: "100%",
+                        marginTop: "15px",
+                        display: "flex",
+                        color: "crimson",
+                        fontSize: "22px",
+                        textAlign: "center",
+                    }}
+                >
+                    Данная функция находиться в процессе разработке
+                </span>
+            )}
         </div>
     );
 }
+
+// ================================================================
 
 function SearchOptions() {
     return (

@@ -2,16 +2,19 @@ import "./Friends.scss";
 import React from "react";
 
 import SadSmileIcon from "@mui/icons-material/SentimentDissatisfiedRounded";
-
-import type BaseUserData from "../../../../../../shared/types/common/BaseUserData";
+import RefershIcon from "@mui/icons-material/AutorenewRounded";
 
 import { useTypedSelector } from "../../../../../../shared/model/hooks/useTypedSelector";
-import { AxiosError } from "axios";
-import TalkNetAPI from "../../../../../../shared/api/TalkNetAPI";
 import { DefaultLoader } from "../../../../../../shared/UI/Loader";
 import { Link } from "react-router-dom";
 import Avatar from "../../../../../../shared/UI/Avatar";
 import Button from "../../../../../../shared/UI/Button";
+import { useTypedDispatch } from "../../../../../../shared/model/hooks/useTypedDispatch";
+import addFetchFriends from "../../../../model/store/actionCreators/friendsActions";
+import addFetchIncomingFriendRequests from "../../../../model/store/actionCreators/incomingFriendRequestsActions";
+import addFetchOutcomingFriendRequests from "../../../../model/store/actionCreators/outcomingFriendRequests";
+import TalkNetAPI from "../../../../../../shared/api/TalkNetAPI";
+import { AxiosError } from "axios";
 
 type FriendExplorerTarget = "friend-list" | "incoming-friend-requests" | "outcoming-friend-requests";
 
@@ -23,78 +26,72 @@ const friendExplorerTargetsMap: readonly FriendExplorerTarget[] = [
     "outcoming-friend-requests",
 ] as const;
 
-export async function getFriendRequests(requestsType: "incoming" | "outcoming") {
-    const response = await TalkNetAPI.get("/user/friend-requests?type=" + requestsType);
-
-    return response.data as BaseUserData[];
-}
-
-export async function getFriends() {
-    const response = await TalkNetAPI.get("/user/friends");
-
-    return response.data as BaseUserData[];
-}
-
-// TODO Require optimization. There are a lot of rerenders now
-// BUG Sometimes occur error with request. It always return code 401 and token expired error.
-//     Most likely it appears after second response with this code and error.
+// TODO Show loader when user force content updating (by button click)
+// TODO Handle request errors
 export default function Friends() {
-    const { user } = useTypedSelector((state) => state.auth);
+    const {
+        auth: authState,
+        friends: friendsState,
+        incomingFriendRequests: incomingFriendRequestsState,
+        outcomingFriendRequests: outcomingFriendRequestsState,
+    } = useTypedSelector((state) => state);
+    const dispatch = useTypedDispatch();
+
+    const user = authState.payload;
 
     const [friendExplorerTarget, setFriendExplorerTarget] = React.useState<FriendExplorerTarget>("friend-list");
-    const [friendExplorerContent, setFriendExplorerContent] = React.useState<BaseUserData[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true);
 
-    const prevFriendExplorerTargetRef = React.useRef(friendExplorerTarget);
+    const friendExplorerContent = (function () {
+        if (friendExplorerTarget === "friend-list") {
+            return friendsState;
+        }
+
+        if (friendExplorerTarget === "incoming-friend-requests") {
+            return incomingFriendRequestsState;
+        }
+
+        if (friendExplorerTarget === "outcoming-friend-requests") {
+            return outcomingFriendRequestsState;
+        }
+
+        throw new TypeError("Incorrect friendExplorerTarget value");
+    })();
+
+    const isLoading = friendExplorerContent.payload === null;
 
     if (!user) {
         throw new Error("Require authorization.");
     }
 
     React.useEffect(() => {
-        (async function () {
-            setFriendExplorerContent(await getFriends());
-            setIsLoading(false);
-        })();
-    }, []);
+        // This is async function, so if you want to add some other actions after this function call,
+        // need to wrap this in async IIFE and use before it "await".
+        updateCurrentFriendExplorerContent();
+    }, [friendExplorerTarget]);
 
-    React.useEffect(() => {
-        if (prevFriendExplorerTargetRef.current === friendExplorerTarget) {
+    async function updateCurrentFriendExplorerContent(force = false) {
+        if (!force && !isLoading) {
             return;
         }
 
-        setIsLoading(true);
+        if (force) {
+            document.body.style.cursor = "wait";
+        }
 
-        (async function () {
-            try {
-                if (friendExplorerTarget === "friend-list") {
-                    setFriendExplorerContent(await getFriends());
-                    prevFriendExplorerTargetRef.current = "friend-list";
-                }
+        if (friendExplorerTarget === "friend-list") {
+            await dispatch(addFetchFriends());
+        }
 
-                if (friendExplorerTarget === "incoming-friend-requests") {
-                    setFriendExplorerContent(await getFriendRequests("incoming"));
-                    prevFriendExplorerTargetRef.current = "incoming-friend-requests";
-                }
+        if (friendExplorerTarget === "incoming-friend-requests") {
+            await dispatch(addFetchIncomingFriendRequests());
+        }
 
-                if (friendExplorerTarget === "outcoming-friend-requests") {
-                    setFriendExplorerContent(await getFriendRequests("outcoming"));
-                    prevFriendExplorerTargetRef.current = "outcoming-friend-requests";
-                }
-            } catch (err) {
-                if (!(err instanceof AxiosError)) {
-                    throw err;
-                }
+        if (friendExplorerTarget === "outcoming-friend-requests") {
+            await dispatch(addFetchOutcomingFriendRequests());
+        }
 
-                // TODO replase alert with modal window
-                console.error(err);
-                alert("Произошла непредвиденная ошибка. Страница будет перезагружена");
-                window.location.reload();
-            }
-
-            setIsLoading(false);
-        })();
-    }, [friendExplorerTarget]);
+        document.body.style.cursor = "default";
+    }
 
     function friendExplorerTargetsItemClickHandler(e: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
         const targetElementId = e.currentTarget.id;
@@ -111,8 +108,51 @@ export default function Friends() {
         setFriendExplorerTarget(newFriendExplorerTarget);
     }
 
-    console.log("render");
-    // console.log(friendExplorerContent);
+    async function friendRequestActionButtonClickHandler(e: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
+        const targetedUserID = e.currentTarget.id;
+
+        if (!targetedUserID) {
+            throw new TypeError("Missing targeted user id");
+        }
+
+        if (friendExplorerTarget !== "incoming-friend-requests" && friendExplorerTarget !== "outcoming-friend-requests") {
+            throw new TypeError("Invalid friendExplorerTarget value");
+        }
+
+        try {
+            const endpoint = friendExplorerTarget === "incoming-friend-requests" ? "accept" : "decline";
+            const response = await TalkNetAPI.patch("/user/friend-requests/" + endpoint, {
+                from: friendExplorerTarget === "incoming-friend-requests" ? targetedUserID : user!.id,
+                to: friendExplorerTarget === "incoming-friend-requests" ? user!.id : targetedUserID,
+            });
+
+            await updateCurrentFriendExplorerContent(true);
+
+            // If user accept incoming request need to update his friend list state
+            if (friendExplorerTarget === "incoming-friend-requests") {
+                await dispatch(addFetchFriends());
+            }
+        } catch (err) {
+            if (!(err instanceof AxiosError)) {
+                throw err;
+            }
+
+            console.log(err);
+
+            // TODO replace this with modal.
+            alert("Во время запроса на сервер произошла ошибка. Страница будет перезагружена");
+
+            window.location.reload();
+        }
+    }
+
+    function friendExplorerRefreshContentButtonClickHandler() {
+        if (isLoading) {
+            return;
+        }
+
+        updateCurrentFriendExplorerContent(true);
+    }
 
     return (
         <div className="TNUI-Friend-explorer">
@@ -152,32 +192,47 @@ export default function Friends() {
                     Исходящие заявки
                 </span>
             </div>
+            <Button
+                variant="outlined"
+                size="small"
+                className="TNUI-Friend-explorer-refresh-content-button"
+                onClick={friendExplorerRefreshContentButtonClickHandler}
+            >
+                <span className="TNUI-Friend-explorer-refresh-content-button_label">Обновить</span>
+                <RefershIcon className="TNUI-Friend-explorer-refresh-content-button_icon" />
+            </Button>
             {isLoading && <DefaultLoader className="TNUI-Friend-explorer-loader" />}
-            {!isLoading && friendExplorerTarget === "friend-list" && user.friends.length === 0 && (
-                <div className="TNUI-Friend-explorer-empty-friend-list-alert">
-                    <SadSmileIcon className="TNUI-Friend-explorer-empty-friend-list-alert_icon" />
-                    <span className="TNUI-Friend-explorer-empty-friend-list-alert_label">Увы, у вас нет друзей</span>
+            {!isLoading && friendExplorerContent.payload!.length === 0 && (
+                <div className="TNUI-Friend-explorer-empty-content-alert">
+                    {friendExplorerTarget === "friend-list" && (
+                        <SadSmileIcon className="TNUI-Friend-explorer-empty-content-alert_icon" />
+                    )}
+                    <span className="TNUI-Friend-explorer-empty-content-alert_label">
+                        {friendExplorerTarget === "friend-list" ? "Увы, у вас нет друзей" : "Заявки отсутствуют"}
+                    </span>
                 </div>
             )}
             {!isLoading &&
-                friendExplorerContent.map((friend) => {
+                friendExplorerContent!.payload!.map((user) => {
                     return (
-                        <Link key={friend.id} to="#" className="TNUI-Friend-explorer-content-item">
+                        <Link key={user.id} to="#" className="TNUI-Friend-explorer-content-item">
                             <Avatar className="TNUI-Friend-explorer-content-item_user-avatar" />
                             <span
                                 className="TNUI-Friend-explorer-content-item_user-name"
-                                title={`${friend.surname} ${friend.name}`}
+                                title={`${user.surname} ${user.name}`}
                             >
-                                {friend.name} {friend.surname}
+                                {user.name} {user.surname}
                             </span>
                             {friendExplorerTarget !== "friend-list" && (
                                 <Button
                                     variant="contained"
                                     size="small"
+                                    id={user.id}
                                     className="TNUI-Friend-explorer-content-item_action-button"
+                                    onClick={friendRequestActionButtonClickHandler}
                                 >
                                     {friendExplorerTarget === "incoming-friend-requests" && "Принять"}
-                                    {friendExplorerTarget === "outcoming-friend-requests" && "Отменить"}
+                                    {friendExplorerTarget === "outcoming-friend-requests" && "Отклонить"}
                                 </Button>
                             )}
                         </Link>

@@ -15,7 +15,7 @@ interface MessagesPageProps extends UiComponentProps<HTMLDivElement> {
 export default function MessagesPage(props: MessagesPageProps) {
     const { className = "", ...otherProps } = props;
 
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
     const [searchParams, setSearchParams] = useSearchParams();
 
     if (!user) {

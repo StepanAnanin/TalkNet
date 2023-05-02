@@ -15,7 +15,7 @@ interface ChatHeaderProps extends Omit<UiComponentProps<HTMLDivElement>, "childr
 export default function ChatHeader(props: ChatHeaderProps) {
     const { className = "", chat, ...otherProps } = props;
 
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
 
     if (!user) {
         throw new Error("Необходима авторизация");

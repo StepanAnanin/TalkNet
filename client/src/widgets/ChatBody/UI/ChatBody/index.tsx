@@ -34,7 +34,7 @@ export default function ChatBody(props: ChatProps) {
     const messageInputRef = React.useRef<HTMLDivElement>(null);
     const prevMessageSentDateDayDifferenceRef = React.useRef(0);
 
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
     const { MessengerServiceConnection, userChats, getCurrentChatID } = useChat();
 
     const sendButtonClickHandler = React.useCallback(

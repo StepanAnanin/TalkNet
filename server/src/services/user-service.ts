@@ -394,6 +394,25 @@ class UserService {
         await sender.save();
     }
 
+    public async declineFriendRequest(to: string, from: string) {
+        const targetedUser = await this.getUserByID(to);
+        const sender = await this.getUserByID(from);
+
+        // "from" and "to" is already validated in this.getUser
+        const incomingFriendRequestID = targetedUser.incomingFriendRequests.indexOf(from as any);
+        const outcomingFriendRequestID = sender.outcomingFriendRequests.indexOf(to as any);
+
+        if (incomingFriendRequestID === -1) {
+            throw new HTTPError(404, "Не удалось найти заявку в друзья");
+        }
+
+        targetedUser.incomingFriendRequests.splice(incomingFriendRequestID, 1);
+        sender.outcomingFriendRequests.splice(outcomingFriendRequestID, 1);
+
+        await targetedUser.save();
+        await sender.save();
+    }
+
     /**
      * In DB friend requests is just array of users id.
      *

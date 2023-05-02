@@ -360,6 +360,42 @@ class UserContoller {
         }
     }
 
+    public async declineFriendRequest(req: Request, res: Response) {
+        const from = req.body.from as string;
+        const to = req.body.to as string;
+
+        const validationResult = validateRequest(req.body, [
+            { key: "from", type: "string" },
+            { key: "to", type: "string" },
+        ]);
+
+        if (!validationResult.ok) {
+            res.status(400).json({ message: validationResult.message });
+            return;
+        }
+
+        try {
+            await userService.declineFriendRequest(to, from);
+
+            res.status(200).json({ message: "Заявка на добавление в друзья отклонена" });
+        } catch (err: any) {
+            if (err instanceof HTTPError) {
+                if (err.errorCode === 401) {
+                    res.status(err.errorCode).json({ message: `Требуется аутентификация` });
+                    return;
+                }
+
+                if (err.errorCode === 409) {
+                    res.status(err.errorCode).json({ message: err.message });
+                    return;
+                }
+            }
+
+            res.status(500).json({ message: `Что-то пошло не так...` });
+            console.error(err);
+        }
+    }
+
     public async getParsedUserFriendRequests(req: Request, res: Response) {
         const user = req.body.user;
         const requestsType = req.query.type;

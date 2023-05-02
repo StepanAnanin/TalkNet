@@ -24,7 +24,7 @@ interface WithAPIProps {
 export default function WithAPI({ children }: WithAPIProps) {
     const [isAuthUpdatingInProcess, setIsAuthUpdatingInProcess] = React.useState(false);
 
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
     const dispatch = useTypedDispatch();
     const retryRef = React.useRef(false);
 
@@ -52,8 +52,10 @@ export default function WithAPI({ children }: WithAPIProps) {
         async (err: AxiosError) => {
             const originalRequest = err.config!;
 
+            // If access token is expired then server attach to
+            // request body property "tokenExpired" wich is equal true.
             // @ts-ignore
-            if (err.response!.status === 401 && err.config && !err.config._isRetry) {
+            if (err.response?.data.tokenExpired && !err.config._isRetry) {
                 // @ts-ignore
                 originalRequest._isRetry = true;
 
@@ -66,6 +68,8 @@ export default function WithAPI({ children }: WithAPIProps) {
                     return TalkNetAPI.request(originalRequest);
                 } catch (err) {
                     console.error(err);
+                } finally {
+                    retryRef.current = false;
                 }
             }
 

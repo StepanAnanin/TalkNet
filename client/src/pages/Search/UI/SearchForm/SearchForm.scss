@@ -1,16 +1,14 @@
 @import "../../../../app/styles/variables.scss";
 @import "../../../../app/styles/screen-breakpoints.scss";
+@import "../../../../app/styles/mixins.scss";
 
 .TNUI-ChatSearch {
-    height: fit-content;
+    height: 100%;
 
     display: flex;
 
     margin-inline: 17.5%;
     margin-top: 5px;
-
-    overflow-y: hidden;
-    overflow-x: hidden;
 
     @media screen and (max-width: 1600px) {
         margin-inline: 12.5%;
@@ -37,10 +35,24 @@
     }
 
     &-content {
+        @include custom-scrollbar(7.5px, transparent);
+
         width: 100%;
+        height: calc(100% - 5px);
 
         border-top-left-radius: inherit;
         border-bottom-left-radius: inherit;
+
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        @media screen and (max-width: $laptop) {
+            @include custom-scrollbar(7.5px, transparent);
+        }
+
+        @media screen and (max-width: $mobile) {
+            @include custom-scrollbar(5px, transparent);
+        }
     }
 
     &-header {
@@ -72,7 +84,7 @@
     }
 
     &-body {
-        height: calc(100% - 100px);
+        height: 100%;
 
         margin-top: 5px;
 
@@ -206,7 +218,6 @@
 
         &_search-result-list {
             width: 100%;
-            height: fit-content;
 
             margin-top: 15px;
             padding-inline: 10px;

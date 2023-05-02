@@ -42,7 +42,7 @@ export default function SearchTarget(props: SearchTargetProps) {
 
     return (
         <NavigatorExplorerItem
-            to={"/n/search?target=" + target}
+            to={"/n/search?nt=search&target=" + target}
             img={getSearchTargetIcon(target)}
             className={classes}
             {...otherProps}

@@ -54,11 +54,12 @@ function getSearchInpuPlaceholder(searchTarget: SearchTarget) {
 // TODO require decomposition
 // TODO add loader for search result
 // TODO fix add button responsivness when it's disabled
+// TODO save user search query in query params
 export default function SearchForm(props: SearchFormProps) {
     const { className = "", isOpen = false, ...otherProps } = props;
 
     const [queryParams] = useSearchParams();
-    const { user } = useTypedSelector((state) => state.auth);
+    const { payload: user } = useTypedSelector((state) => state.auth);
     const windowLayout = useTypedSelector((state) => state.windowLayout);
 
     const searchTarget = queryParams.get("target") as SearchTarget;
@@ -181,8 +182,8 @@ export default function SearchForm(props: SearchFormProps) {
             throw new Error("NOT IMPLEMENTED");
         } catch (err) {
             if (err instanceof AxiosError && err.response!.status === 409) {
-                // TODO temp, replace this
-                alert(err.response!.data.message ?? "xdd");
+                // TODO temp, replace this with modal
+                alert(err.response!.data.message ?? "Во время запроса на сервер произошла ошибка");
             }
 
             console.log(err);
@@ -196,11 +197,6 @@ export default function SearchForm(props: SearchFormProps) {
     }
 
     const classes = ["TNUI-ChatSearch", className].join(" ");
-
-    //=================================================================================================================
-    // debuging
-
-    console.log(user);
 
     return (
         <div className={classes} {...otherProps}>
