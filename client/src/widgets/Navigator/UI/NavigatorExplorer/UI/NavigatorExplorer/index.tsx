@@ -9,6 +9,7 @@ import SearchTarget from "../SearchTarget";
 import { useTypedSelector } from "../../../../../../shared/model/hooks/useTypedSelector";
 import { DefaultLoader } from "../../../../../../shared/UI/Loader";
 import Friends from "../Friends";
+import SettingsList from "../SettingsList";
 
 interface NavigatorExplorerProps extends UiComponentProps<HTMLDivElement> {
     target: ExplorerTarget;
@@ -30,6 +31,7 @@ export default function NavigatorExplorer(props: NavigatorExplorerProps) {
             {target === "chats" && <Chats />}
             {target === "search" && <SearchOptions />}
             {target === "friends" && <Friends />}
+            {target === "settings" && <SettingsList />}
             {target === "communities" && (
                 <span
                     style={{

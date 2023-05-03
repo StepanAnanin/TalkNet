@@ -1,0 +1,24 @@
+@import "../../../app/styles/mixins.scss";
+@import "../../../app/styles/variables.scss";
+@import "../../../app/styles/screen-breakpoints.scss";
+
+.TNUI-SettingsPage {
+    @include custom-scrollbar(10px, $black);
+
+    display: flex;
+    align-items: center;
+
+    padding-inline: 10px;
+    padding-bottom: 15px;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    @media screen and (max-width: $laptop) {
+        @include custom-scrollbar(7.5px, transparent);
+    }
+
+    @media screen and (max-width: $mobile) {
+        @include custom-scrollbar(5px, transparent);
+    }
+}

@@ -1,0 +1,87 @@
+@import "../../../../app/styles/variables.scss";
+
+$paddingInlineValue: 15px;
+$paddingBlockValue: 5px;
+
+.TNUI-SettingsSection {
+    width: 100%;
+
+    max-width: 750px;
+
+    display: flex;
+    flex-direction: column;
+
+    margin-inline: 5px;
+    margin-top: 20px;
+
+    background-color: $darkGrey;
+    border-radius: 10px;
+    border: 1px solid $lightGrey;
+
+    &-header {
+        display: flex;
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding-bottom: 2.5px;
+
+        margin-top: $paddingBlockValue;
+        padding-inline: $paddingInlineValue;
+
+        border-bottom: 1px solid $grey;
+
+        &_section-name {
+            display: flex;
+            align-items: center;
+
+            &-img-wrapper {
+                width: 25px;
+                height: 25px;
+
+                img,
+                svg {
+                    width: 100% !important;
+                    height: 100% !important;
+
+                    transform: scale(125%);
+
+                    color: $lightPrimary;
+                }
+            }
+
+            &-label {
+                height: 100%;
+
+                display: flex;
+                align-items: center;
+
+                margin-left: 7.5px;
+
+                font-size: 20px;
+                letter-spacing: 0.5px;
+
+                color: white;
+
+                user-select: none;
+            }
+        }
+
+        &_action-button {
+            min-width: 125px;
+
+            margin-top: 2.5px;
+            margin-bottom: 2.5px;
+        }
+    }
+
+    &-body {
+        padding-inline: $paddingInlineValue;
+        margin-top: $paddingBlockValue * 1.25;
+        margin-bottom: $paddingBlockValue * 1.75;
+
+        color: white;
+
+        font-size: 16px;
+    }
+}

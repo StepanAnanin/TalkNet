@@ -1,0 +1,10 @@
+.TNUI-UserSettingsPage {
+    &-user-avatar-variants {
+        display: flex;
+        align-items: center;
+
+        &_item {
+            margin-right: 15px;
+        }
+    }
+}

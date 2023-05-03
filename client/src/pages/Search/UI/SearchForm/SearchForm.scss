@@ -35,7 +35,7 @@
     }
 
     &-content {
-        @include custom-scrollbar(7.5px, transparent);
+        @include custom-scrollbar(10px, transparent);
 
         width: 100%;
         height: calc(100% - 5px);

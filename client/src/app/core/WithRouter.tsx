@@ -36,9 +36,6 @@ export default function WithRouter() {
                     </Suspense>
                 }
             />
-
-            {/* <Route path="/m" element={<NavigatorRouter path="/m" />} /> */}
-            {/* <Route path="/search" element={<NavigatorRouter path="/search" />} /> */}
             <Route path="/n/*" element={<NavigatorRouter />} />
         </Routes>
     );

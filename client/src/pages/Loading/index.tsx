@@ -12,7 +12,7 @@ export default function LoadingPage({ className = "", hideHeader = false, ...oth
     const classes = ["TNUI-LoadingPage", className].join(" ");
 
     return (
-        <Page className={classes} {...otherProps}>
+        <Page title="TalkNet | Загрузка..." className={classes} {...otherProps}>
             {!hideHeader && <Header hideSignInButton />}
             <div className="TNUI-LoadingPage-loader">
                 <SquareLoader className="TNUI-LoadingPage-loader_spinner" size="large" />

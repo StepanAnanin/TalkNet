@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import NavigatorLayout from "../layouts/NavigatorLayout";
 import LoadingPage from "../../Loading";
 import ErrorPage404 from "../../Error404";
+import { SettingsPageRouter } from "../../Settings";
 
 const MessagesPage = lazy(() => import("../../Messages"));
 const SearchPage = lazy(() => import("../../Search"));
@@ -33,6 +34,7 @@ export default function NavigatorRouter() {
                         </Suspense>
                     }
                 />
+                <Route path="/settings/*" element={<SettingsPageRouter />} />
             </Routes>
         </NavigatorLayout>
     );
