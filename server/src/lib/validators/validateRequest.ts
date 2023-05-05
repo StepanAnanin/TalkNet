@@ -25,7 +25,7 @@ export default function validateRequest(target: unknown, expectedProperties: Exp
         const requestedPropertyType = property.type;
 
         // If not required property is skipped
-        if (property.notRequired && propertyValue === undefined) {
+        if (property.notRequired && (propertyValue === undefined || propertyValue === "")) {
             continue;
         }
 
@@ -45,7 +45,7 @@ export default function validateRequest(target: unknown, expectedProperties: Exp
             continue;
         }
 
-        // If property isn't exist
+        // If property doesn't exist
         if (propertyValue === undefined) {
             result.ok = false;
             result.message = `Property '${property.key}' is missing.`;

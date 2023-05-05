@@ -6,7 +6,7 @@ import IChat from "../types/DB/models/Chat";
 import ChatMessage from "../types/DB/schemas/ChatMessage";
 import { Types } from "mongoose";
 
-// TODO move chat messages to the different table, or do something with message selection optimization if there are a lot of them
+// TODO require decomposition
 class ChatService {
     protected createChatDTO(chat: IChat) {
         return new ChatDTO({

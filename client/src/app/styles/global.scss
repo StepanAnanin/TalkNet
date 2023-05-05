@@ -54,11 +54,26 @@ html {
     display: flex;
     justify-content: center;
 
-    padding-top: 25vh;
+    padding-top: 20vh;
+    padding-bottom: 7.5vh;
+
+    overflow-y: scroll;
 
     z-index: -$ModalsRootElement_z-index;
 
-    transition: background-color 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+
+    @media screen and (max-height: 600px) {
+        padding-top: 10vh;
+    }
+
+    @media screen and (max-height: 500px) {
+        padding-top: 25px;
+    }
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     &:not(:empty) {
         background-color: rgba(0, 0, 0, 0.35);

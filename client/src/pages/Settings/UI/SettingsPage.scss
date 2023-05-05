@@ -22,3 +22,16 @@
         @include custom-scrollbar(5px, transparent);
     }
 }
+
+.TNUI-SettingsPage-modal {
+    width: 100%;
+    height: fit-content;
+
+    max-width: 600px;
+
+    &-info {
+        margin: 0;
+
+        font-size: 16px;
+    }
+}

@@ -13,6 +13,7 @@ namespace ModalWindowsProps {
         dontCloseOnClickAway?: boolean;
         hideCloseIcon?: boolean;
         hideCloseButton?: boolean;
+        hideConfirmButton?: boolean;
         hideHeader?: boolean;
         hideControl?: boolean;
         closeButtonLabel?: string;

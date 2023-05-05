@@ -1,16 +1,12 @@
 import { Router } from "express";
-import authMiddleware from "../middlewares/auth-middleware";
-import ChatController from "../controller/chat-controller";
-import UserController from "../controller/user-controller";
+import SearchController from "../controller/search-controller";
 
 /**
  *      Handle '/search' route
  */
 
-const ChatRouter = Router();
+const SearchRouter = Router();
 
-// ChatRouter.get("/chat", ChatController.);
-ChatRouter.get("/user", UserController.searchForUser);
-// ChatRouter.get("/community", );
+SearchRouter.get("/user", SearchController.searchForUser);
 
-export default ChatRouter;
+export default SearchRouter;

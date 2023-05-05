@@ -1,4 +1,4 @@
-type constructorModel = {
+export interface UserDTOModel {
     id: string;
     name: string;
     surname: string;
@@ -15,7 +15,7 @@ type constructorModel = {
     incomingFriendRequests: string[];
     outcomingFriendRequests: string[];
     blackList: string[];
-};
+}
 
 export default class UserDTO {
     public id: string;
@@ -32,7 +32,7 @@ export default class UserDTO {
     public outcomingFriendRequests: string[];
     public blackList: string[];
 
-    constructor(model: constructorModel) {
+    constructor(model: UserDTOModel) {
         this.id = model.id;
         this.name = model.name;
         this.surname = model.surname;

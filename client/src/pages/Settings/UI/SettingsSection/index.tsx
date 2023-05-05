@@ -6,12 +6,22 @@ import Button from "../../../../shared/UI/Button";
 interface SettingsSectionProps extends UiComponentProps<HTMLElement> {
     header: string;
     actionButtonLabel?: string;
+    actionDisabled?: boolean;
     onActionButtonClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     img?: React.ReactNode;
 }
 
 export default function SettingsSection(props: SettingsSectionProps) {
-    const { className = "", header, img, actionButtonLabel, onActionButtonClick, children, ...otherProps } = props;
+    const {
+        className = "",
+        actionDisabled = false,
+        header,
+        img,
+        actionButtonLabel,
+        onActionButtonClick,
+        children,
+        ...otherProps
+    } = props;
 
     const classes = ["TNUI-SettingsSection", className ?? ""].join(" ");
 
@@ -28,6 +38,7 @@ export default function SettingsSection(props: SettingsSectionProps) {
                         size="small"
                         className="TNUI-SettingsSection-header_action-button"
                         onClick={onActionButtonClick}
+                        disabled={actionDisabled}
                     >
                         {actionButtonLabel}
                     </Button>

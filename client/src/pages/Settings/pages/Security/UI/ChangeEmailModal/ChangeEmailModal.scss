@@ -1,0 +1,26 @@
+@import "../../../../../../app/styles/variables.scss";
+
+.TNUI-ChangeEmailModal {
+    &-alert {
+        margin-bottom: 5px;
+    }
+
+    &-new-email-input {
+        width: 100%;
+
+        margin-top: 15px;
+
+        input {
+            font-weight: 600;
+
+            color: $lightestPrimary !important;
+        }
+    }
+
+    &-password-input {
+        width: 100%;
+
+        margin-top: 12.5px;
+        margin-bottom: 10px;
+    }
+}

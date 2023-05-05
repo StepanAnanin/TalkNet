@@ -2,10 +2,9 @@ import type { Request, Response, NextFunction } from "express";
 
 import config from "../config";
 import HTTPError from "../errors/HTTPError";
-import userModel from "../DB/models/User";
-import userService from "../services/user-service";
+import UserService from "../services/user-service";
 import validateRequest from "../lib/validators/validateRequest";
-import chatService from "../services/chat-service";
+import ChatService from "../services/chat-service";
 
 class UserContoller {
     public async registrate(req: Request, res: Response) {
@@ -86,7 +85,7 @@ class UserContoller {
         }
 
         try {
-            const userData = await userService.registrate(name, surname, patronymic, email, password);
+            const userData = await UserService.registrate(name, surname, patronymic, email, password);
 
             res.status(200).json({ message: `Пользователь успешно создан`, ...userData });
         } catch (err: any) {
@@ -117,7 +116,7 @@ class UserContoller {
         }
 
         try {
-            const userData = await userService.login(email, password);
+            const userData = await UserService.login(email, password);
 
             res.cookie("refreshToken", userData.refreshToken, {
                 maxAge: 14 * 24 * 60 * 60 * 1000,
@@ -148,7 +147,7 @@ class UserContoller {
         const refreshToken = req.cookies.refreshToken;
 
         try {
-            await userService.logout(refreshToken);
+            await UserService.logout(refreshToken);
 
             res.clearCookie("refreshToken");
             res.status(200).json({ message: "Выход из системы выполнен успешно." });
@@ -170,7 +169,7 @@ class UserContoller {
         }
 
         try {
-            await userService.activateAccount(activationLink);
+            await UserService.activateAccount(activationLink);
 
             res.redirect(config.CLIENT_URL);
         } catch (err: any) {
@@ -199,7 +198,7 @@ class UserContoller {
         }
 
         try {
-            const userData = await userService.updateRefreshToken(refreshToken);
+            const userData = await UserService.updateRefreshToken(refreshToken);
 
             res.cookie("refreshToken", userData.refreshToken, {
                 maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
@@ -234,49 +233,9 @@ class UserContoller {
         }
 
         try {
-            const userChats = await chatService.getUserChatsInfo(userID);
+            const userChats = await ChatService.getUserChatsInfo(userID);
 
             res.status(200).json(userChats);
-        } catch (err: any) {
-            if (err instanceof HTTPError && err.errorCode === 401) {
-                res.status(err.errorCode).json({ message: `Требуется аутентификация` });
-                return;
-            }
-
-            res.status(500).json({ message: `Что-то пошло не так...` });
-            console.error(err);
-        }
-    }
-
-    public async searchForUser(req: Request, res: Response) {
-        const page = parseInt(req.query.page as string);
-
-        if (typeof page !== "number" || Number.isNaN(page)) {
-            res.status(400).json({ message: "Search page is missing or has incorrect data type" });
-            return;
-        }
-
-        const validationResult = validateRequest(req.query, [
-            { key: "name", type: "string", exact: true },
-            { key: "surname", type: "string", exact: true },
-            { key: "patronymic", type: "string", exact: true },
-        ]);
-
-        if (!validationResult.ok) {
-            res.status(400).json({ message: validationResult.message });
-            return;
-        }
-
-        const name = req.query.name as string | undefined;
-        const surname = req.query.surname as string | undefined;
-        const patronymic = req.query.patronymic as string | undefined;
-
-        try {
-            const searchResult = (await userService.searchForUser(page, name, surname, patronymic))!.map((user) => {
-                return { id: user._id, name: user.name, surname: user.surname, patronymic: user.patronymic };
-            });
-
-            res.status(200).json(searchResult);
         } catch (err: any) {
             if (err instanceof HTTPError && err.errorCode === 401) {
                 res.status(err.errorCode).json({ message: `Требуется аутентификация` });
@@ -303,7 +262,7 @@ class UserContoller {
         }
 
         try {
-            await userService.sendFriendRequest(to, from);
+            await UserService.sendFriendRequest(to, from);
 
             res.status(200).json({ message: "Заявка на добавление в друзья отправлена" });
         } catch (err: any) {
@@ -339,7 +298,7 @@ class UserContoller {
         }
 
         try {
-            await userService.acceptFriendRequest(to, from);
+            await UserService.acceptFriendRequest(to, from);
 
             res.status(200).json({ message: "Заявка на добавление в друзья принятна" });
         } catch (err: any) {
@@ -375,7 +334,7 @@ class UserContoller {
         }
 
         try {
-            await userService.declineFriendRequest(to, from);
+            await UserService.declineFriendRequest(to, from);
 
             res.status(200).json({ message: "Заявка на добавление в друзья отклонена" });
         } catch (err: any) {
@@ -411,7 +370,7 @@ class UserContoller {
         }
 
         try {
-            const parsedFriendRequests = await userService.getParsedUserFriendRequests(requestsType, user.id);
+            const parsedFriendRequests = await UserService.getParsedUserFriendRequests(requestsType, user.id);
 
             res.status(200).json(parsedFriendRequests);
         } catch (err: any) {
@@ -436,7 +395,7 @@ class UserContoller {
         }
 
         try {
-            const parsedFriendRequests = await userService.getParsedUserFriends(user.id);
+            const parsedFriendRequests = await UserService.getParsedUserFriends(user.id);
 
             res.status(200).json(parsedFriendRequests);
         } catch (err: any) {
@@ -452,18 +411,69 @@ class UserContoller {
         }
     }
 
-    // Require testing
+    public async changeEmail(req: Request, res: Response) {
+        res.setHeader("Accept-Charset", "utf-8");
+
+        const user = req.body.user;
+        const newEmail = req.body.newEmail;
+        const password = req.body.password;
+
+        if (!newEmail) {
+            res.status(400).json({ message: "newEmail property is missing in request body" });
+            return;
+        }
+
+        if (!password) {
+            res.status(400).json({ message: "password property is missing in request body" });
+            return;
+        }
+
+        if (!user) {
+            res.status(500).json({ message: "Не удалось получить информацию о пользователе" });
+            return;
+        }
+
+        if (!user.isActivated) {
+            res.status(400).json({ message: "Для выполнения это операции необходимо активировать аккаунт" });
+            return;
+        }
+
+        if (newEmail === user.email) {
+            res.status(409).json({ message: "Новый и старый E-Mail'ы совпадают" });
+            return;
+        }
+
+        try {
+            await UserService.changeEmail(user.email, newEmail, password);
+
+            res.status(200).json({ message: `E-Mail успешно изменён.` });
+        } catch (err) {
+            if (err instanceof HTTPError) {
+                res.status(err.errorCode).json({ message: err.message });
+                return;
+            }
+
+            console.error(err);
+            res.status(500).json({ message: "Что-то пошло не так..." });
+        }
+    }
+
     public async changePassword(req: Request, res: Response) {
         res.setHeader("Accept-Charset", "utf-8");
 
-        const email = req.body.email;
+        const user = req.body.user;
+
+        if (!user) {
+            res.status(400).json({ message: "Не удалось получить данные пользователя" });
+            return;
+        }
+
         const currentPassword = req.body.currentPassword;
         const newPassword = req.body.newPassword;
 
         const requestValidationResult = validateRequest(req.body, [
             { key: "currentPassword", type: "string" },
             { key: "newPassword", type: "string" },
-            { key: "email", type: "string" },
         ]);
 
         if (!requestValidationResult.ok) {
@@ -472,9 +482,53 @@ class UserContoller {
         }
 
         try {
-            await userService.changePassword(email, currentPassword, newPassword);
+            await UserService.changePassword(user.email, currentPassword, newPassword);
 
             res.status(200).json({ message: `Пароль успешно изменён.` });
+        } catch (err) {
+            if (err instanceof HTTPError) {
+                res.status(err.errorCode).json({ message: err.message });
+                return;
+            }
+
+            console.error(err);
+            res.status(500).json({ message: "Что-то пошло не так..." });
+        }
+    }
+
+    public async changeFullname(req: Request, res: Response) {
+        res.setHeader("Accept-Charset", "utf-8");
+
+        const name = req.body.name;
+        const surname = req.body.surname;
+        const patronymic = req.body.patronymic;
+        const user = req.body.user;
+
+        const propertiesToValidate = [
+            { key: "name", type: "string" },
+            { key: "surname", type: "string" },
+        ];
+
+        if (patronymic !== null) {
+            propertiesToValidate.push({ key: "patronymic", type: "string" });
+        }
+
+        const requestValidationResult = validateRequest(req.body, propertiesToValidate as any[]);
+
+        if (!requestValidationResult.ok) {
+            res.status(400).json({ message: requestValidationResult.message });
+            return;
+        }
+
+        if (!user) {
+            res.status(500).json({ message: "Не удалось получить информацию о пользователе" });
+            return;
+        }
+
+        try {
+            await UserService.changeFullname(user.id, name, surname, patronymic);
+
+            res.status(200).json({ message: `Данные успешно изменены.` });
         } catch (err) {
             if (err instanceof HTTPError) {
                 res.status(err.errorCode).json({ message: err.message });
@@ -494,7 +548,7 @@ class UserContoller {
         }
 
         try {
-            const avatarUploader = await userService.configureAvatarUploader();
+            const avatarUploader = await UserService.configureAvatarUploader();
 
             const uploadErrorHandler: NextFunction = (err) => {
                 if (err) {

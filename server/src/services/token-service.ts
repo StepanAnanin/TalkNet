@@ -1,5 +1,5 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
-import tokenModel from "../DB/models/Token";
+import TokenModel from "../DB/models/Token";
 
 /**
  * @IMPORTANT Right now user can login in system only from 1 device
@@ -14,24 +14,24 @@ class TokenService {
     }
 
     public async saveRefreshTokenToDB(userId: string, refreshToken: string) {
-        const existingToken = await tokenModel.findOne({ user: userId });
+        const existingToken = await TokenModel.findOne({ user: userId });
 
         if (existingToken) {
             existingToken.refreshToken = refreshToken;
             return await existingToken.save();
         }
 
-        return await tokenModel.create({ user: userId, refreshToken });
+        return await TokenModel.create({ user: userId, refreshToken });
     }
 
     public async removeToken(refreshToken: string) {
-        const tokenData = await tokenModel.deleteOne({ refreshToken });
+        const tokenData = await TokenModel.deleteOne({ refreshToken });
 
         return tokenData;
     }
 
     public async findToken(refreshToken: string) {
-        const tokenData = await tokenModel.findOne({ refreshToken });
+        const tokenData = await TokenModel.findOne({ refreshToken });
 
         return tokenData;
     }

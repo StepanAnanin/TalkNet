@@ -1,5 +1,5 @@
 import { Router } from "express";
-import userController from "../controller/user-controller";
+import UserController from "../controller/user-controller";
 import authMiddleware from "../middlewares/auth-middleware";
 
 /**
@@ -8,26 +8,32 @@ import authMiddleware from "../middlewares/auth-middleware";
 
 const UserRouter = Router();
 
-UserRouter.post("/sign-up", userController.registrate);
+UserRouter.post("/sign-up", UserController.registrate);
 
-UserRouter.post("/login", userController.login);
+UserRouter.post("/login", UserController.login);
 
-UserRouter.post("/logout", userController.logout);
+UserRouter.post("/logout", UserController.logout);
 
-UserRouter.post("/refresh", userController.updateRefreshToken);
+UserRouter.post("/refresh", UserController.updateRefreshToken);
 
-UserRouter.post("/friend-requests", authMiddleware, userController.sendFriendRequest);
+UserRouter.post("/friend-requests", authMiddleware, UserController.sendFriendRequest);
 
-UserRouter.patch("/friend-requests/accept", authMiddleware, userController.acceptFriendRequest);
+UserRouter.patch("/change/email", authMiddleware, UserController.changeEmail);
 
-UserRouter.patch("/friend-requests/decline", authMiddleware, userController.declineFriendRequest);
+UserRouter.patch("/change/password", authMiddleware, UserController.changePassword);
 
-UserRouter.get("/friend-requests", authMiddleware, userController.getParsedUserFriendRequests);
+UserRouter.patch("/change/fullname", authMiddleware, UserController.changeFullname);
 
-UserRouter.get("/friends", authMiddleware, userController.getParsedUserFriends);
+UserRouter.patch("/friend-requests/accept", authMiddleware, UserController.acceptFriendRequest);
 
-UserRouter.get("/:id/chats", userController.getUserChats);
+UserRouter.patch("/friend-requests/decline", authMiddleware, UserController.declineFriendRequest);
 
-UserRouter.get("/activate/:link", userController.activateAccount);
+UserRouter.get("/friend-requests", authMiddleware, UserController.getParsedUserFriendRequests);
+
+UserRouter.get("/friends", authMiddleware, UserController.getParsedUserFriends);
+
+UserRouter.get("/:id/chats", UserController.getUserChats);
+
+UserRouter.get("/activate/:link", UserController.activateAccount);
 
 export default UserRouter;

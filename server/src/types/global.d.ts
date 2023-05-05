@@ -1,9 +1,7 @@
-import { User } from "./DB/models/User";
 import { Request } from "express";
+import { UserDTOModel } from "../DTO/user-DTO";
 
-interface UserData extends User {
-    id: string;
-
+interface UserData extends UserDTOModel {
     // This user data received from access token.
     // Properties below added by JWT library.
     // (I don't need them actually, but it's bad to leave them unaccounted)
