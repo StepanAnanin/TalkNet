@@ -16,6 +16,7 @@ namespace ModalWindowsProps {
         hideConfirmButton?: boolean;
         hideHeader?: boolean;
         hideControl?: boolean;
+        isConfirmButtonDisabled?: boolean;
         closeButtonLabel?: string;
         confirmButtonLabel?: string;
         onClose?: () => void;

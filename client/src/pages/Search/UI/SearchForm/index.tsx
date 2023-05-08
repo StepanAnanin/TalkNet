@@ -277,17 +277,21 @@ export default function SearchForm(props: SearchFormProps) {
                                 <span className="TNUI-ChatSearch-body_nothing-found-alert_label">Ничего не надено</span>
                             </div>
                         )}
-                        {searchResult.payload.map((item, index) => (
-                            <div key={item.id} className="TNUI-ChatSearch-body_search-result-list-item">
-                                <Avatar size="medium" className="TNUI-ChatSearch-body_search-result-list-item-avatar" />
+                        {searchResult.payload.map((user, index) => (
+                            <div key={user.id} className="TNUI-ChatSearch-body_search-result-list-item">
+                                <Avatar
+                                    userID={user.id}
+                                    size="medium"
+                                    className="TNUI-ChatSearch-body_search-result-list-item-avatar"
+                                />
                                 <span className="TNUI-ChatSearch-body_search-result-list-item-full-user-name">
-                                    {item.name} {item.surname} {item.patronymic}
+                                    {user.name} {user.surname} {user.patronymic}
                                 </span>
                                 <Button
                                     variant="contained"
                                     className="TNUI-ChatSearch-body_search-result-list-item-add-button"
                                     // TODO temp???
-                                    id={item.id}
+                                    id={user.id}
                                     onClick={sendFriendRequest}
                                 >
                                     Добавить

@@ -4,16 +4,23 @@ import "./Avatar.scss";
 import type { ScalabelUiComponentProps } from "../../types/UI/UiComponentProps";
 
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import TalkNetApiURL from "../../lib/URL/TalkNetApiURL";
 
 interface AvatarProps extends ScalabelUiComponentProps<HTMLDivElement> {
     src?: string;
     alt?: string | React.ReactNode;
     outlined?: boolean;
+
+    /**
+     * If this props is passed then instead of using "src" props to get image
+     * will be displayed avatar of user with this specific id or placeholder (if user hasn't avatar or failed to get it).
+     */
+    userID?: string;
 }
 
 // TODO replace alt on failed getting img to default user img (take it from MUI icons)
 export default React.forwardRef(function Avatar(props: AvatarProps, ref: React.ForwardedRef<HTMLDivElement>) {
-    const { className, src, alt, size = "small", outlined = false, ...otherProps } = props;
+    const { className, src, alt, size = "small", outlined = false, userID, ...otherProps } = props;
     const imgRef = React.useRef<HTMLImageElement | null>(null);
 
     // ================================== picking styles ==================================
@@ -53,10 +60,10 @@ export default React.forwardRef(function Avatar(props: AvatarProps, ref: React.F
 
     return (
         <div ref={ref} className={classes} {...otherProps}>
-            {src && (
+            {(src || userID) && (
                 <img
                     className="TNUI-Avatar-img"
-                    src={src}
+                    src={userID ? `${TalkNetApiURL}/static/user/${userID}/avatar.png` : src}
                     alt=""
                     ref={imgRef}
                     onError={imgLoadErrorHandler}

@@ -13,6 +13,7 @@ interface ModalControlProps extends UiComponentProps<HTMLDivElement> {
     onConfirm?: () => void;
     onClose?: () => void;
     onReject?: () => void;
+    isConfirmButtonDisabled?: boolean;
 }
 
 export default function ModalControl(props: ModalControlProps) {
@@ -26,6 +27,7 @@ export default function ModalControl(props: ModalControlProps) {
         onConfirm,
         hideCloseButton,
         hideConfirmButton,
+        isConfirmButtonDisabled = false,
         ...otherProps
     } = props;
 
@@ -48,7 +50,12 @@ export default function ModalControl(props: ModalControlProps) {
                 </Button>
             )}
             {!hideConfirmButton && (
-                <Button variant="contained" className="TNUI-ModalControl_confirm-button" onClick={confirmButtonClickHandler}>
+                <Button
+                    variant="contained"
+                    className="TNUI-ModalControl_confirm-button"
+                    onClick={confirmButtonClickHandler}
+                    disabled={isConfirmButtonDisabled}
+                >
                     {confirmButtonLabel ?? "Подтвердить"}
                 </Button>
             )}

@@ -20,7 +20,6 @@ interface AvatarMenuProps extends UiComponentProps<HTMLUListElement> {
     user: User;
     avatarClassName?: string;
     avatarId?: string;
-    src?: string;
 }
 
 /**
@@ -30,7 +29,7 @@ interface AvatarMenuProps extends UiComponentProps<HTMLUListElement> {
 // TODO add theme changing button here
 // TODO there are 1 excess render on modal close due to confirm modal handler "onReject" not implemented
 export default function AvatarMenu(props: AvatarMenuProps) {
-    const { user, className = "", avatarClassName, avatarId, src, ...otherProps } = props;
+    const { user, className = "", avatarClassName, avatarId, ...otherProps } = props;
 
     const [isOpen, setIsOpen] = React.useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
@@ -85,7 +84,7 @@ export default function AvatarMenu(props: AvatarMenuProps) {
     return (
         <>
             <div className={`TNUI-AvatarMenu-avatar-wrapper ${isOpen ? "open" : ""}`} onClick={avatarClickHandler}>
-                <Avatar src={src} className={avatarClasses} id={avatarId} />
+                <Avatar userID={user.id} className={avatarClasses} id={avatarId} />
                 <span className="TNUI-AvatarMenu-open-indicator">{isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}</span>
             </div>
             {isOpen && (
@@ -93,7 +92,7 @@ export default function AvatarMenu(props: AvatarMenuProps) {
                 <Menu ref={menuRef as any} className={classes} {...otherProps}>
                     <ClickAwayListener className="TNUI-AvatarMenu-wrapper" onClickAway={clickAwayHandler}>
                         <MenuItem className="TNUI-AvatarMenu-item">
-                            <Avatar src={src} className="TNUI-AvatarMenu-item_avatar" />
+                            <Avatar userID={user.id} className="TNUI-AvatarMenu-item_avatar" />
                             <span className="TNUI-AvatarMenu-item_label">{`${user.name} ${user.surname}`}</span>
                         </MenuItem>
                         <MenuItem className="TNUI-AvatarMenu-item" onClick={logoutButtonClickHandler}>

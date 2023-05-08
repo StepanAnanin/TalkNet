@@ -24,6 +24,8 @@ UserRouter.patch("/change/password", authMiddleware, UserController.changePasswo
 
 UserRouter.patch("/change/fullname", authMiddleware, UserController.changeFullname);
 
+UserRouter.patch("/change/avatar", authMiddleware, UserController.changeAvatar);
+
 UserRouter.patch("/friend-requests/accept", authMiddleware, UserController.acceptFriendRequest);
 
 UserRouter.patch("/friend-requests/decline", authMiddleware, UserController.declineFriendRequest);

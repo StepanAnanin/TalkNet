@@ -9,16 +9,31 @@ import FormatedDate from "../../../../../../shared/lib/helpers/FormatedDate";
 import NavigatorExplorerItem from "../../../../../../features/NavigatorExplorerItem";
 
 interface ChatProps extends Omit<UiComponentProps<HTMLAnchorElement>, "onClick"> {
-    imgURL: string;
     chatName: string;
     chat: DialogueChat;
+    imgURL?: string;
     lastReadMessageIndex: number;
     active?: boolean;
+
+    /**
+     * If this props is passed then instead of using "imgURL" props to get image
+     * will be displayed avatar of user with this specific id or placeholder (if user hasn't avatar or failed to get it).
+     */
+    interlocutorID?: string;
 }
 
 // TODO add icon if chat muted
 export default function ChatPreview(props: ChatProps) {
-    const { className = "", active = false, imgURL, chatName, chat, lastReadMessageIndex, ...otherProps } = props;
+    const {
+        className = "",
+        active = false,
+        imgURL,
+        interlocutorID,
+        chatName,
+        chat,
+        lastReadMessageIndex,
+        ...otherProps
+    } = props;
 
     const lastMessage = chat.lastMessage;
 
@@ -33,7 +48,14 @@ export default function ChatPreview(props: ChatProps) {
             to={"/n/m?chat=" + chat.id}
             className={classes}
             title={chatName}
-            img={<Avatar src={imgURL} className="TNUI-ChatPreview-avatar" size="medium" />}
+            img={
+                <Avatar
+                    userID={chat.type === "dialogue" ? interlocutorID : undefined}
+                    src={chat.type === "dialogue" ? undefined : imgURL}
+                    className="TNUI-ChatPreview-avatar"
+                    size="medium"
+                />
+            }
             {...otherProps}
         >
             <div className="TNUI-ChatPreview-top">

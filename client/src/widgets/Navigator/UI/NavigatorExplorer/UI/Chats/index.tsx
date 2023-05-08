@@ -59,16 +59,17 @@ export default function Chats() {
                 </div>
             )}
             {userChats.map((chat) => {
-                const interluctor = chat.members.find((member) => member.userID !== user.id)!;
-                const userChatMember = chat.members.find((member) => member !== interluctor)!;
+                const interlocutor = chat.members.find((member) => member.userID !== user.id)!;
+                const userChatMember = chat.members.find((member) => member.userID !== interlocutor.userID)!;
 
                 return (
                     <ChatPreview
                         active={chat.id === currentChatID}
                         key={chat.id}
-                        imgURL=""
+                        // imgURL=""
+                        interlocutorID={interlocutor.userID}
                         chat={chat}
-                        chatName={interluctor.fullUserName}
+                        chatName={interlocutor.fullUserName}
                         lastReadMessageIndex={userChatMember.lastReadMessageIndex}
                     />
                 );

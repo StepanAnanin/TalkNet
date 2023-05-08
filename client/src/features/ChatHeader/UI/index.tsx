@@ -31,9 +31,8 @@ export default function ChatHeader(props: ChatHeaderProps) {
 
     return (
         <div className={classes} {...otherProps}>
-            {/* TODO make it link */}
             <div className="TNUI-ChatHeader-chat-info">
-                <Avatar className="TNUI-ChatHeader-chat-info_avatar" />
+                <Avatar userID={interlocutor.userID} className="TNUI-ChatHeader-chat-info_avatar" />
                 <span className="TNUI-ChatHeader-chat-info_chat-name">{interlocutor.fullUserName}</span>
             </div>
             <div className="TNUI-ChatHeader-chat-control">

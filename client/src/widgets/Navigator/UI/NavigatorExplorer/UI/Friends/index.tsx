@@ -216,7 +216,7 @@ export default function Friends() {
                 friendExplorerContent!.payload!.map((user) => {
                     return (
                         <Link key={user.id} to="#" className="TNUI-Friend-explorer-content-item">
-                            <Avatar className="TNUI-Friend-explorer-content-item_user-avatar" />
+                            <Avatar userID={user.id} className="TNUI-Friend-explorer-content-item_user-avatar" />
                             <span
                                 className="TNUI-Friend-explorer-content-item_user-name"
                                 title={`${user.surname} ${user.name}`}

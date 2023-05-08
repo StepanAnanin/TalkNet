@@ -99,7 +99,7 @@ export default function AuthForm({ className, style }: AuthFormProps) {
                 />
                 <div className="AuthForm-form_block">
                     <Checkbox
-                        id="AuthForm-form_password-display-control-checkbox"
+                        checkboxId="AuthForm-form_password-display-control-checkbox"
                         onClick={passwordDisplayControlCheckboxClickHandler}
                         label={<span>Показать пароль</span>}
                     />

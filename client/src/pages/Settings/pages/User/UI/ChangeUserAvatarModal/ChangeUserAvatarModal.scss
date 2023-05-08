@@ -1,0 +1,46 @@
+.TNUI-ChangeUserAvatarModal {
+    &-new-avatar-select-form {
+        height: 150px;
+        margin-block: 10px;
+    }
+
+    &-avatars-block {
+        display: flex;
+        justify-content: space-evenly;
+
+        flex-wrap: wrap;
+    }
+
+    &-avatar-preview {
+        &__hidden {
+            display: none !important;
+        }
+
+        &_header {
+            width: 100%;
+
+            display: flex;
+            justify-content: center;
+
+            user-select: none;
+        }
+
+        &-list {
+            display: flex;
+            align-items: center;
+
+            margin-block: 5px;
+
+            & .TNUI-Avatar {
+                margin-inline: 10px;
+            }
+        }
+    }
+
+    @media screen and (max-width: 475px) {
+        &-avatars-block {
+            // background-color: red;
+            justify-content: center;
+        }
+    }
+}

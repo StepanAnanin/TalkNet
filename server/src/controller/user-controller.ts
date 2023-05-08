@@ -540,15 +540,21 @@ class UserContoller {
         }
     }
 
-    // Require testing
     public async changeAvatar(req: Request, res: Response) {
         if (!req.headers["content-type"]?.includes("multipart/form-data")) {
             res.status(400).send({ message: `Only requests of content-type 'multipart/form-data' supported` });
             return;
         }
 
+        const user = req.body.user;
+
+        if (!user) {
+            res.status(400).json({ message: "Не удалось получить данные пользователя" });
+            return;
+        }
+
         try {
-            const avatarUploader = await UserService.configureAvatarUploader();
+            const avatarUploader = await UserService.configureAvatarUploader(user.id);
 
             const uploadErrorHandler: NextFunction = (err) => {
                 if (err) {

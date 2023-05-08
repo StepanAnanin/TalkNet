@@ -201,19 +201,21 @@ class UserService {
         throw new Error(`Not implemented`);
     }
 
-    public async configureAvatarUploader() {
+    public async configureAvatarUploader(userID: string) {
+        if (!userID) {
+            throw new Error("configureAvatarUploader: Missing userID argument");
+        }
+
         const fileStorageEngine = multer.diskStorage({
             destination: async (request, file, callback) => {
                 let error: null | Error = null;
 
-                const userId = request.query.userId;
-
-                if (typeof userId !== "string") {
-                    callback(new Error(`Missing userId property in query params`), "");
+                if (typeof userID !== "string") {
+                    callback(new Error(`Не удалось получить данные пользователя`), "");
                     return;
                 }
 
-                const avatarUploadAbsolutePath = path.join(config.ROOT_PATH, "/static/user", userId);
+                const avatarUploadAbsolutePath = path.join(config.ROOT_PATH, "static", "user", userID);
 
                 if (!error && !fsSync.existsSync(avatarUploadAbsolutePath)) {
                     error = new Error(`Критическая ошибка: Папка с статичными файлами пользователя не существует.`);
@@ -231,7 +233,7 @@ class UserService {
                 callback(error, avatarUploadAbsolutePath);
             },
             filename: (request, file, callback) => {
-                callback(null, "avatar.jpg");
+                callback(null, "avatar.png");
             },
         });
 

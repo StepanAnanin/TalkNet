@@ -4,6 +4,7 @@ node_modules
 
 dist/*
 dist/temp/*
+dist/static/user/*
 !dist/static
 !dist/README.txt
 !dist/temp

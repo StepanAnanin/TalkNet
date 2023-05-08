@@ -65,6 +65,7 @@ export default function ModalWrapper(props: ModalWindowsProps.AnyModal) {
                     onReject={handleReject}
                     hideCloseButton={props.hideCloseButton}
                     hideConfirmButton={props.hideConfirmButton}
+                    isConfirmButtonDisabled={props.isConfirmButtonDisabled}
                 />
             )}
         </ClickAwayListener>,
