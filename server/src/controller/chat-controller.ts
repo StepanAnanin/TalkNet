@@ -78,7 +78,7 @@ class ChatController {
         ]);
 
         if (!validationResult.ok) {
-            res.status(400).json(validationResult.message);
+            res.status(400).json({ message: validationResult.message });
             return;
         }
 
@@ -108,7 +108,7 @@ class ChatController {
         ]);
 
         if (!validationResult.ok) {
-            res.status(400).json(validationResult.message);
+            res.status(400).json({ message: validationResult.message });
             return;
         }
 
@@ -126,10 +126,10 @@ class ChatController {
         }
     }
 
-    public async sendMessage(req: Request<{ id: string }>, res: Response) {
+    public async sendMessage(req: Request<{ chatID: string }>, res: Response) {
         res.setHeader("Accept-Charset", "utf-8");
 
-        const chatID = req.params.id;
+        const chatID = req.params.chatID;
         const senderID: string = req.body.senderID;
         const messageText: string = req.body.messageText;
         const sentDate: number = req.body.sentDate;
@@ -141,7 +141,7 @@ class ChatController {
         ]);
 
         if (!validationResult.ok) {
-            res.status(400).json(validationResult.message);
+            res.status(400).json({ message: validationResult.message });
             return;
         }
 
@@ -154,6 +154,37 @@ class ChatController {
             const message = await ChatService.sendMessage(chatID, senderID, messageText, sentDate);
 
             res.status(200).json({ chatID, ...message });
+        } catch (err: any) {
+            if (err instanceof HTTPError) {
+                res.status(err.errorCode).json({ message: err.message });
+                return;
+            }
+
+            res.status(500).json({ message: "Что-то пошло не так..." });
+        }
+    }
+
+    public async updateMessageReadDate(req: Request<{ chatID: string }>, res: Response) {
+        res.setHeader("Accept-Charset", "utf-8");
+
+        const chatID = req.params.chatID;
+        const messageID: string = req.body.messageID;
+        const newReadDate: number = req.body.newReadDate;
+
+        const validationResult = validateRequest(req.body, [
+            { key: "messageID", type: "string" },
+            { key: "newReadDate", type: "number" },
+        ]);
+
+        if (!validationResult.ok) {
+            res.status(400).json({ message: validationResult.message });
+            return;
+        }
+
+        try {
+            await ChatService.updateMessageReadDate(chatID, messageID, newReadDate);
+
+            res.status(200).json({ message: "Read date updated" });
         } catch (err: any) {
             if (err instanceof HTTPError) {
                 res.status(err.errorCode).json({ message: err.message });

@@ -171,6 +171,40 @@ class ChatService {
 
         return messageData;
     }
+
+    public async updateMessageReadDate(chatID: string, messageID: string, newReadDate: number) {
+        if (!ObjectId.isValid(chatID)) {
+            throw new HTTPError(400, "chatID has incorrect format");
+        }
+
+        if (!ObjectId.isValid(messageID)) {
+            throw new HTTPError(400, "messageID has incorrect format");
+        }
+
+        const targetedChat = await ChatModel.findById(chatID);
+
+        if (!targetedChat) {
+            throw new HTTPError(404, "Failed to find requested chat");
+        }
+
+        const targetedMessage = targetedChat.messages.find((message) => message._id.toString() === messageID);
+
+        if (!targetedMessage) {
+            throw new HTTPError(404, "Failed to find requested message");
+        }
+
+        const targetedMessageIndex = targetedChat.messages.indexOf(targetedMessage);
+
+        targetedChat.messages.forEach((message, index) => {
+            if (index > targetedMessageIndex) {
+                return;
+            }
+
+            message.readDate = newReadDate;
+        });
+
+        await targetedChat.save();
+    }
 }
 
 export default new ChatService();

@@ -17,6 +17,7 @@ import {
 import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
 import { MemoChatFragment } from "../ChatFragment";
 import { useChat } from "../../../../entities/Chat";
+import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 
 interface ChatProps extends UiComponentProps<HTMLDivElement> {
     chatID: string | null;
@@ -166,11 +167,31 @@ export default function ChatBody(props: ChatProps) {
                         {messages ? (
                             <div className="TNUI-ChatBody-messages">
                                 {messages.map((message, index, arr) => {
-                                    // Keep in mind that this array is inverted.
+                                    // Keep in mind that this array is inverted. And it goes from latest message to first.
+                                    // (prev message is below and next message is above)
                                     const nextMessage = arr[index - 1];
                                     const prevMessage = arr[index + 1];
-                                    const isLatestMessage = prevMessage === undefined;
-                                    const isPrevMessageLatest = arr[index + 2] === undefined;
+                                    const isFirstMessage = prevMessage === undefined;
+                                    const isPrevMessageFirst = arr[index + 2] === undefined;
+
+                                    const isUnreadMessagesBlockStart = (function () {
+                                        // if all messages are read
+                                        if (index === 0 && !!message.readDate) {
+                                            return false;
+                                        }
+
+                                        // if all messages aren't read
+                                        if (!prevMessage && message.readDate === null) {
+                                            return true;
+                                        }
+
+                                        // Is there an any point in this condition?
+                                        if (!prevMessage && !!message.readDate) {
+                                            return true;
+                                        }
+
+                                        return message.readDate !== null && prevMessage.readDate === null;
+                                    })();
 
                                     const prevMessageSentDateDayDifference = prevMessageSentDateDayDifferenceRef.current;
                                     const sentDateDayDifference = FormatedDate.dayDifference(Date.now(), message.sentDate);
@@ -191,12 +212,15 @@ export default function ChatBody(props: ChatProps) {
                                     return (
                                         <MemoChatFragment
                                             key={message._id}
+                                            index={index}
                                             message={message}
                                             nextMessage={nextMessage}
                                             user={user!}
-                                            isLatestMessage={isLatestMessage}
+                                            chatID={chatID}
+                                            isFirstMessage={isFirstMessage}
                                             isBlockEnded={isBlockEnded}
-                                            isPrevMessageLatest={isPrevMessageLatest}
+                                            isPrevMessageFirst={isPrevMessageFirst}
+                                            isUnreadMessagesBlockStart={isUnreadMessagesBlockStart}
                                         />
                                     );
                                 })}

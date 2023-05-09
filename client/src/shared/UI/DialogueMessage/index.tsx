@@ -17,7 +17,10 @@ interface DialogueMessageProps extends UiComponentProps<HTMLDivElement> {
     sentDate: number; // or already parsed string??
 }
 
-export default function DialogueMessage(props: DialogueMessageProps) {
+const DialogueMessage = React.forwardRef(function DialogueMessage(
+    props: DialogueMessageProps,
+    ref: React.ForwardedRef<HTMLDivElement>
+) {
     const {
         className = "",
         sender,
@@ -39,7 +42,7 @@ export default function DialogueMessage(props: DialogueMessageProps) {
     const formatedSentDate = new FormatedDate(sentDate);
 
     return (
-        <div className={classes} {...otherProps}>
+        <div ref={ref} className={classes} {...otherProps}>
             {sender === "interlocutor" && <div className="TNUI-DialogueMessage-offside-shape" />}
             <div className="TNUI-DialogueMessage-body">
                 <p className="TNUI-DialogueMessage-text">
@@ -85,6 +88,8 @@ export default function DialogueMessage(props: DialogueMessageProps) {
             {sender === "user" && <div className="TNUI-DialogueMessage-offside-shape" />}
         </div>
     );
-}
+});
+
+export default DialogueMessage;
 
 export const MemoDialogueMessage = React.memo(DialogueMessage);

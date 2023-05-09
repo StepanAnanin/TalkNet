@@ -3,6 +3,6 @@ export default interface DialogueChatMessage {
     sentBy: string;
     data: string;
     sentDate: number;
-    readDate: number;
+    readDate: number | null;
     edited: boolean;
 }

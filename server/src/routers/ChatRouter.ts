@@ -15,6 +15,8 @@ ChatRouter.post("/messages/:id", authMiddleware, ChatController.getChatMessages)
 
 ChatRouter.post("/create/dialogue", authMiddleware, ChatController.createDialogueChat);
 
-ChatRouter.post("/message/:id", authMiddleware, ChatController.sendMessage);
+ChatRouter.post("/message/:chatID", authMiddleware, ChatController.sendMessage);
+
+ChatRouter.patch("/messages/:chatID/read-date", authMiddleware, ChatController.updateMessageReadDate);
 
 export default ChatRouter;
