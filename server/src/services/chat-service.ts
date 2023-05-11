@@ -5,6 +5,7 @@ import ChatDTO from "../DTO/chat-DTO";
 import IChat from "../types/DB/models/Chat";
 import ChatMessage from "../types/DB/schemas/ChatMessage";
 import { Types } from "mongoose";
+import UserModel from "../DB/models/User";
 
 // TODO require decomposition
 class ChatService {
@@ -172,16 +173,24 @@ class ChatService {
         return messageData;
     }
 
-    public async updateMessageReadDate(chatID: string, messageID: string, newReadDate: number) {
+    // TODO move all ObjectId validations out from all this methods
+    public async updateMessageReadDate(userID: string, chatID: string, messageID: string, newReadDate: number) {
+        if (!ObjectId.isValid(userID)) {
+            throw new HTTPError(400, "chatID has incorrect format");
+        }
         if (!ObjectId.isValid(chatID)) {
             throw new HTTPError(400, "chatID has incorrect format");
         }
-
         if (!ObjectId.isValid(messageID)) {
             throw new HTTPError(400, "messageID has incorrect format");
         }
 
+        const targetedUser = await UserModel.findById(userID);
         const targetedChat = await ChatModel.findById(chatID);
+
+        if (!targetedUser) {
+            throw new HTTPError(404, "Failed to find user");
+        }
 
         if (!targetedChat) {
             throw new HTTPError(404, "Failed to find requested chat");
@@ -195,6 +204,16 @@ class ChatService {
 
         const targetedMessageIndex = targetedChat.messages.indexOf(targetedMessage);
 
+        const userChatMember = targetedChat.members.find((chatMember, i) => {
+            return chatMember.userID.toString() === targetedUser._id.toString();
+        });
+
+        if (!userChatMember) {
+            throw new HTTPError(404, "Failed to find chat member");
+        }
+
+        userChatMember.lastReadMessageIndex = targetedMessageIndex;
+
         targetedChat.messages.forEach((message, index) => {
             if (index > targetedMessageIndex) {
                 return;
@@ -204,6 +223,8 @@ class ChatService {
         });
 
         await targetedChat.save();
+
+        return { updatedMessage: targetedChat.messages[targetedMessageIndex], updatedMessageIndex: targetedMessageIndex };
     }
 }
 

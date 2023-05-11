@@ -1,4 +1,4 @@
-import type { SendMessageEvent } from "../types/WebSocket/Events";
+import type { UpdateMessageReadDate } from "../types/WebSocket/Events";
 
 import WebSocket from "ws";
 import http from "http";
@@ -6,8 +6,12 @@ import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 import { Socket } from "socket.io";
 
-export default async function SendMessageHandler(event: SendMessageEvent, socket: Socket<any, any, any, any>) {
-    const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.payload.chatID, "POST", event.accessToken);
+export default async function SendMessageHandler(event: UpdateMessageReadDate, socket: Socket<any, any, any, any>) {
+    const requestOptions = new TalkNetAPIRequestOptions(
+        `/chat/messages/${event.payload.chatID}/read-date`,
+        "PATCH",
+        event.accessToken
+    );
 
     // @ts-ignore
     const request = http.request(requestOptions, function (response) {
@@ -45,7 +49,7 @@ export default async function SendMessageHandler(event: SendMessageEvent, socket
                     return;
                 }
 
-                const chatID = responsePayload.chatID;
+                const chatID = responsePayload.chat;
 
                 if (typeof chatID !== "string") {
                     socket.emit(
@@ -57,12 +61,17 @@ export default async function SendMessageHandler(event: SendMessageEvent, socket
                     return;
                 }
 
-                // If success
-                socket.emit("send-message", new MessengerServiceResponse(200, "send-message", responsePayload).JSON());
+                socket.emit(
+                    "update-message-read-date",
+                    new MessengerServiceResponse(200, "update-message-read-date", responsePayload.payload).JSON()
+                );
 
                 socket
                     .to(chatID)
-                    .emit("receive-message", new MessengerServiceResponse(200, "receive-message", responsePayload).JSON());
+                    .emit(
+                        "update-message-read-date",
+                        new MessengerServiceResponse(200, "update-message-read-date", responsePayload.payload).JSON()
+                    );
             });
 
         // response.on("end", function () {});
@@ -74,7 +83,11 @@ export default async function SendMessageHandler(event: SendMessageEvent, socket
 
     // sending request to the TalkNet API
     request.write(
-        JSON.stringify({ senderID: event.userID, messageText: event.payload.message, sentDate: event.payload.sentDate })
+        JSON.stringify({
+            messageID: event.payload.messageID,
+            chatID: event.payload.chatID,
+            newReadDate: event.payload.newReadDate,
+        })
     );
 
     request.end();

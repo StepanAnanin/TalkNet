@@ -1,19 +1,24 @@
 import React from "react";
 
 import type MessengerServiceModel from "../../../../shared/types/shared/lib/MessengerServiceModel";
-import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
 import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
+import DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
+import { useTypedDispatch } from "../../../../shared/model/hooks/useTypedDispatch";
 import {
     MessengerServiceIncomingEvent,
     MessengerServiceOutcomingEventResponse,
 } from "../../../../shared/lib/MessengerServiceEvent";
-import DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
+import chatSlice from "../store/reducers/chatListReducer";
 
 export default function useChat() {
-    const { payload: user } = useTypedSelector((state) => state.auth);
+    const { auth, chatList } = useTypedSelector((state) => state);
+    const dispatch = useTypedDispatch();
+    const userChats = chatList.payload;
+
+    const user = auth.payload;
 
     if (!user) {
         throw new Error(`Authorization required`);
@@ -21,10 +26,9 @@ export default function useChat() {
 
     // This needed cuz userChats is enclosed, hence will have incorrect value in functions declared in this scope (like updateChatInfo).
     // This is a fucked way to fix that, but I didn’t come up with a better one.
-    const userChatsRef = React.useRef<DialogueChat[] | null>(null);
+    const userChatsRef = React.useRef<typeof userChats>(userChats);
 
-    const [userChats, setUserChats] = React.useState<DialogueChat[] | null>(null);
-    const [isChatsConnectionEstablised, setIsChatsConnectionEstablised] = React.useState(false);
+    // const [isChatsConnectionEstablised, setIsChatsConnectionEstablised] = React.useState(false);
 
     const MessengerServiceConnection = useMessengerService();
 
@@ -38,26 +42,25 @@ export default function useChat() {
             updateChatInfo((e.payload as any).chatID, e.payload as DialogueChatMessage);
         }
 
-        function connectToChatsHandler(
-            e: MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>
-        ) {
-            setIsChatsConnectionEstablised(true);
-        }
+        // function connectToChatsHandler(e: MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>) {
+        // setIsChatsConnectionEstablised(true);
+        // }
 
         MessengerServiceConnection.addOutcomingEventHandler("send-message", updateMessageAmount);
-        MessengerServiceConnection.addOutcomingEventHandler("connect-to-chats", connectToChatsHandler);
         MessengerServiceConnection.addIncomingEventHandler("receive-message", updateMessageAmount);
+        // MessengerServiceConnection.addOutcomingEventHandler("connect-to-chats", connectToChatsHandler);
 
         (async function () {
             const response = await TalkNetAPI.get(`/user/${user.id}/chats`);
 
-            setUserChats(response.data);
+            // console.log(response.data);
+            dispatch(chatSlice.actions.setChatList(response.data));
         })();
 
         return function () {
             MessengerServiceConnection.removeOutcomingEventHandler("send-message", updateMessageAmount);
-            MessengerServiceConnection.removeOutcomingEventHandler("connect-to-chats", connectToChatsHandler);
             MessengerServiceConnection.removeIncomingEventHandler("receive-message", updateMessageAmount);
+            // MessengerServiceConnection.removeOutcomingEventHandler("connect-to-chats", connectToChatsHandler);
         };
     }, []);
 
@@ -94,15 +97,22 @@ export default function useChat() {
             throw new Error("Не удалось обновить данные чата: Запрошенный чат не был найден");
         }
 
-        targetedChat.messageAmount += lastMessageIndexIncrement;
-        targetedChat.lastMessage = newLastMessage;
-
-        setUserChats((p) => [...p!]);
+        dispatch(
+            chatSlice.actions.updateChat({
+                ...targetedChat,
+                messageAmount: targetedChat.messageAmount + lastMessageIndexIncrement,
+                lastMessage: newLastMessage,
+            })
+        );
     }
 
     function getCurrentChatID() {
         return new URLSearchParams(window.location.search).get("chat");
     }
 
-    return { userChats, isChatsConnectionEstablised, getCurrentChatID, MessengerServiceConnection };
+    return {
+        getCurrentChatID,
+        MessengerServiceConnection,
+        // isChatsConnectionEstablised,
+    };
 }

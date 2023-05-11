@@ -3,7 +3,12 @@ import type ChatMessage from "../api/ChatMessage";
 
 // TODO Require refactoring
 
-export type incomingEvent = "send-message" | "establish-connection" | "get-chat-messages" | "connect-to-chats";
+export type incomingEvent =
+    | "send-message"
+    | "establish-connection"
+    | "get-chat-messages"
+    | "connect-to-chats"
+    | "update-message-read-date";
 
 export type outcomingEvent =
     | "receive-message"
@@ -32,6 +37,11 @@ export type ConnectToChatsEvent = ConnectionEvent<"connect-to-chats", { userChat
 export type ReceiveMessage = ConnectionEvent<"receive-message", ChatMessage>;
 
 export type AccessDenied = ConnectionEvent<"access-denied", { message: string | null }>;
+
+export type UpdateMessageReadDate = ConnectionEvent<
+    "update-message-read-date",
+    { chatID: string; messageID: string; newReadDate: number }
+>;
 
 type AnyEvent = SendMessageEvent | GetChatMessagesEvent | ConnectToChatsEvent | ReceiveMessage | AccessDenied;
 

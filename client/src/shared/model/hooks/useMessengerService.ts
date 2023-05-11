@@ -65,6 +65,10 @@ export default function useMessengerService() {
 
         addSocketIncomingEventHandlers(socket);
         addSocketOutcomingEventHandlers(socket);
+
+        window.onbeforeunload = () => {
+            MessengerServiceConnectionRef.current?.close();
+        };
     }
 
     function addSocketIncomingEventHandlers(socket: ReturnType<typeof io>) {
@@ -161,7 +165,16 @@ export default function useMessengerService() {
             case "edite-message":
                 throw new Error("Not implemented");
             case "update-message-read-date":
-                throw new Error("Not implemented");
+                const updateMessageReadDateEvent: MessengerServiceModel.OutcomingEvent.Request.UpdateMessageReadDate = {
+                    type: "request",
+                    event: "update-message-read-date",
+                    payload: ConnectionEvent.payload as any,
+                };
+
+                lastEventRef.current = updateMessageReadDateEvent;
+
+                MessengerServiceConnection.updateMessageReadDate(updateMessageReadDateEvent);
+                break;
             case "connect-to-chats":
                 const connectToChatsEvent: MessengerServiceModel.OutcomingEvent.Request.ConnectToChats = {
                     type: "request",

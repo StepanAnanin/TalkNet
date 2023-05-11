@@ -15,48 +15,58 @@ export default async function GetChatMessagesEventHandler(event: GetChatMessages
     const requestOptions = new TalkNetAPIRequestOptions("/chat/messages/" + event.payload.chatID, "POST", event.accessToken);
 
     // TODO move this to a new fuction or class method
-    // @ts-ignore
-    const request = http.request(requestOptions, function (response) {
-        response.setEncoding("utf-8");
+    const request = http
+        .request(requestOptions, function (response) {
+            response.setEncoding("utf-8");
 
-        response.on("data", function (chunk) {
-            const responsePayload = JSON.parse(chunk);
+            const chunks: Buffer[] = [];
 
-            // Checking access token
-            if (response.statusCode === 401 && responsePayload.tokenExpired) {
-                socket.emit(
-                    "access-token-expired",
-                    new MessengerServiceResponse(response.statusCode, "access-token-expired", {
-                        message: responsePayload.message,
-                    }).JSON()
-                );
-                return;
-            }
+            response
+                .on("data", function (chunk) {
+                    chunks.push(Buffer.from(chunk));
+                })
+                .on("end", () => {
+                    const stringifiedData = Buffer.concat(chunks).toString("utf8");
+                    const responsePayload = JSON.parse(stringifiedData);
 
-            // If error
-            if (response.statusCode! >= 400) {
-                console.log(chunk);
-                socket.emit(
-                    "unexpected-error",
-                    new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
-                        message: responsePayload.message,
-                    }).JSON()
-                );
-                return;
-            }
+                    // Checking access token
+                    if (response.statusCode === 401 && responsePayload.tokenExpired) {
+                        socket.emit(
+                            "access-token-expired",
+                            // @ts-ignore
+                            new MessengerServiceResponse(response.statusCode, "access-token-expired", {
+                                message: responsePayload.message,
+                            }).JSON()
+                        );
+                        return;
+                    }
 
-            // console.log(chunk);
+                    // If error
+                    if (response.statusCode! >= 400) {
+                        // console.log(chunk);
+                        console.log(response);
+                        socket.emit(
+                            "unexpected-error",
+                            new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
+                                message: responsePayload.message,
+                            }).JSON()
+                        );
+                        return;
+                    }
 
-            // If success
-            socket.send(new MessengerServiceResponse(200, "get-chat-messages", responsePayload).JSON());
-        });
+                    // console.log(chunk);
 
-        // response.on("end", function () {});
+                    // If success
+                    socket.send(new MessengerServiceResponse(200, "get-chat-messages", responsePayload).JSON());
+                });
 
-        response.on("error", (err) => {
-            console.error(err);
-        });
-    });
+            // response.on("end", function () {});
+
+            response.on("error", (err) => {
+                console.error(err);
+            });
+        })
+        .on("end", () => {});
 
     // sending request to the TalkNet API
     request.write(JSON.stringify({ userID: event.userID }));

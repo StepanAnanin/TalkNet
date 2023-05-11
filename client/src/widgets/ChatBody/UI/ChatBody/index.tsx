@@ -15,9 +15,8 @@ import {
     MessengerServiceOutcomingEventResponse,
 } from "../../../../shared/lib/MessengerServiceEvent";
 import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
-import { MemoChatFragment } from "../ChatFragment";
+import ChatFragment, { MemoChatFragment } from "../ChatFragment";
 import { useChat } from "../../../../entities/Chat";
-import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 
 interface ChatProps extends UiComponentProps<HTMLDivElement> {
     chatID: string | null;
@@ -29,14 +28,17 @@ interface ChatProps extends UiComponentProps<HTMLDivElement> {
 export default function ChatBody(props: ChatProps) {
     const { className = "", chatID, ...otherProps } = props;
 
+    const { MessengerServiceConnection, getCurrentChatID } = useChat();
+
+    const { chatList, auth } = useTypedSelector((state) => state);
+    const userChats = chatList.payload;
+    const user = auth.payload;
+
     const [messages, setMessages] = React.useState<DialogueChatMessage[]>([]);
     const [isMessageSendInProgress, setIsMessageSendInProgress] = React.useState(false);
 
     const messageInputRef = React.useRef<HTMLDivElement>(null);
     const prevMessageSentDateDayDifferenceRef = React.useRef(0);
-
-    const { payload: user } = useTypedSelector((state) => state.auth);
-    const { MessengerServiceConnection, userChats, getCurrentChatID } = useChat();
 
     const sendButtonClickHandler = React.useCallback(
         function () {
@@ -94,7 +96,6 @@ export default function ChatBody(props: ChatProps) {
             MessengerServiceConnection.removeOutcomingEventHandler("get-chat-messages", handleGetChatMessagesResponse);
             MessengerServiceConnection.removeOutcomingEventHandler("send-message", handleSendMessageResponse);
             MessengerServiceConnection.removeIncomingEventHandler("receive-message", handleReceiveMessage);
-            MessengerServiceConnection.closeConnection();
         };
     }, []);
 
@@ -174,6 +175,15 @@ export default function ChatBody(props: ChatProps) {
                                     const isFirstMessage = prevMessage === undefined;
                                     const isPrevMessageFirst = arr[index + 2] === undefined;
 
+                                    const messageSender = message.sentBy === user!.id ? "user" : "interlocutor";
+                                    const nextMessageSender = (function () {
+                                        if (!nextMessage) {
+                                            return null;
+                                        }
+
+                                        return nextMessage.sentBy === user!.id ? "user" : "interlocutor";
+                                    })();
+
                                     const isUnreadMessagesBlockStart = (function () {
                                         // if all messages are read
                                         if (index === 0 && !!message.readDate) {
@@ -187,10 +197,15 @@ export default function ChatBody(props: ChatProps) {
 
                                         // Is there an any point in this condition?
                                         if (!prevMessage && !!message.readDate) {
-                                            return true;
+                                            return false;
                                         }
 
-                                        return message.readDate !== null && prevMessage.readDate === null;
+                                        return (
+                                            message.readDate !== null &&
+                                            nextMessage.readDate === null &&
+                                            nextMessageSender === "interlocutor" &&
+                                            messageSender === "user"
+                                        );
                                     })();
 
                                     const prevMessageSentDateDayDifference = prevMessageSentDateDayDifferenceRef.current;
@@ -210,17 +225,19 @@ export default function ChatBody(props: ChatProps) {
                                     // otherwise this label will always show up when user scroll at the end of chat.
                                     // So i decided temporarily abandon this idea.
                                     return (
-                                        <MemoChatFragment
+                                        <ChatFragment
                                             key={message._id}
                                             index={index}
                                             message={message}
                                             nextMessage={nextMessage}
-                                            user={user!}
+                                            chatMessages={messages}
+                                            messageSender={messageSender}
                                             chatID={chatID}
                                             isFirstMessage={isFirstMessage}
                                             isBlockEnded={isBlockEnded}
                                             isPrevMessageFirst={isPrevMessageFirst}
                                             isUnreadMessagesBlockStart={isUnreadMessagesBlockStart}
+                                            MessengerServiceConnection={MessengerServiceConnection}
                                         />
                                     );
                                 })}

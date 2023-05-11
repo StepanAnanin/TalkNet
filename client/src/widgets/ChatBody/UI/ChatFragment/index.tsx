@@ -1,96 +1,136 @@
 import "./ChatFragment.scss";
 import React from "react";
 
-import type User from "../../../../shared/types/entities/User";
 import type DialogueChatMessage from "../../../../shared/types/shared/DialogueChatMessage";
-import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
 import MessageBlockDateDivider from "../MessageBlockDateDivider";
 import DialogueMessage from "../../../../shared/UI/DialogueMessage";
-import updateMessageReadDate from "../../model/updateMessageReadDate";
-import { useChat } from "../../../../entities/Chat";
+import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
+import handleUpdateMessageReadDate from "../../model/updateMessageReadDate";
+import MessengerServiceModel from "../../../../shared/types/shared/lib/MessengerServiceModel";
+import addOnViewListener from "../../../../shared/types/shared/lib/addOnViewListener";
 
 interface ChatFragmentProps {
     index: number;
     message: DialogueChatMessage;
     nextMessage?: DialogueChatMessage;
+    chatMessages: DialogueChatMessage[];
     isBlockEnded: boolean;
     isFirstMessage: boolean;
     isPrevMessageFirst: boolean;
     isUnreadMessagesBlockStart: boolean;
     chatID: string;
-    user: User;
+    messageSender: "user" | "interlocutor";
+    MessengerServiceConnection: ReturnType<typeof useMessengerService>;
 }
 
 export default function ChatFragment(props: ChatFragmentProps) {
     const {
-        index,
-        user,
+        index: messageIndex,
+        messageSender,
         chatID,
         message,
         nextMessage,
+        chatMessages,
         isBlockEnded,
         isFirstMessage,
         isPrevMessageFirst,
         isUnreadMessagesBlockStart,
+        MessengerServiceConnection,
     } = props;
 
-    const x = useChat();
+    // const chatMessages = userChats.find(chat => chat.id === chatID).
+    const [currentMessage, setCurrentMessage] = React.useState(message);
 
     const messageElementRef = React.useRef<HTMLDivElement | null>(null);
-    const messageSender = message.sentBy === user!.id ? "user" : "interlocutor";
 
     React.useEffect(() => {
-        if (message.readDate !== null || messageSender === "user") {
+        if (currentMessage.readDate !== null) {
             return;
         }
 
-        const messageElement = messageElementRef.current;
+        let viewObserver: IntersectionObserver | null = null;
 
-        if (!(messageElement instanceof HTMLElement)) {
-            throw new TypeError("Failed to find messageElement");
+        if (messageSender === "interlocutor") {
+            // If it's === null, then addOnViewListener will throw error.
+            const messageElement = messageElementRef.current!;
+
+            viewObserver = addOnViewListener(messageElement, function () {
+                handleUpdateMessageReadDate(messageIndex, function () {
+                    MessengerServiceConnection.dispathOutcomingEvent({
+                        event: "update-message-read-date",
+                        payload: { newReadDate: Date.now(), messageID: currentMessage._id, chatID },
+                    });
+                });
+            });
+
+            viewObserver.observe(messageElement);
         }
 
-        const intersectorObserverOptions: IntersectionObserverInit = {
-            root: messageElement.parentElement,
-            threshold: 1,
-            rootMargin: "0px",
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            const entry = entries[0];
-
-            if (entry.isIntersecting) {
-                updateMessageReadDate(chatID, message._id, index);
-                // const element = entry.target;
-            }
-        }, intersectorObserverOptions);
-
-        observer.observe(messageElement);
+        MessengerServiceConnection.addOutcomingEventHandler(
+            "update-message-read-date",
+            updateMessageReadDateEventResponseHandler as any
+        );
 
         return function () {
-            observer.disconnect();
+            MessengerServiceConnection.removeOutcomingEventHandler(
+                "update-message-read-date",
+                updateMessageReadDateEventResponseHandler as any
+            );
+
+            viewObserver && viewObserver.disconnect();
         };
-    }, []);
+    }, [currentMessage]);
+
+    // TODO idk why and how, but this work... (but shouldn't or ??????)
+    // TODO seems like there are some excess renders...
+    function updateMessageReadDateEventResponseHandler(
+        e: MessengerServiceModel.OutcomingEvent.Response.UpdateMessageReadDate
+    ) {
+        // I remind that object is reference type
+        const readMessageTwin = e.payload.message;
+        const indexOfReadMessage = e.payload.index;
+
+        // TODO do something with inverted array of messages.
+        // On client this array is inverted, but not on server.
+        // So need to cast indexes for them to point to correct message.
+        // P.S. Seems like inverting of array was a bad idea... (should i did this on server?)
+        const indexOfLastFirstMessage = chatMessages.length - 1;
+        const fixedIndexOfReadMessage = indexOfLastFirstMessage - indexOfReadMessage;
+
+        // If current message wasn't read
+        if (messageIndex < fixedIndexOfReadMessage) {
+            return;
+        }
+
+        setCurrentMessage((p) => {
+            return { ...p, readDate: readMessageTwin.readDate };
+        });
+    }
 
     // Keep in mind that all this elements are rendered on page in reverse order.
     // (cuz in ChatBody they used in reversed array)
     return (
         <React.Fragment>
+            {isUnreadMessagesBlockStart && (
+                <div className="TNUI-ChatFragment-unread-messages-block-start-alert" id="unread-messages-alert">
+                    Непрочитанные сообщения
+                </div>
+            )}
             {isBlockEnded && nextMessage && (!isFirstMessage || isPrevMessageFirst) && (
                 <MessageBlockDateDivider date={nextMessage.sentDate} />
             )}
             <DialogueMessage
-                id={message._id}
+                id={currentMessage._id}
                 ref={messageElementRef}
-                read={!!message.readDate}
+                read={!!currentMessage.readDate}
                 sender={messageSender}
-                sentDate={message.sentDate}
+                sentDate={currentMessage.sentDate}
             >
-                {message.data}
+                {currentMessage.data}
             </DialogueMessage>
-            {isFirstMessage && <MessageBlockDateDivider date={message.sentDate} />}
-            {isUnreadMessagesBlockStart && (
+            {isFirstMessage && <MessageBlockDateDivider date={currentMessage.sentDate} />}
+            {isFirstMessage && isUnreadMessagesBlockStart && (
                 <div className="TNUI-ChatFragment-unread-messages-block-start-alert" id="unread-messages-alert">
                     Непрочитанные сообщения
                 </div>

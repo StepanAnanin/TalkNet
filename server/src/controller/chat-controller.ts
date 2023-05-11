@@ -167,9 +167,15 @@ class ChatController {
     public async updateMessageReadDate(req: Request<{ chatID: string }>, res: Response) {
         res.setHeader("Accept-Charset", "utf-8");
 
+        const user = req.body.user;
         const chatID = req.params.chatID;
         const messageID: string = req.body.messageID;
         const newReadDate: number = req.body.newReadDate;
+
+        if (!user) {
+            res.status(500).json({ message: "Не удалось получить данные пользователя." });
+            return;
+        }
 
         const validationResult = validateRequest(req.body, [
             { key: "messageID", type: "string" },
@@ -182,9 +188,14 @@ class ChatController {
         }
 
         try {
-            await ChatService.updateMessageReadDate(chatID, messageID, newReadDate);
+            const { updatedMessage, updatedMessageIndex } = await ChatService.updateMessageReadDate(
+                user.id,
+                chatID,
+                messageID,
+                newReadDate
+            );
 
-            res.status(200).json({ message: "Read date updated" });
+            res.status(200).json({ chat: chatID, payload: { message: updatedMessage, index: updatedMessageIndex } });
         } catch (err: any) {
             if (err instanceof HTTPError) {
                 res.status(err.errorCode).json({ message: err.message });

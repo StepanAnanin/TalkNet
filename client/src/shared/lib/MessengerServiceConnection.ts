@@ -23,6 +23,7 @@ export default class MessengerServiceConnection {
         "get-chat-messages",
         "send-message",
         "update-message-read-date",
+        "update-message-read-date",
     ] as const;
 
     public static readonly EventsMap: readonly MessengerServiceModel.AnyEventName[] = [
@@ -98,5 +99,11 @@ export default class MessengerServiceConnection {
 
     public getChatMessages(getChatMessagesEvent: MessengerServiceModel.OutcomingEvent.Request.GetChatMessages) {
         this.emitEvent(getChatMessagesEvent);
+    }
+
+    public updateMessageReadDate(
+        updateMessageReadDateEvent: MessengerServiceModel.OutcomingEvent.Request.UpdateMessageReadDate
+    ) {
+        this.emitEvent(updateMessageReadDateEvent);
     }
 }

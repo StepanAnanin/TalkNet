@@ -44,9 +44,12 @@ namespace MessengerServiceModel {
                 payload: {};
             }
 
-            // Not implemented yet
             export interface UpdateMessageReadDate extends OutcomingEventRequest<"update-message-read-date"> {
-                payload: {};
+                payload: {
+                    newReadDate: number;
+                    messageID: string;
+                    chatID: string;
+                };
             }
 
             export interface ConnectToChats extends OutcomingEventRequest<"connect-to-chats"> {
@@ -98,7 +101,7 @@ namespace MessengerServiceModel {
 
             // Not implemented yet
             export interface UpdateMessageReadDate extends OutcomingEventResponse<"update-message-read-date"> {
-                payload: DialogueChatMessage;
+                payload: { message: DialogueChatMessage; index: number };
             }
 
             export interface ConnectToChats extends OutcomingEventResponse<"connect-to-chats"> {

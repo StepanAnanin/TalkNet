@@ -1,37 +1,24 @@
-import TalkNetAPI from "../../../shared/api/TalkNetAPI";
-
 // By default it's must by the biggest positive number.
-// (it's needed for all other numbers to be less then it, see @mark_1)
+// (it's needed for all other numbers to be less then it, see @1)
 let lowestIndex = Infinity;
 
-let callbackTimeout: NodeJS.Timeout;
+let handlerTimeout: NodeJS.Timeout;
 
-function callbackx(messageID: string) {
-    console.log(lowestIndex);
-}
+const handlerTimeoutDelay = 1000; // ms
 
-// TODO this won't work correctly, need to use websokect...
-async function callback(chatID: string, messageID: string) {
-    try {
-        await TalkNetAPI.patch(`/chat/messages/${chatID}/read-date`, {
-            newReadDate: Date.now(),
-            messageID,
-        });
-    } catch (err) {
-        console.log(`Failed to update message read date. (message id: ${messageID})`);
-        console.error(err);
+export default function handleUpdateMessageReadDate(messageIndex: number, handler: () => void | Promise<void>) {
+    if (messageIndex < 0) {
+        throw new RangeError("messageIndex must be positive number");
     }
-}
 
-export default function updateMessageReadDate(chatID: string, messageID: string, messageIndex: number) {
-    // @mark_1
+    // @1
     if (messageIndex > lowestIndex) {
         return;
     }
 
-    clearTimeout(callbackTimeout);
+    clearTimeout(handlerTimeout);
 
     lowestIndex = messageIndex;
 
-    callbackTimeout = setTimeout(() => callback(chatID, messageID), 1000);
+    handlerTimeout = setTimeout(() => handler(), handlerTimeoutDelay);
 }

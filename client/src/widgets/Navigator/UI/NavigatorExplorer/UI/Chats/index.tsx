@@ -9,8 +9,11 @@ import { useChat } from "../../../../../../entities/Chat";
 import { NavigatorExplorerItemSkeleton } from "../../../../../../features/NavigatorExplorerItem";
 
 export default function Chats() {
-    const { payload: user } = useTypedSelector((state) => state.auth);
-    const { userChats, isChatsConnectionEstablised, getCurrentChatID } = useChat();
+    const { auth, chatList } = useTypedSelector((state) => state);
+    const user = auth.payload;
+    const userChats = chatList.payload;
+
+    const { getCurrentChatID } = useChat();
     const currentChatID = getCurrentChatID();
 
     // BUG not working
