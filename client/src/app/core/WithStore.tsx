@@ -7,7 +7,7 @@ import { navigatorSlice } from "../../pages";
 import friendsSlice from "../../widgets/Navigator/model/store/reducers/friendsReducer";
 import incomingFriendRequestsSlice from "../../widgets/Navigator/model/store/reducers/incomingFriendRequestsReducer";
 import outcomingFriendRequestsSlice from "../../widgets/Navigator/model/store/reducers/outcomingFriendRequestsReducer";
-import chatListSlice from "../../entities/Chat/model/store/reducers/chatListReducer";
+import chatListSlice from "../../shared/model/store/reducers/chatListReducer";
 
 interface withStoreProps {
     children: React.ReactNode;

@@ -1,9 +1,9 @@
-import DialogueChatMessage from "../shared/DialogueChatMessage";
+import IChatMessage from "../entities/IChatMessage";
 
 export default interface DialogueChat {
     id: string;
     type: "dialogue";
-    lastMessage: DialogueChatMessage;
+    lastMessage: IChatMessage;
     messageAmount: number;
     members: [DialogueChatMember, DialogueChatMember];
 }

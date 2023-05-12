@@ -5,72 +5,75 @@ import http from "http";
 import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 import { Socket } from "socket.io";
+import TalkNetAPIRequest from "../lib/TalkNetApiRequest";
 
 export default async function SendMessageHandler(event: SendMessageEvent, socket: Socket<any, any, any, any>) {
     const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.payload.chatID, "POST", event.accessToken);
 
-    // @ts-ignore
-    const request = http.request(requestOptions, function (response) {
-        response.setEncoding("utf-8");
+    const request = TalkNetAPIRequest(event.event, requestOptions, socket, true);
 
-        const chunks: Buffer[] = [];
+    // // @ts-ignore
+    // const request = http.request(requestOptions, function (response) {
+    //     response.setEncoding("utf-8");
 
-        response
-            .on("data", function (chunk) {
-                chunks.push(Buffer.from(chunk));
-            })
-            .on("end", function () {
-                const stringifiedData = Buffer.concat(chunks).toString("utf8");
-                const responsePayload = JSON.parse(stringifiedData);
+    //     const chunks: Buffer[] = [];
 
-                // Checking access token
-                if (response.statusCode === 401 && responsePayload.tokenExpired) {
-                    socket.emit(
-                        "access-token-expired",
-                        new MessengerServiceResponse(response.statusCode, "access-token-expired", {
-                            message: responsePayload.message,
-                        }).JSON()
-                    );
-                    return;
-                }
+    //     response
+    //         .on("data", function (chunk) {
+    //             chunks.push(Buffer.from(chunk));
+    //         })
+    //         .on("end", function () {
+    //             const stringifiedData = Buffer.concat(chunks).toString("utf8");
+    //             const responsePayload = JSON.parse(stringifiedData);
 
-                // If error
-                if (response.statusCode! >= 400) {
-                    socket.emit(
-                        "unexpected-error",
-                        new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
-                            message: responsePayload.message,
-                        }).JSON()
-                    );
-                    return;
-                }
+    //             // Checking access token
+    //             if (response.statusCode === 401 && responsePayload.tokenExpired) {
+    //                 socket.emit(
+    //                     "access-token-expired",
+    //                     new MessengerServiceResponse(response.statusCode, "access-token-expired", {
+    //                         message: responsePayload.message,
+    //                     }).JSON()
+    //                 );
+    //                 return;
+    //             }
 
-                const chatID = responsePayload.chatID;
+    //             // If error
+    //             if (response.statusCode! >= 400) {
+    //                 socket.emit(
+    //                     "unexpected-error",
+    //                     new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
+    //                         message: responsePayload.message,
+    //                     }).JSON()
+    //                 );
+    //                 return;
+    //             }
 
-                if (typeof chatID !== "string") {
-                    socket.emit(
-                        "unexpected-error",
-                        new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
-                            message: "[Messenger Service Internal Error] Не удалось получить ID чата",
-                        }).JSON()
-                    );
-                    return;
-                }
+    //             const chatID = responsePayload.chatID;
 
-                // If success
-                socket.emit("send-message", new MessengerServiceResponse(200, "send-message", responsePayload).JSON());
+    //             if (typeof chatID !== "string") {
+    //                 socket.emit(
+    //                     "unexpected-error",
+    //                     new MessengerServiceResponse(response.statusCode!, "unexpected-error", {
+    //                         message: "[Messenger Service Internal Error] Не удалось получить ID чата",
+    //                     }).JSON()
+    //                 );
+    //                 return;
+    //             }
 
-                socket
-                    .to(chatID)
-                    .emit("receive-message", new MessengerServiceResponse(200, "receive-message", responsePayload).JSON());
-            });
+    //             // If success
+    //             socket.emit("send-message", new MessengerServiceResponse(200, "send-message", responsePayload).JSON());
 
-        // response.on("end", function () {});
+    //             socket
+    //                 .to(chatID)
+    //                 .emit("receive-message", new MessengerServiceResponse(200, "receive-message", responsePayload).JSON());
+    //         });
 
-        response.on("error", (err) => {
-            console.error(err);
-        });
-    });
+    //     // response.on("end", function () {});
+
+    //     response.on("error", (err) => {
+    //         console.error(err);
+    //     });
+    // });
 
     // sending request to the TalkNet API
     request.write(

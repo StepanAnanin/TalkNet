@@ -187,18 +187,6 @@ export default function useMessengerService() {
                 MessengerServiceConnection.connectToChats(connectToChatsEvent);
 
                 break;
-            case "get-chat-messages":
-                const getChatMessagesEvent: MessengerServiceModel.OutcomingEvent.Request.GetChatMessages = {
-                    type: "request",
-                    event: "get-chat-messages",
-                    payload: ConnectionEvent.payload as any,
-                };
-
-                lastEventRef.current = getChatMessagesEvent;
-
-                MessengerServiceConnection.getChatMessages(getChatMessagesEvent);
-
-                break;
             default:
                 throw new Error("Wrong event type");
         }

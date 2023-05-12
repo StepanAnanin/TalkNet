@@ -10,7 +10,7 @@ import { AxiosError } from "axios";
 import TalkNetAPI from "../../../../../../shared/api/TalkNetAPI";
 import Alert from "../../../../../../shared/UI/Alert";
 import Avatar from "../../../../../../shared/UI/Avatar";
-import FileSelectForm from "../../../../../../features/FileSelectForm";
+import FileSelectForm from "../../../../../../shared/UI/FileSelectForm";
 
 interface ChangeUserAvatarModalProps extends UiComponentProps<HTMLDivElement> {
     user: User;

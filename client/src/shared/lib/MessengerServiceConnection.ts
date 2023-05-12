@@ -20,7 +20,6 @@ export default class MessengerServiceConnection {
         "edite-message",
         "establish-connection",
         "connect-to-chats",
-        "get-chat-messages",
         "send-message",
         "update-message-read-date",
         "update-message-read-date",
@@ -95,10 +94,6 @@ export default class MessengerServiceConnection {
 
     public connectToChats(connectToChatsEvent: MessengerServiceModel.OutcomingEvent.Request.ConnectToChats) {
         this.emitEvent(connectToChatsEvent);
-    }
-
-    public getChatMessages(getChatMessagesEvent: MessengerServiceModel.OutcomingEvent.Request.GetChatMessages) {
-        this.emitEvent(getChatMessagesEvent);
     }
 
     public updateMessageReadDate(

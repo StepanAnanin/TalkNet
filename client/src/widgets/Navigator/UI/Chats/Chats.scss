@@ -1,0 +1,28 @@
+@import "../../../../app/styles/variables.scss";
+
+.TNUI-Chats-empty-chat-list-alert {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 12.5px;
+
+    &_icon {
+        min-height: 35px;
+        min-width: 35px;
+
+        color: $lightPrimary;
+    }
+
+    &_label {
+        margin-left: 5px;
+
+        font-size: 21px;
+
+        color: white;
+
+        user-select: none;
+    }
+}

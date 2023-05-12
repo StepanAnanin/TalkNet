@@ -3,7 +3,7 @@ import Page from "../../shared/UI/Page";
 import Button from "../../shared/UI/Button";
 import Header from "../../widgets/Header";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
-import FileSelectForm from "../../features/FileSelectForm";
+import FileSelectForm from "../../shared/UI/FileSelectForm";
 import { Link } from "react-router-dom";
 
 export default function HomePage() {

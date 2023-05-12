@@ -1,5 +1,4 @@
-import DialogueChat from "../../features/DialogueChat";
-import DialogueChatMessage from "../DialogueChatMessage";
+import IChatMessage from "../../entities/IChatMessage";
 import HTTPStatusCode from "./HTTPStatusCode";
 
 namespace MessengerServiceModel {
@@ -58,12 +57,6 @@ namespace MessengerServiceModel {
                 };
             }
 
-            export interface GetChatMessages extends OutcomingEventRequest<"get-chat-messages"> {
-                payload: {
-                    chatID: string;
-                };
-            }
-
             export interface EstablishConnection extends OutcomingEventRequest<"establish-connection"> {
                 payload: {};
             }
@@ -73,7 +66,6 @@ namespace MessengerServiceModel {
                 | EditeMessage
                 | DeleteMessage
                 | UpdateMessageReadDate
-                | GetChatMessages
                 | ConnectToChats
                 | EstablishConnection;
         }
@@ -86,32 +78,28 @@ namespace MessengerServiceModel {
                     }
 
             export interface SendMessage extends OutcomingEventResponse<"send-message"> {
-                payload: DialogueChatMessage;
+                payload: IChatMessage;
             }
 
             // Not implemented yet
             export interface EditeMessage extends OutcomingEventResponse<"edite-message"> {
-                payload: DialogueChatMessage;
+                payload: IChatMessage;
             }
 
             // Not implemented yet
             export interface DeleteMessage extends OutcomingEventResponse<"delete-message"> {
-                payload: DialogueChatMessage;
+                payload: IChatMessage;
             }
 
             // Not implemented yet
             export interface UpdateMessageReadDate extends OutcomingEventResponse<"update-message-read-date"> {
-                payload: { message: DialogueChatMessage; index: number };
+                payload: { message: IChatMessage; index: number };
             }
 
             export interface ConnectToChats extends OutcomingEventResponse<"connect-to-chats"> {
                 payload: {
                     message: string;
                 };
-            }
-
-            export interface GetChatMessages extends OutcomingEventResponse<"get-chat-messages"> {
-                payload: DialogueChat[];
             }
 
             export interface EstablishConnection extends OutcomingEventResponse<"establish-connection"> {
@@ -125,7 +113,6 @@ namespace MessengerServiceModel {
                 | EditeMessage
                 | DeleteMessage
                 | UpdateMessageReadDate
-                | GetChatMessages
                 | ConnectToChats
                 | EstablishConnection;
         }
@@ -141,7 +128,7 @@ namespace MessengerServiceModel {
             payload: P;
         }
 
-        export type ReceiveMessage = IncomingEvent<DialogueChatMessage, "receive-message">;
+        export type ReceiveMessage = IncomingEvent<IChatMessage, "receive-message">;
 
         export type AccessTokenExpiredError<P extends object> = IncomingEvent<P, "access-token-expired">;
 

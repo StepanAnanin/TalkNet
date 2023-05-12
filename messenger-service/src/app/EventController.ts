@@ -1,9 +1,7 @@
 import type { Socket } from "socket.io";
 
-import EventEmitter from "./EventEmitter";
 import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import SendMessageHandler from "../EventHandlers/SendMessageHandler";
-import GetChatMessagesHandler from "../EventHandlers/GetChatMessagesHandler";
 import ConnectToChatsHandler from "../EventHandlers/ConnectToChatsHandler";
 import UpdateMessageReadDate from "../EventHandlers/UpdateMessageReadDate";
 
@@ -19,10 +17,6 @@ export default function EventController(socket: Socket<any, any, any, any>) {
 
     socket.on("update-message-read-date", (e) => {
         UpdateMessageReadDate(JSON.parse(e), socket);
-    });
-
-    socket.on("get-chat-messages", (e) => {
-        GetChatMessagesHandler(JSON.parse(e), socket);
     });
 
     socket.on("error", (e) => socket.send(e.message));

@@ -5,7 +5,7 @@ import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentPr
 import Page from "../../../../shared/UI/Page";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import ChatBody from "../../../../widgets/ChatBody";
+import Chat from "../../../../widgets/Chat";
 import NavigatorLayout from "../../../UI/layouts/NavigatorLayout";
 
 interface MessagesPageProps extends UiComponentProps<HTMLDivElement> {
@@ -28,7 +28,7 @@ export default function MessagesPage(props: MessagesPageProps) {
     // TODO need to add navigator closing and opening
     return (
         <Page title="TalkNet | Сообщения" className={classes} {...otherProps}>
-            <ChatBody chatID={chatID} />
+            <Chat chatID={chatID} />
         </Page>
     );
 }
