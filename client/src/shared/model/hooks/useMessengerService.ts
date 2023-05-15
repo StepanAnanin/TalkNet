@@ -1,37 +1,53 @@
-import { io } from "socket.io-client";
 import React from "react";
+import { io } from "socket.io-client";
 
-import type MessengerServiceModel from "../../types/shared/lib/MessengerServiceModel";
+import type MessengerServiceEventModel from "../../types/shared/lib/MessengerService/MessengerServiceModel";
 
 import { useTypedSelector } from "./useTypedSelector";
 import MessengerServiceURL from "../../lib/URL/MessengerServiceURL";
-import { addRefresh } from "../../../entities/User";
-import { useTypedDispatch } from "./useTypedDispatch";
-import MessengerServiceConnection from "../../lib/MessengerServiceConnection";
-import { MessengerServiceIncomingEvent, MessengerServiceOutcomingEventResponse } from "../../lib/MessengerServiceEvent";
+import MessengerServiceEventEmitter from "../../lib/MessengerService/MessengerServiceEventEmitter";
+import {
+    MessengerServiceIncomingEvent,
+    MessengerServiceOutcomingEventResponse,
+} from "../../lib/MessengerService/MessengerServiceEvent";
+import { useAuthControl } from "../../../features/Auth";
+import MSEventController from "../../lib/MessengerService/MessengerServiceEventController";
 
-/**
+type ConnectionEventMainData = Omit<Omit<MessengerServiceEventModel.OutcomingEvent.Request.Any, "type">, "severity">;
+
+/*
  * If move it inside of hook, then connection will be closed and open on each call of useMessengerService,
  * this will ruin intended behavior of this hook
+ *
+ * IMPORTANT:
+ * EventEmitter automatically close connection before window unload.
+ * (see MessengerServiceEventEmitter's constructor for details)
  */
-const MessengerServiceConnectionRef: { current: MessengerServiceConnection | null } = { current: null };
+let MSEventEmitter: MessengerServiceEventEmitter | null = null;
 
 /**
+ * This hook automatically controls connection state with `Messenger Service`.
+ *
  * @returns `MessengerServiceConnection` object
  *
  * All error events are logged in console by default.
  */
+// BUG If open some chat, than go to the any other page and go back to chat, then outcoming event handlers will not be called...
 export default function useMessengerService() {
     const { payload: user } = useTypedSelector((state) => state.auth);
-    const dispatch = useTypedDispatch();
+    const { refreshAuth } = useAuthControl();
 
-    // TODO Now on each event will occur render, regardless is it handled or not.
-    // Try to do something with this, not sure is it possible or not, cuz useEffect won't work without rerender;
-    const [lastIncomingEvent, setLastIncomingEvent] = React.useState<MessengerServiceIncomingEvent | null>(null);
-    const [lastOutcomingEvent, setLastOutcomingEvent] = React.useState<MessengerServiceOutcomingEventResponse | null>(null);
+    const [lastHandledIncomingEvent, setLastHandledIncomingEvent] =
+        React.useState<MessengerServiceIncomingEvent | null>(null);
+
+    const [lastHandledOutcomingEvent, setLastHandledOutcomingEvent] =
+        React.useState<MessengerServiceOutcomingEventResponse | null>(null);
+
     const [error, setError] = React.useState<string | null>(null);
 
-    const lastEventRef = React.useRef<MessengerServiceModel.OutcomingEvent.Request.Any | null>(null);
+    if (!user) {
+        throw new Error(`[Messenger Service] Authorization required`);
+    }
 
     // I can't just throw error from socket.io event handler, so this is only way to do that... (cuz more likely it's wrapped in try catch and prevents any error from bubbling)
     // (By the way most bugged shit so far, it's literally ruins app's architecture in some cases and force me to do that shit below, i must add an additional state and useEffect...)
@@ -45,41 +61,40 @@ export default function useMessengerService() {
         throw new Error(error);
     }, [error]);
 
-    if (!user) {
-        throw new Error(`[Messenger Service] Connection require authorization`);
-    }
-
-    if (!(MessengerServiceConnectionRef.current instanceof MessengerServiceConnection)) {
+    if (!(MSEventEmitter instanceof MessengerServiceEventEmitter)) {
         establishConnection();
     }
 
     function establishConnection() {
-        if (MessengerServiceConnectionRef.current instanceof MessengerServiceConnection) {
+        if (MSEventEmitter instanceof MessengerServiceEventEmitter) {
             console.warn("[Messenger Service] Connection already established");
             return;
         }
 
         const socket = io(MessengerServiceURL);
 
-        MessengerServiceConnectionRef.current = new MessengerServiceConnection(user!, socket);
+        MSEventEmitter = new MessengerServiceEventEmitter(user!, socket);
 
         addSocketIncomingEventHandlers(socket);
         addSocketOutcomingEventHandlers(socket);
+    }
 
-        window.onbeforeunload = () => {
-            MessengerServiceConnectionRef.current?.close();
-        };
+    function updateLastIncomingEvent(e: MessengerServiceIncomingEvent) {
+        // If event isn't handled there are no point to update state, it will cause an excess re-render.
+        if (!MSEventController.isEventHandled(e.name)) {
+            return;
+        }
+
+        setLastHandledIncomingEvent(e);
     }
 
     function addSocketIncomingEventHandlers(socket: ReturnType<typeof io>) {
-        const connection = MessengerServiceConnectionRef.current;
-
-        if (!(connection instanceof MessengerServiceConnection)) {
+        if (!(MSEventEmitter instanceof MessengerServiceEventEmitter)) {
             throw new Error("Messenger Service connection is missing");
         }
 
         socket.on("receive-message", (e) => {
-            setLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, JSON.parse(e)));
+            updateLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, JSON.parse(e)));
         });
 
         socket.on("access-denied", (e) => {
@@ -90,9 +105,9 @@ export default function useMessengerService() {
         socket.on("access-token-expired", async (e) => {
             console.log("[Messenger Service] Request error: Access token expired. Updating...");
 
-            await dispatch(addRefresh());
+            await refreshAuth();
 
-            connection.repeatLastOutcomingEventRequest();
+            MSEventEmitter!.repeatLastOutcomingEventRequest();
         });
 
         socket.on("invalid-request", (e) => {
@@ -101,7 +116,7 @@ export default function useMessengerService() {
             console.error("[Messenger Service] Invalid request:");
             console.error(parsedEvent);
 
-            setLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, parsedEvent));
+            updateLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, parsedEvent));
         });
 
         socket.on("validation-error", (e) => {
@@ -110,7 +125,7 @@ export default function useMessengerService() {
             console.error("[Messenger Service] Validation error:");
             console.error(parsedEvent);
 
-            setLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, parsedEvent));
+            updateLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, parsedEvent));
         });
 
         socket.on("unexpected-error", (e) => {
@@ -119,217 +134,93 @@ export default function useMessengerService() {
             console.error("[Messenger Service] Unexpected error:");
             console.error(parsedEvent);
 
-            setLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, parsedEvent));
+            updateLastIncomingEvent(new MessengerServiceIncomingEvent(user!.id, parsedEvent));
         });
     }
 
     function addSocketOutcomingEventHandlers(socket: ReturnType<typeof io>) {
         // Outcoming events handled not there, so just need to update lastOutcomingEvent
-        socket.onAny((eventName, event) => {
-            const parsedEvent = JSON.parse(event);
+        socket.onAny((eventName, stringifiedEvent) => {
+            const parsedEvent = JSON.parse(stringifiedEvent);
 
             // If event isn't outcoming
-            if (!MessengerServiceConnection.OutcomingEventsMap.includes(parsedEvent.event)) {
+            if (!MSEventController.OutcomingEventsMap.includes(parsedEvent.name)) {
                 return;
             }
 
-            setLastOutcomingEvent(new MessengerServiceOutcomingEventResponse(user!.id, parsedEvent));
+            const event = new MessengerServiceOutcomingEventResponse(user!.id, parsedEvent);
+
+            // If event isn't handled there are no point to update state, it will cause an excess re-render.
+            if (!MSEventController.isEventHandled(event.name)) {
+                return;
+            }
+
+            setLastHandledOutcomingEvent(event);
         });
     }
 
-    // There are some problem with typesation of payload, it's appears after i added Omit
-    // TODO steel has problem with typesation of connectionEvent
-    // TODO move all logic inside of switch's cases to functions and then call them. This will make code more readable
-    function dispathOutcomingEvent(ConnectionEvent: Omit<MessengerServiceModel.OutcomingEvent.Request.Any, "type">) {
-        const MessengerServiceConnection = MessengerServiceConnectionRef.current;
-
-        if (!MessengerServiceConnection) {
-            throw new Error(`Messenger Serivce connection isn't established`);
+    function dispathOutcomingEvent(ConnectionEvent: ConnectionEventMainData) {
+        if (!(MSEventEmitter instanceof MessengerServiceEventEmitter)) {
+            throw new Error(`[Messenger Service] Failed to dispatch outcoming event: Connection isn't established`);
         }
 
-        switch (ConnectionEvent.event) {
-            case "send-message":
-                const sendMessageEvent: MessengerServiceModel.OutcomingEvent.Request.SendMessage = {
-                    type: "request",
-                    event: "send-message",
-                    payload: ConnectionEvent.payload as any,
-                };
-
-                lastEventRef.current = sendMessageEvent;
-
-                MessengerServiceConnection.sendMessage(sendMessageEvent);
-
-                break;
-            case "delete-message":
-                throw new Error("Not implemented");
-            case "edite-message":
-                throw new Error("Not implemented");
-            case "update-message-read-date":
-                const updateMessageReadDateEvent: MessengerServiceModel.OutcomingEvent.Request.UpdateMessageReadDate = {
-                    type: "request",
-                    event: "update-message-read-date",
-                    payload: ConnectionEvent.payload as any,
-                };
-
-                lastEventRef.current = updateMessageReadDateEvent;
-
-                MessengerServiceConnection.updateMessageReadDate(updateMessageReadDateEvent);
-                break;
-            case "connect-to-chats":
-                const connectToChatsEvent: MessengerServiceModel.OutcomingEvent.Request.ConnectToChats = {
-                    type: "request",
-                    event: "connect-to-chats",
-                    payload: ConnectionEvent.payload as any,
-                };
-
-                lastEventRef.current = connectToChatsEvent;
-
-                MessengerServiceConnection.connectToChats(connectToChatsEvent);
-
-                break;
-            default:
-                throw new Error("Wrong event type");
+        if (!MSEventController.OutcomingEventsMap.includes(ConnectionEvent.name)) {
+            throw new TypeError("[Messenger Service] Failed to dispatch outcoming event: Wrong event name");
         }
+
+        MSEventEmitter.emitOutcomingEventRequest(createOutcomingEventRequest(ConnectionEvent.name, ConnectionEvent.payload));
     }
 
-    function closeConnection() {
-        const connection = MessengerServiceConnectionRef.current;
-
-        if (!(connection instanceof MessengerServiceConnection)) {
-            console.warn("[Messenger Service] Connection closing error: connection wasn't established");
-            return;
-        }
-
-        connection.close();
-        MessengerServiceConnectionRef.current = null;
+    // TODO There are a problem with typesation of return object.
+    function createOutcomingEventRequest(
+        name: MessengerServiceEventModel.OutcomingEvent.Request.Any["name"],
+        payload: MessengerServiceEventModel.OutcomingEvent.Request.Any["payload"]
+    ) {
+        return {
+            type: "outcoming",
+            severity: "request",
+            name,
+            payload,
+        } as any;
     }
 
-    // Handling incoming event
+    // TODO unite below useEffects
+
+    // Tracking and handling incoming events
     React.useEffect(() => {
-        if (!lastIncomingEvent) {
+        if (!lastHandledIncomingEvent) {
             return;
         }
 
-        for (const eventHandler of incomingEventHandlers) {
-            if (lastIncomingEvent.event === eventHandler.event) {
-                eventHandler.handler(lastIncomingEvent);
+        for (const eventHandler of MSEventController.incomingEventHandlers) {
+            if (lastHandledIncomingEvent.name === eventHandler.event) {
+                eventHandler.handler(lastHandledIncomingEvent);
             }
         }
-    }, [lastIncomingEvent]);
+    }, [lastHandledIncomingEvent]);
 
-    // Handling outcoming event
+    // Tracking and handling outcoming events
     React.useEffect(() => {
-        if (!lastOutcomingEvent) {
+        if (!lastHandledOutcomingEvent) {
             return;
         }
 
-        for (const eventHandler of outcomingEventHandlers) {
-            if (lastOutcomingEvent.event === eventHandler.event) {
-                eventHandler.handler(lastOutcomingEvent);
+        for (const eventHandler of MSEventController.outcomingEventHandlers) {
+            if (lastHandledOutcomingEvent.name === eventHandler.event) {
+                eventHandler.handler(lastHandledOutcomingEvent);
             }
         }
-    }, [lastOutcomingEvent]);
+    }, [lastHandledOutcomingEvent]);
 
     return {
         dispathOutcomingEvent,
-        closeConnection,
-        connectionRef: MessengerServiceConnectionRef,
-        lastIncomingEvent,
-        lastOutcomingEvent,
-        addIncomingEventHandler,
-        addOutcomingEventHandler,
-        removeIncomingEventHandler,
-        removeOutcomingEventHandler,
+
+        // TODO try to solve problem decribed below.
+        // (This will remove excess renders for components wich use only functions below)
+
+        // If use this methods directly from "MSEventController", then it won't work,
+        // cuz logic of tracking and handling events are located inside of this hook.
+        addEventHandler: MSEventController.addEventHandler,
+        removeEventHandler: MSEventController.removeEventHandler,
     };
-}
-
-// ========================================= Events Handling =========================================
-// TODO Argument "e" on event handlers has problems with typesation, fix it.
-// TODO There are a lot of code duplicates, try to get rid of it.
-
-/**
- * There are two arrays for event handlers cuz outcoming events have request and response,
- * but incoming events have only response cuz they are dispatched only by messenger service.
- * (for example when user get message from interlocutor)
- */
-
-interface IncomingEventHandler {
-    event: MessengerServiceModel.IncomingEventName;
-    handler: (e: MessengerServiceIncomingEvent) => void;
-}
-
-interface OutcomingEventHandler {
-    event: MessengerServiceModel.OutcomingEventName;
-    handler: (e: MessengerServiceOutcomingEventResponse) => void;
-}
-
-const incomingEventHandlers: IncomingEventHandler[] = [];
-const outcomingEventHandlers: OutcomingEventHandler[] = [];
-
-function addOutcomingEventHandler(
-    event: MessengerServiceModel.OutcomingEventName,
-    handler: (e: MessengerServiceOutcomingEventResponse) => void
-) {
-    if (!MessengerServiceConnection.OutcomingEventsMap.includes(event)) {
-        throw new TypeError(`Event must be OutcomingEvent`);
-    }
-
-    outcomingEventHandlers.push({ event, handler });
-}
-
-function addIncomingEventHandler(
-    event: MessengerServiceModel.IncomingEventName,
-    handler: (e: MessengerServiceIncomingEvent) => void
-) {
-    if (!MessengerServiceConnection.IncomingEventsMap.includes(event)) {
-        throw new TypeError(`Event must be IncomingEvent`);
-    }
-
-    incomingEventHandlers.push({ event, handler });
-}
-
-function removeOutcomingEventHandler(
-    event: MessengerServiceModel.OutcomingEventName,
-    handler: (e: MessengerServiceOutcomingEventResponse) => void
-) {
-    let handlerIndex: number = -1;
-
-    // Cannot use '.indexOf' or '.includes' cuz it's array of objects;
-    for (let i = 0; i < outcomingEventHandlers.length; i++) {
-        const eventHandler = outcomingEventHandlers[i];
-
-        if (eventHandler.event === event && eventHandler.handler === handler) {
-            handlerIndex = i;
-            break;
-        }
-    }
-
-    if (handlerIndex === -1) {
-        return;
-    }
-
-    outcomingEventHandlers.splice(handlerIndex, 1);
-}
-
-function removeIncomingEventHandler(
-    event: MessengerServiceModel.IncomingEventName,
-    handler: (e: MessengerServiceIncomingEvent) => void
-) {
-    let handlerIndex: number = -1;
-
-    // Cannot use '.indexOf' or '.includes' cuz it's array of objects;
-    for (let i = 0; i < incomingEventHandlers.length; i++) {
-        const eventHandler = incomingEventHandlers[i];
-
-        if (eventHandler.event === event && eventHandler.handler === handler) {
-            handlerIndex = i;
-            break;
-        }
-    }
-
-    if (handlerIndex === -1) {
-        return;
-    }
-
-    incomingEventHandlers.splice(handlerIndex, 1);
 }

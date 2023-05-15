@@ -8,7 +8,7 @@ import FailedToSendIcon from "@mui/icons-material/CancelOutlined";
 import type IChatMessage from "../../shared/types/entities/IChatMessage";
 import type { UiComponentProps } from "../../shared/types/UI/UiComponentProps";
 
-import FormatedDate from "../../shared/lib/helpers/FormatedDate";
+import FormatedDate from "../../shared/lib/FormatedDate";
 
 interface DialogueMessageProps extends UiComponentProps<HTMLDivElement> {
     sender: "user" | "interlocutor";

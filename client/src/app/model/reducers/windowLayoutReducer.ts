@@ -1,6 +1,6 @@
 import type WindowLayoutState from "../../../shared/types/app/store/windowLayoutReducer";
 
-import getWindowLayout from "../../../shared/lib/helpers/geWindowLayout";
+import getWindowLayout from "../../../shared/lib/helpers/getWindowLayout";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 // BREAKPOINTS:

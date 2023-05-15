@@ -14,9 +14,8 @@ export default async function SendMessageHandler(event: UpdateMessageReadDate, s
         event.accessToken
     );
 
-    const request = TalkNetAPIRequest(event.event, requestOptions, socket, true);
+    const request = TalkNetAPIRequest(event.name, requestOptions, socket, true);
 
-    // sending request to the TalkNet API
     request.write(
         JSON.stringify({
             messageID: event.payload.messageID,

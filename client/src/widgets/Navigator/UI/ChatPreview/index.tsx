@@ -5,7 +5,7 @@ import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentPr
 import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
 import Avatar from "../../../../shared/UI/Avatar";
-import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
+import FormatedDate from "../../../../shared/lib/FormatedDate";
 import NavigatorExplorerItem from "../NavigatorExplorerItem";
 
 interface ChatProps extends Omit<UiComponentProps<HTMLAnchorElement>, "onClick"> {

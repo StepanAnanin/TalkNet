@@ -1,19 +1,25 @@
 import React from "react";
 
-import type MessengerServiceModel from "../../types/shared/lib/MessengerServiceModel";
+import type MessengerServiceEventModel from "../../types/shared/lib/MessengerService/MessengerServiceModel";
 
 import useMessengerService from "./useMessengerService";
 import TalkNetAPI from "../../api/TalkNetAPI";
 import { useTypedSelector } from "./useTypedSelector";
 import IChatMessage from "../../types/entities/IChatMessage";
 import { useTypedDispatch } from "./useTypedDispatch";
-import { MessengerServiceIncomingEvent, MessengerServiceOutcomingEventResponse } from "../../lib/MessengerServiceEvent";
-import chatSlice from "../store/reducers/chatListReducer";
+import {
+    MessengerServiceIncomingEvent,
+    MessengerServiceOutcomingEventResponse,
+} from "../../lib/MessengerService/MessengerServiceEvent";
+import chatListSlice from "../store/reducers/chatListReducer";
+import { useSearchParams } from "react-router-dom";
 
 export default function useChat() {
     const { auth, chatList } = useTypedSelector((state) => state);
     const dispatch = useTypedDispatch();
     const userChats = chatList.payload;
+
+    const [searchParams] = useSearchParams();
 
     const user = auth.payload;
 
@@ -25,29 +31,30 @@ export default function useChat() {
     // This is a fucked way to fix that, but I didn’t come up with a better one.
     const userChatsRef = React.useRef<typeof userChats>(userChats);
 
+    // TODO Add useCallback or useMemo here?
     const MessengerServiceConnection = useMessengerService();
 
     React.useEffect(() => {
         function updateMessageAmount(
             e:
-                | MessengerServiceOutcomingEventResponse<MessengerServiceModel.OutcomingEvent.Response.Any>
-                | MessengerServiceIncomingEvent<MessengerServiceModel.IncomingEvent.Any>
+                | MessengerServiceOutcomingEventResponse<MessengerServiceEventModel.OutcomingEvent.Response.Any>
+                | MessengerServiceIncomingEvent<MessengerServiceEventModel.IncomingEvent.Any>
         ) {
             updateChatInfo((e.payload as any).chatID, e.payload as IChatMessage);
         }
 
-        MessengerServiceConnection.addOutcomingEventHandler("send-message", updateMessageAmount);
-        MessengerServiceConnection.addIncomingEventHandler("receive-message", updateMessageAmount);
+        MessengerServiceConnection.addEventHandler("send-message", updateMessageAmount);
+        MessengerServiceConnection.addEventHandler("receive-message", updateMessageAmount);
 
         (async function () {
             const response = await TalkNetAPI.get(`/user/${user.id}/chats`);
 
-            dispatch(chatSlice.actions.setChatList(response.data));
+            dispatch(chatListSlice.actions.setChatList(response.data));
         })();
 
         return function () {
-            MessengerServiceConnection.removeOutcomingEventHandler("send-message", updateMessageAmount);
-            MessengerServiceConnection.removeIncomingEventHandler("receive-message", updateMessageAmount);
+            MessengerServiceConnection.removeEventHandler("send-message", updateMessageAmount);
+            MessengerServiceConnection.removeEventHandler("receive-message", updateMessageAmount);
         };
     }, []);
 
@@ -64,7 +71,7 @@ export default function useChat() {
         // If socket that already in room will try to join it again then it attemption will be ignored
         // https://stackoverflow.com/questions/23930388/joining-same-room-more-then-once-and-clients-in-a-room
         MessengerServiceConnection.dispathOutcomingEvent({
-            event: "connect-to-chats",
+            name: "connect-to-chats",
             payload: { userChatsIDs: userChats.map((chat) => chat.id) },
         });
     }, [userChats]);
@@ -85,7 +92,7 @@ export default function useChat() {
         }
 
         dispatch(
-            chatSlice.actions.updateChat({
+            chatListSlice.actions.updateChat({
                 ...targetedChat,
                 messageAmount: targetedChat.messageAmount + lastMessageIndexIncrement,
                 lastMessage: newLastMessage,
@@ -94,7 +101,7 @@ export default function useChat() {
     }
 
     function getCurrentChatID() {
-        return new URLSearchParams(window.location.search).get("chat");
+        return searchParams.get("chat");
     }
 
     return {

@@ -1,7 +1,7 @@
 import React from "react";
 import useDebounce from "../../shared/model/hooks/useDebounce";
 import { useTypedDispatch } from "../../shared/model/hooks/useTypedDispatch";
-import getWindowLayout from "../../shared/lib/helpers/geWindowLayout";
+import getWindowLayout from "../../shared/lib/helpers/getWindowLayout";
 import widnowLayoutSlice from "../model/reducers/windowLayoutReducer";
 
 interface WithGlobalProps {

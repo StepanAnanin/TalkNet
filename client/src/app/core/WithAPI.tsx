@@ -1,11 +1,10 @@
 import React from "react";
-import { addRefresh } from "../../entities/User";
 import TalkNetAPI from "../../shared/api/TalkNetAPI";
 import LocalStorageController from "../../shared/lib/LocalStorageController";
-import { useTypedDispatch } from "../../shared/model/hooks/useTypedDispatch";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import LoadingPage from "../../pages/Loading";
 import { AxiosError } from "axios";
+import { useAuthControl } from "../../features/Auth";
 
 interface WithAPIProps {
     children: React.ReactNode;
@@ -25,7 +24,7 @@ export default function WithAPI({ children }: WithAPIProps) {
     const [isAuthUpdatingInProcess, setIsAuthUpdatingInProcess] = React.useState(false);
 
     const { payload: user } = useTypedSelector((state) => state.auth);
-    const dispatch = useTypedDispatch();
+    const { refreshAuth } = useAuthControl();
     const retryRef = React.useRef(false);
 
     React.useEffect(() => {
@@ -33,7 +32,7 @@ export default function WithAPI({ children }: WithAPIProps) {
             if (LocalStorageController.accessToken.get() && !user) {
                 setIsAuthUpdatingInProcess(true);
 
-                await dispatch(addRefresh());
+                await refreshAuth();
 
                 setIsAuthUpdatingInProcess(false);
             }
@@ -62,7 +61,7 @@ export default function WithAPI({ children }: WithAPIProps) {
                 try {
                     if (LocalStorageController.accessToken.get() && !retryRef.current) {
                         retryRef.current = true; // idk is this work?
-                        await dispatch(addRefresh());
+                        await refreshAuth();
                     }
 
                     return TalkNetAPI.request(originalRequest);

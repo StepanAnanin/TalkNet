@@ -1,7 +1,4 @@
-import WebSocket from "ws";
-import http from "http";
 import MessengerServiceResponse from "../lib/MessengerServiceResponse";
-import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 
 import type { ConnectToChatsEvent } from "../types/WebSocket/Events";
 import type { Socket } from "socket.io";

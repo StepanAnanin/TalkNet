@@ -1,0 +1,40 @@
+@import "../../../../app/styles/variables.scss";
+
+.TNUI-Header {
+    position: fixed;
+
+    width: 100%;
+    height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-inline: 25px;
+
+    box-shadow: 0px 0px 4px 5px rgba(0, 0, 0, 0.15);
+
+    background-color: $darkGrey;
+
+    z-index: 100;
+
+    .TNUI-Header-left {
+        height: 100%;
+
+        display: flex;
+        align-items: center;
+    }
+
+    .TNUI-Header-right {
+        height: 100%;
+
+        display: flex;
+        align-items: center;
+
+        .TNUI-Header-signin-button {
+            padding: 7px 20px;
+
+            letter-spacing: 1px;
+        }
+    }
+}

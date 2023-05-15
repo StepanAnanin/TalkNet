@@ -6,8 +6,8 @@ import type IChatMessage from "../../../../shared/types/entities/IChatMessage";
 import MessageBlockDateDivider from "../ChatFragmentDateDivider";
 import ChatMessage from "../../../../entities/ChatMessage";
 import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
-import handleUpdateMessageReadDate from "../../model/updateMessageReadDate";
-import MessengerServiceModel from "../../../../shared/types/shared/lib/MessengerServiceModel";
+import callThrottledMessageReadUpdateHandler from "../../model/callThrottledMessageReadUpdateHandler";
+import MessengerServiceEventModel from "../../../../shared/types/shared/lib/MessengerService/MessengerServiceModel";
 import addOnViewListener from "../../../../shared/types/shared/lib/addOnViewListener";
 
 interface ChatFragmentProps {
@@ -24,6 +24,7 @@ interface ChatFragmentProps {
     MessengerServiceConnection: ReturnType<typeof useMessengerService>;
 }
 
+// TODO Maybee move logic of message read updating out from there?
 export default function ChatFragment(props: ChatFragmentProps) {
     const {
         index: messageIndex,
@@ -55,9 +56,9 @@ export default function ChatFragment(props: ChatFragmentProps) {
             const messageElement = messageElementRef.current!;
 
             viewObserver = addOnViewListener(messageElement, function () {
-                handleUpdateMessageReadDate(messageIndex, function () {
+                callThrottledMessageReadUpdateHandler(messageIndex, function () {
                     MessengerServiceConnection.dispathOutcomingEvent({
-                        event: "update-message-read-date",
+                        name: "update-message-read-date",
                         payload: { newReadDate: Date.now(), messageID: currentMessage._id, chatID },
                     });
                 });
@@ -66,13 +67,13 @@ export default function ChatFragment(props: ChatFragmentProps) {
             viewObserver.observe(messageElement);
         }
 
-        MessengerServiceConnection.addOutcomingEventHandler(
+        MessengerServiceConnection.addEventHandler(
             "update-message-read-date",
             updateMessageReadDateEventResponseHandler as any
         );
 
         return function () {
-            MessengerServiceConnection.removeOutcomingEventHandler(
+            MessengerServiceConnection.removeEventHandler(
                 "update-message-read-date",
                 updateMessageReadDateEventResponseHandler as any
             );
@@ -84,7 +85,7 @@ export default function ChatFragment(props: ChatFragmentProps) {
     // TODO idk why and how, but this work... (but shouldn't or ??????)
     // TODO seems like there are some excess renders...
     function updateMessageReadDateEventResponseHandler(
-        e: MessengerServiceModel.OutcomingEvent.Response.UpdateMessageReadDate
+        e: MessengerServiceEventModel.OutcomingEvent.Response.UpdateMessageReadDate
     ) {
         // I remind that object is reference type
         const readMessageTwin = e.payload.message;
@@ -119,7 +120,7 @@ export default function ChatFragment(props: ChatFragmentProps) {
             {isBlockEnded && nextMessage && (!isFirstMessage || isPrevMessageFirst) && (
                 <MessageBlockDateDivider date={nextMessage.sentDate} />
             )}
-            <ChatMessage message={currentMessage} sender={messageSender} />
+            <ChatMessage ref={messageElementRef} message={currentMessage} sender={messageSender} />
             {isFirstMessage && <MessageBlockDateDivider date={currentMessage.sentDate} />}
             {isFirstMessage && isUnreadMessagesBlockStart && (
                 <div className="TNUI-ChatFragment-unread-messages-block-start-alert" id="unread-messages-alert">

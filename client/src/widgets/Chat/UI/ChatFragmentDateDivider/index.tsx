@@ -3,7 +3,7 @@ import React from "react";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
-import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
+import FormatedDate from "../../../../shared/lib/FormatedDate";
 
 interface MessageBlockDateDividerProps extends UiComponentProps<HTMLDivElement> {
     date: number;

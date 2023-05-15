@@ -33,7 +33,7 @@ export default function Alert(props: AlertProps) {
             )}
             <div className="TNUI-Alert-body">
                 {header && <AlertHeader severity={severity}>{header}</AlertHeader>}
-                <p className="TNUI-Alert-message">{children}</p>
+                <div className="TNUI-Alert-message">{children}</div>
             </div>
         </div>
     );

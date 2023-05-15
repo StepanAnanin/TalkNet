@@ -6,7 +6,7 @@ interface NavigatorState {
 
 const initialState: NavigatorState = { isOpen: false };
 
-const authSlice = createSlice({
+const navigatorSlice = createSlice({
     name: "navigator",
     initialState,
     reducers: {
@@ -19,4 +19,4 @@ const authSlice = createSlice({
     },
 });
 
-export default authSlice;
+export default navigatorSlice;

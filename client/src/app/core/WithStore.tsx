@@ -1,13 +1,13 @@
 import React from "react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { Provider as StoreProvider } from "react-redux";
-import { authSlice } from "../../entities/User";
 import widnowLayoutSlice from "../model/reducers/windowLayoutReducer";
 import { navigatorSlice } from "../../pages";
 import friendsSlice from "../../widgets/Navigator/model/store/reducers/friendsReducer";
 import incomingFriendRequestsSlice from "../../widgets/Navigator/model/store/reducers/incomingFriendRequestsReducer";
 import outcomingFriendRequestsSlice from "../../widgets/Navigator/model/store/reducers/outcomingFriendRequestsReducer";
 import chatListSlice from "../../shared/model/store/reducers/chatListReducer";
+import { authSlice } from "../../features/Auth";
 
 interface withStoreProps {
     children: React.ReactNode;

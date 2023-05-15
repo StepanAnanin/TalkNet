@@ -7,7 +7,7 @@ import AccountActivationStateIcon from "@mui/icons-material/ManageAccountsRounde
 import Page from "../../../../shared/UI/Page";
 import SettingsSection from "../../UI/SettingsSection";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import FormatedDate from "../../../../shared/lib/helpers/FormatedDate";
+import FormatedDate from "../../../../shared/lib/FormatedDate";
 import ChangeEmailModal from "./UI/ChangeEmailModal";
 import ChangePasswordModal from "./UI/ChangePasswordModal";
 

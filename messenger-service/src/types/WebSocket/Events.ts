@@ -24,7 +24,7 @@ export type event = incomingEvent | outcomingEvent;
 interface ConnectionEvent<E extends incomingEvent | outcomingEvent, P extends object> {
     accessToken: string;
     userID: string;
-    event: E;
+    name: E;
     payload: P;
 }
 

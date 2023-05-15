@@ -2,7 +2,7 @@ import { event } from "../types/WebSocket/Events";
 
 export default class MessengerServiceResponse<P extends object> {
     public readonly code: number;
-    public readonly event: event;
+    public readonly name: event;
     public readonly type = "response"; // TODO Remove this
     public readonly payload: P;
 
@@ -12,7 +12,7 @@ export default class MessengerServiceResponse<P extends object> {
 
     constructor(code: number, event: event, payload: P) {
         this.code = code;
-        this.event = event;
+        this.name = event;
         this.payload = payload;
     }
 }

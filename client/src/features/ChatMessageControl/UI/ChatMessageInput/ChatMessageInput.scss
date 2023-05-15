@@ -1,0 +1,61 @@
+@import "../../../../app/styles/variables.scss";
+
+.TNUI-ChatMessageInput {
+    width: 100%;
+
+    padding: 5px 15px;
+
+    display: flex;
+    align-items: flex-end;
+
+    background-color: transparent;
+
+    &-input {
+        width: 100%;
+        height: 90%;
+
+        max-height: 150px;
+        min-width: 200px;
+
+        display: flex;
+        flex-grow: 1;
+
+        padding-bottom: 10px !important;
+
+        &_button {
+            width: 25px !important;
+            height: 25px !important;
+
+            margin-inline: 5px;
+
+            color: rgb(100, 100, 100);
+
+            cursor: pointer;
+
+            &:hover {
+                color: rgb(150, 150, 150);
+            }
+        }
+    }
+
+    &-send-button {
+        width: 30px !important;
+        height: 30px !important;
+
+        margin-left: 10px;
+        margin-bottom: 2px;
+
+        color: rgb(100, 100, 100);
+
+        cursor: pointer;
+
+        &:hover {
+            color: rgb(150, 150, 150);
+        }
+    }
+
+    &-send-in-progress-indicator {
+        margin-left: 10px;
+        margin-bottom: 2px;
+    }
+}
