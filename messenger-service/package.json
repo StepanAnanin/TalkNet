@@ -1,6 +1,6 @@
 {
     "name": "talknet-messenger-service",
-    "version": "0.7.1",
+    "version": "0.7.5",
     "description": "",
     "main": "server.js",
     "scripts": {

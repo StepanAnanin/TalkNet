@@ -18,7 +18,7 @@ export type outcomingEvent =
     | "invalid-request"
     | "access-denied";
 
-export type event = incomingEvent | outcomingEvent;
+export type eventName = incomingEvent | outcomingEvent;
 
 // On changing this don't forget to change event validator
 interface ConnectionEvent<E extends incomingEvent | outcomingEvent, P extends object> {

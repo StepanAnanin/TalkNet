@@ -1,25 +1,25 @@
 import React from "react";
 
-import type MessengerServiceEventModel from "../../types/shared/lib/MessengerService/MessengerServiceModel";
+import type MessengerServiceEventModel from "../../../../shared/types/shared/lib/MessengerService/MessengerServiceModel";
 
-import useMessengerService from "./useMessengerService";
-import TalkNetAPI from "../../api/TalkNetAPI";
-import { useTypedSelector } from "./useTypedSelector";
-import IChatMessage from "../../types/entities/IChatMessage";
-import { useTypedDispatch } from "./useTypedDispatch";
+import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
+import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
+import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
+import IChatMessage from "../../../../shared/types/entities/IChatMessage";
+import { useTypedDispatch } from "../../../../shared/model/hooks/useTypedDispatch";
 import {
     MessengerServiceIncomingEvent,
     MessengerServiceOutcomingEventResponse,
-} from "../../lib/MessengerService/MessengerServiceEvent";
-import chatListSlice from "../store/reducers/chatListReducer";
-import { useSearchParams } from "react-router-dom";
+} from "../../../../shared/lib/MessengerService/MessengerServiceEvent";
+import chatListSlice from "../../../../shared/model/store/reducers/chatListReducer";
 
-export default function useChat() {
+/**
+ * Returns the user's automatically updating chats
+ */
+export default function useChats() {
     const { auth, chatList } = useTypedSelector((state) => state);
     const dispatch = useTypedDispatch();
     const userChats = chatList.payload;
-
-    const [searchParams] = useSearchParams();
 
     const user = auth.payload;
 
@@ -31,7 +31,6 @@ export default function useChat() {
     // This is a fucked way to fix that, but I didn’t come up with a better one.
     const userChatsRef = React.useRef<typeof userChats>(userChats);
 
-    // TODO Add useCallback or useMemo here?
     const MessengerServiceConnection = useMessengerService();
 
     React.useEffect(() => {
@@ -100,12 +99,5 @@ export default function useChat() {
         );
     }
 
-    function getCurrentChatID() {
-        return searchParams.get("chat");
-    }
-
-    return {
-        getCurrentChatID,
-        MessengerServiceConnection,
-    };
+    return userChats;
 }

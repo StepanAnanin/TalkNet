@@ -1,11 +1,11 @@
 import http from "http";
 import { Socket } from "socket.io";
-import { event } from "./../types/WebSocket/Events";
+import { eventName } from "./../types/WebSocket/Events";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 
 export default function TalkNetAPIRequest(
-    event: event,
+    event: eventName,
     options: TalkNetAPIRequestOptions,
     socket: Socket<any, any, any, any>,
     emitEventToChat = false

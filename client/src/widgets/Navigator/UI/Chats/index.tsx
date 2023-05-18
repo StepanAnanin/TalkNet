@@ -5,39 +5,22 @@ import NoChatsAlert from "@mui/icons-material/CommentsDisabledRounded";
 
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
 import ChatPreview from "../ChatPreview";
-import useChat from "../../../../shared/model/hooks/useChat";
 import { NavigatorExplorerItemSkeleton } from "../NavigatorExplorerItem";
+import { useSearchParams } from "react-router-dom";
+import useChats from "../../model/hooks/useChats";
 
 export default function Chats() {
-    const { auth, chatList } = useTypedSelector((state) => state);
+    const { auth } = useTypedSelector((state) => state);
     const user = auth.payload;
-    const userChats = chatList.payload;
-
-    const { getCurrentChatID } = useChat();
-    const currentChatID = getCurrentChatID();
-
-    // BUG not working
-    // const parsedUserChats = React.useMemo(() => {
-    //     if (!userChats || !user) {
-    //         return null;
-    //     }
-
-    //     return userChats.map((chat) => {
-    //         const interluctor = chat.members.find((member) => member.userID !== user.id)!;
-    //         const userChatMember = chat.members.find((member) => member !== interluctor)!;
-
-    //         return {
-    //             active: chat.id === currentChatID,
-    //             chatName: interluctor.fullUserName,
-    //             lastReadMessageIndex: userChatMember.lastReadMessageIndex,
-    //             chat,
-    //         };
-    //     });
-    // }, [userChats, currentChatID]);
 
     if (!user) {
         throw new Error(`Необходима авторизация`);
     }
+
+    const userChats = useChats();
+
+    const [searchParams] = useSearchParams();
+    const currentChatID = searchParams.get("chat");
 
     if (!userChats) {
         return (
@@ -69,7 +52,6 @@ export default function Chats() {
                     <ChatPreview
                         active={chat.id === currentChatID}
                         key={chat.id}
-                        // imgURL=""
                         interlocutorID={interlocutor.userID}
                         chat={chat}
                         chatName={interlocutor.fullUserName}
@@ -77,19 +59,6 @@ export default function Chats() {
                     />
                 );
             })}
-            {/* Not working */}
-            {/* {parsedUserChats.map((parsedChat) => {
-                return (
-                    <MemoChatPreview
-                        key={parsedChat.chat.id}
-                        active={parsedChat.active}
-                        chatName={parsedChat.chatName}
-                        lastReadMessageIndex={parsedChat.lastReadMessageIndex}
-                        imgURL=""
-                        chat={parsedChat.chat}
-                    />
-                );
-            })} */}
         </>
     );
 }

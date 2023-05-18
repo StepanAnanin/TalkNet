@@ -13,16 +13,17 @@ import {
     MessengerServiceIncomingEvent,
     MessengerServiceOutcomingEventResponse,
 } from "../../../../shared/lib/MessengerService/MessengerServiceEvent";
-import useChat from "../../../../shared/model/hooks/useChat";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
 import { AxiosError } from "axios";
 import { DoubledLoader } from "../../../../shared/UI/Loader";
 import { MemoChatMessageInput } from "../../../../features/ChatMessageControl";
 import getIsUserHasAccessToChat from "../../lib/getIsUserHasAccessToChat";
 import parseChatMessages from "../../lib/parseChatMessages";
+import useMessengerService from "../../../../shared/model/hooks/useMessengerService";
 
 interface ChatProps extends UiComponentProps<HTMLDivElement> {
-    //
+    MessengerServiceConnection: ReturnType<typeof useMessengerService>;
+    chatID: string;
 }
 
 interface MessagesState {
@@ -33,21 +34,18 @@ interface MessagesState {
 // TODO Fix overflow styles
 // TODO try to get rid of excess renders
 export default function Chat(props: ChatProps) {
-    const { className = "", ...otherProps } = props;
+    const { className = "", MessengerServiceConnection, chatID, ...otherProps } = props;
 
     const [userChats, user] = useTypedSelector((state) => [state.chatList.payload, state.auth.payload]);
 
     const [messages, setMessages] = React.useState<MessagesState>({ requestStatus: "Pending", payload: null });
 
-    const { MessengerServiceConnection, getCurrentChatID } = useChat();
-    const currentChatID = getCurrentChatID();
-
     React.useEffect(() => {
-        if (!currentChatID) {
+        if (!chatID) {
             return;
         }
 
-        if (userChats && currentChatID && !getIsUserHasAccessToChat(userChats, currentChatID)) {
+        if (userChats && chatID && !getIsUserHasAccessToChat(userChats, chatID)) {
             throw new Error(`У вас нет доступа к этому чату`);
         }
 
@@ -77,7 +75,7 @@ export default function Chat(props: ChatProps) {
 
         (async function () {
             try {
-                const response = await TalkNetAPI.post(`/chat/messages/${currentChatID}`, { userID: user?.id });
+                const response = await TalkNetAPI.post(`/chat/messages/${chatID}`, { userID: user?.id });
 
                 // TODO try to get rid of reverse
                 setMessages({ requestStatus: "Success", payload: response.data.reverse() });
@@ -96,43 +94,31 @@ export default function Chat(props: ChatProps) {
             MessengerServiceConnection.removeEventHandler("send-message", handleSendMessageResponse);
             MessengerServiceConnection.removeEventHandler("receive-message", handleReceiveMessage);
         };
-    }, [currentChatID]);
+    }, [chatID]);
 
     const classes = ["TNUI-Chat", className].join(" ");
 
     return (
         <div className={classes} {...otherProps}>
-            {currentChatID ? (
-                <>
-                    {userChats && <ChatHeader chat={userChats.find((chat) => chat.id === getCurrentChatID())!} />}
-                    <div className="TNUI-Chat-content">
-                        {messages.requestStatus === "Success" &&
-                            (messages.payload!.length > 0 ? (
-                                <div className="TNUI-Chat-messages">
-                                    {parseChatMessages(messages.payload!, user!, MessengerServiceConnection, currentChatID)}
-                                </div>
-                            ) : (
-                                // TODO fix it
-                                <div className="TNUI-Chat-no-messages-alert">No messages</div>
-                            ))}
-                        {messages.requestStatus === "Pending" && (
-                            <div className="TNUI-Chat-loader">
-                                <DoubledLoader className="TNUI-Chat-loader_loader" size="large" />
-                                <span className="TNUI-Chat-loader_label">Загрузка</span>
-                            </div>
-                        )}
-                        <MemoChatMessageInput
-                            chatID={currentChatID}
-                            MessengerServiceConnection={MessengerServiceConnection}
-                        />
+            {userChats && <ChatHeader chat={userChats.find((chat) => chat.id === chatID)!} />}
+            <div className="TNUI-Chat-content">
+                {messages.requestStatus === "Success" &&
+                    (messages.payload!.length > 0 ? (
+                        <div className="TNUI-Chat-messages">
+                            {parseChatMessages(messages.payload!, user!, MessengerServiceConnection, chatID)}
+                        </div>
+                    ) : (
+                        // TODO fix it
+                        <div className="TNUI-Chat-no-messages-alert">No messages</div>
+                    ))}
+                {messages.requestStatus === "Pending" && (
+                    <div className="TNUI-Chat-loader">
+                        <DoubledLoader className="TNUI-Chat-loader_loader" size="large" />
+                        <span className="TNUI-Chat-loader_label">Загрузка</span>
                     </div>
-                </>
-            ) : (
-                <span className="TNUI-Chat-no-open-chat-alert">
-                    <NoOpenChatIcon className="TNUI-Chat-no-open-chat-alert_icon" />
-                    <span className="TNUI-Chat-no-open-chat-alert_label">Ни один чат не открыт</span>
-                </span>
-            )}
+                )}
+                <MemoChatMessageInput chatID={chatID} MessengerServiceConnection={MessengerServiceConnection} />
+            </div>
         </div>
     );
 }
