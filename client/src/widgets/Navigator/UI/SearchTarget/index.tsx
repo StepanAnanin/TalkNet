@@ -7,8 +7,8 @@ import ChatIcon from "@mui/icons-material/QuestionAnswerRounded";
 
 import type { UiComponentProps } from "../../../../shared/types/UI/UiComponentProps";
 
-import NavigatorExplorerItem from "../NavigatorExplorerItem";
 import { useLocation } from "react-router-dom";
+import Preview from "../../../../shared/UI/Preview";
 
 type SearchTargetOption = "chats" | "users" | "communities";
 
@@ -41,8 +41,8 @@ export default function SearchTarget(props: SearchTargetProps) {
     );
 
     return (
-        <NavigatorExplorerItem
-            to={"/n/search?nt=search&target=" + target}
+        <Preview
+            href={"/n/search?nt=search&target=" + target}
             img={getSearchTargetIcon(target)}
             className={classes}
             {...otherProps}
@@ -52,7 +52,7 @@ export default function SearchTarget(props: SearchTargetProps) {
                 {target === "communities" && "Сообщества"}
                 {target === "chats" && "Чаты"}
             </span>
-        </NavigatorExplorerItem>
+        </Preview>
     );
 }
 

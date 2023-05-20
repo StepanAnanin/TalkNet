@@ -1,6 +1,8 @@
 @import "../../../../app/styles/variables.scss";
 
 .TNUI-ChatPreview {
+    height: 70px !important;
+
     &.TNUI-ChatPreview-active {
         background-color: $darkestPrimary !important;
     }

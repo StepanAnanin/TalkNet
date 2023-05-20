@@ -3,9 +3,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { Provider as StoreProvider } from "react-redux";
 import widnowLayoutSlice from "../model/reducers/windowLayoutReducer";
 import { navigatorSlice } from "../../pages";
-import friendsSlice from "../../widgets/Navigator/model/store/reducers/friendsReducer";
-import incomingFriendRequestsSlice from "../../widgets/Navigator/model/store/reducers/incomingFriendRequestsReducer";
-import outcomingFriendRequestsSlice from "../../widgets/Navigator/model/store/reducers/outcomingFriendRequestsReducer";
+import { friendsSlice, incomingFriendRequestsSlice, outcomingFriendRequestsSlice } from "../../features/Friends";
 import chatListSlice from "../../shared/model/store/reducers/chatListReducer";
 import { authSlice } from "../../features/Auth";
 

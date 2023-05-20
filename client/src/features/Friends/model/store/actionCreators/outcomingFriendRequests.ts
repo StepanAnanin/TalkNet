@@ -10,7 +10,7 @@ export default function addFetchOutcomingFriendRequests() {
 
             const response = await TalkNetAPI.get("/user/friend-requests?type=outcoming");
 
-            dispatch(outcomingFriendRequestsSlice.actions.setOutcominfFriends(response.data));
+            dispatch(outcomingFriendRequestsSlice.actions.setOutcomingFriends(response.data));
         } catch (err) {
             if (err instanceof AxiosError) {
                 dispatch(

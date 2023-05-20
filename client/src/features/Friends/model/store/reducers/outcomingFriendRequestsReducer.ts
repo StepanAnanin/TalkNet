@@ -3,18 +3,18 @@ import type { RequestState } from "../../../../../shared/types/common/RequestSta
 
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-type IncomingFriendRequestsState = {
+type OutcomingFriendRequestsState = {
     payload: BaseUserData[] | null;
     request: RequestState;
 };
 
-const initialState: IncomingFriendRequestsState = {
+const initialState: OutcomingFriendRequestsState = {
     payload: null,
     request: { status: "idle", message: null },
 };
 
-const incomingFriendRequestsSlice = createSlice({
-    name: "incomingFriendRequests",
+const outcomingFriendRequestsSlice = createSlice({
+    name: "outcomingFriendRequests",
     initialState,
     reducers: {
         setRequestStatusToIdle(state) {
@@ -29,13 +29,13 @@ const incomingFriendRequestsSlice = createSlice({
             state.request.status = "failed";
             state.request.message = action.payload;
         },
-        setIncominfFriends(state, action: PayloadAction<BaseUserData[]>) {
-            state.payload = action.payload;
-
+        setOutcomingFriends(state, action: PayloadAction<BaseUserData[]>) {
             state.request.status = "succeeded";
-            state.request.message = "Данные о входящих заявках в друзья обновлены";
+            state.request.message = "Данные о исходящих заявках в друзья обновлены";
+
+            state.payload = action.payload;
         },
     },
 });
 
-export default incomingFriendRequestsSlice;
+export default outcomingFriendRequestsSlice;

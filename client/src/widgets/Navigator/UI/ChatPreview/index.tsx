@@ -6,7 +6,7 @@ import type DialogueChat from "../../../../shared/types/features/DialogueChat";
 
 import Avatar from "../../../../shared/UI/Avatar";
 import FormatedDate from "../../../../shared/lib/FormatedDate";
-import NavigatorExplorerItem from "../NavigatorExplorerItem";
+import Preview from "../../../../shared/UI/Preview";
 
 interface ChatProps extends Omit<UiComponentProps<HTMLAnchorElement>, "onClick"> {
     chatName: string;
@@ -44,8 +44,8 @@ export default function ChatPreview(props: ChatProps) {
     const classes = ["TNUI-ChatPreview", active ? "TNUI-ChatPreview-active" : "", className].join(" ");
 
     return (
-        <NavigatorExplorerItem
-            to={"/n/m?chat=" + chat.id}
+        <Preview
+            href={"/n/m?chat=" + chat.id}
             className={classes}
             title={chatName}
             img={
@@ -85,7 +85,7 @@ export default function ChatPreview(props: ChatProps) {
                 </span>
             </div>
             <span className="TNUI-ChatPreview_last-message">{lastMessage.data}</span>
-        </NavigatorExplorerItem>
+        </Preview>
     );
 }
 

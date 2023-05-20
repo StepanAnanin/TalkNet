@@ -1,9 +1,9 @@
-@import "../../../../app/styles/variables.scss";
+@import "../../../app/styles/variables.scss";
 
-$NavigatorExplorerItemDefaultHeight: 70px;
+$PreviewDefaultHeight: 55px;
 
-.TNUI-NavigatorExplorerItem {
-    height: $NavigatorExplorerItemDefaultHeight;
+.TNUI-Preview {
+    height: $PreviewDefaultHeight;
     width: 100%;
 
     display: flex;
@@ -30,7 +30,7 @@ $NavigatorExplorerItemDefaultHeight: 70px;
         background-color: $darkGrey;
     }
 
-    &.TNUI-NavigatorExplorerItem-active {
+    &.TNUI-Preview-active {
         background-color: $darkestPrimary;
     }
 
@@ -53,8 +53,8 @@ $darkBackgroundColour: rgba(75, 75, 75, 0.2);
 $lightBackgroundColour: rgba(85, 85, 85, 0.5);
 $animationProperties: flicking 1.75s infinite;
 
-.TNUI-NavigatorExplorerItemSkeleton {
-    height: $NavigatorExplorerItemDefaultHeight;
+.TNUI-PreviewSkeleton {
+    height: $PreviewDefaultHeight;
     width: 100%;
 
     display: flex;
@@ -87,7 +87,7 @@ $animationProperties: flicking 1.75s infinite;
 
         margin-right: 10px;
 
-        .TNUI-NavigatorExplorerItemSkeleton-top {
+        .TNUI-PreviewSkeleton-top {
             height: 25px;
             width: 100%;
 
@@ -100,7 +100,7 @@ $animationProperties: flicking 1.75s infinite;
             animation: $animationProperties;
         }
 
-        .TNUI-NavigatorExplorerItemSkeleton-bottom {
+        .TNUI-PreviewSkeleton-bottom {
             height: 15px;
             width: 100%;
 
