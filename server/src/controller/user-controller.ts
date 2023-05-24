@@ -319,6 +319,31 @@ class UserContoller {
         }
     }
 
+    public async deleteFriend(req: Request<{ id: string }>, res: Response) {
+        res.setHeader("Accept-Charset", "utf-8");
+
+        const user = req.body.user;
+
+        if (!user) {
+            res.status(500).json({ message: "Не удалось получить данные пользователя" });
+            return;
+        }
+
+        try {
+            await UserService.deleteFriend(user.id, req.params.id);
+
+            res.status(200).json({ message: `Пользователь успешно удалён из списка друзей` });
+        } catch (err) {
+            if (err instanceof HTTPError) {
+                res.status(err.errorCode).json({ message: err.message });
+                return;
+            }
+
+            console.error(err);
+            res.status(500).json({ message: "Что-то пошло не так..." });
+        }
+    }
+
     public async declineFriendRequest(req: Request, res: Response) {
         const from = req.body.from as string;
         const to = req.body.to as string;

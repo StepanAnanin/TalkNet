@@ -1,10 +1,9 @@
 import type User from "../../../../../shared/types/entities/User";
-import type { AppDispatch } from "../../../../../shared/types/store";
 
 import TalkNetAPI from "../../../../../shared/api/TalkNetAPI";
-import authSlice from "../reducerss/authReducer";
 import LocalStorageController from "../../../../../shared/lib/LocalStorageController";
 import { AxiosError } from "axios";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 type SuccessRequest = {
     accessToken: string;
@@ -12,62 +11,55 @@ type SuccessRequest = {
     user: User;
 };
 
-export function addLogin(email: string, password: string) {
-    return async function (dispatch: AppDispatch) {
+export const login = createAsyncThunk<User, { email: string; password: string }>(
+    "auth/login",
+    async function ({ email, password }, { rejectWithValue }) {
         try {
-            dispatch(authSlice.actions.setRequestStatusToPending());
+            const response = await TalkNetAPI.post<SuccessRequest>("/user/login", { email, password });
 
-            const response = (await TalkNetAPI.post<SuccessRequest>("/user/login", { email, password })).data;
+            LocalStorageController.accessToken.set(response.data.accessToken);
 
-            LocalStorageController.accessToken.set(response.accessToken);
-
-            dispatch(authSlice.actions.login(response.user));
-        } catch (err: any) {
-            if (err instanceof AxiosError) {
-                dispatch(authSlice.actions.setError(err.response?.data.message ?? "Ошибка аутентификации"));
-                return;
+            return response.data.user;
+        } catch (err) {
+            if (!(err instanceof AxiosError)) {
+                throw err;
             }
 
-            dispatch(authSlice.actions.setError("Произошла неуточнённая ошибка"));
+            return rejectWithValue(err.response?.data.message ?? "Ошибка аутентификации");
         }
-    };
-}
+    }
+);
 
-export function addLogout() {
-    return async function (dispatch: AppDispatch) {
-        try {
-            dispatch(authSlice.actions.setRequestStatusToPending());
+export const logout = createAsyncThunk<string>("auth/logout", async function (args, { rejectWithValue }) {
+    try {
+        const response = await TalkNetAPI.post<SuccessRequest>("/user/logout");
 
-            await TalkNetAPI.post("/user/logout");
+        LocalStorageController.accessToken.reset();
 
-            LocalStorageController.accessToken.reset();
-
-            dispatch(authSlice.actions.logout());
-        } catch (err: any) {
-            console.error(err);
-            dispatch(authSlice.actions.setError("При выходе из аккаунта произошла ошибка"));
+        return response.data.message;
+    } catch (err) {
+        if (!(err instanceof AxiosError)) {
+            throw err;
         }
-    };
-}
 
-/**
- * Updating refresh and access tokens, require user to be authenticated.
- */
-export function addRefresh() {
-    return async function (dispatch: AppDispatch) {
-        try {
-            dispatch(authSlice.actions.setRequestStatusToPending());
+        return rejectWithValue(err.response?.data.message ?? "Ошибка деаутентификации");
+    }
+});
 
-            const response = (await TalkNetAPI.post<SuccessRequest>("/user/refresh")).data;
+export const refreshAuth = createAsyncThunk<User>("auth/refresh", async function (args, { rejectWithValue }) {
+    try {
+        const response = await TalkNetAPI.post<SuccessRequest>("/user/refresh");
 
-            LocalStorageController.accessToken.set(response.accessToken);
+        LocalStorageController.accessToken.set(response.data.accessToken);
 
-            dispatch(authSlice.actions.refresh(response.user));
+        console.log("Access token refreshed");
 
-            console.log("Access token refreshed");
-        } catch (err: any) {
-            console.error(err);
-            dispatch(authSlice.actions.setError("При обновлении токена доступа произошла ошибка"));
+        return response.data.user;
+    } catch (err) {
+        if (!(err instanceof AxiosError)) {
+            throw err;
         }
-    };
-}
+
+        return rejectWithValue(err.response?.data.message ?? "При обновлении токена доступа произошла ошибка");
+    }
+});

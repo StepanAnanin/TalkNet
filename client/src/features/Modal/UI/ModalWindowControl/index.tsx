@@ -32,6 +32,7 @@ export default function ModalControl(props: ModalControlProps) {
     } = props;
 
     function closeButtonClickHandler() {
+        setIsOpen((p) => !p);
         onReject && onReject();
         onClose && onClose();
     }

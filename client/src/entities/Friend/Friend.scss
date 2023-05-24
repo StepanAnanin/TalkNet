@@ -1,0 +1,24 @@
+@import "../../app/styles/variables.scss";
+
+.TNUI-Friend {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &_button {
+        padding: 1.5px;
+
+        color: $lightestPrimary;
+        border-radius: 2.5px;
+
+        cursor: pointer;
+
+        transition: all 0.2s ease-in-out !important;
+
+        &:hover {
+            color: white;
+            background-color: $primary;
+        }
+    }
+}

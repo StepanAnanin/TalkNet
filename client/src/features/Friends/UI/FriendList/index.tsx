@@ -3,12 +3,11 @@ import React from "react";
 
 import { useTypedDispatch } from "../../../../shared/model/hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
-import addFetchFriends from "../../model/store/actionCreators/friendsActions";
+import { fetchFriends } from "../../model/store/actionCreators/friendsActions";
 import { DefaultLoader } from "../../../../shared/UI/Loader";
 
 import SadSmileIcon from "@mui/icons-material/SentimentDissatisfiedRounded";
-import Preview from "../../../../shared/UI/Preview";
-import Avatar from "../../../../shared/UI/Avatar";
+import Friend from "../../../../entities/Friend";
 
 export default function FriendList() {
     const { payload: friends, request: fetchRequest } = useTypedSelector((state) => state.friends);
@@ -22,7 +21,7 @@ export default function FriendList() {
                 return;
             }
 
-            await dispatch(addFetchFriends());
+            await dispatch(fetchFriends());
         })();
     }, [friends]);
 
@@ -35,25 +34,7 @@ export default function FriendList() {
                     <span className="TNUI-Friends-explorer-empty-content-alert_label">Увы, у вас нет друзей</span>
                 </div>
             )}
-            {!isLoading &&
-                friends?.map((user) => {
-                    return (
-                        // TODO redesign this element
-                        <Preview
-                            key={user.id}
-                            img={<Avatar userID={user.id} className="TNUI-Friends-explorer-content-item_user-avatar" />}
-                        >
-                            <div className="TNUI-Friends-explorer-content-item">
-                                <span
-                                    className="TNUI-Friends-explorer-content-item_user-name"
-                                    title={`${user.surname} ${user.name}`}
-                                >
-                                    {user.name} {user.surname}
-                                </span>
-                            </div>
-                        </Preview>
-                    );
-                })}
+            {!isLoading && friends?.map((friend) => <Friend key={friend.id} friend={friend} />)}
         </>
     );
 }

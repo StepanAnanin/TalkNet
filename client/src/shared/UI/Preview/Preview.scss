@@ -22,9 +22,11 @@ $PreviewDefaultHeight: 55px;
 
     overflow: hidden;
 
-    cursor: pointer;
-
     transition: background-color 0.15s ease-in-out;
+
+    &__link {
+        cursor: pointer;
+    }
 
     &:hover {
         background-color: $darkGrey;

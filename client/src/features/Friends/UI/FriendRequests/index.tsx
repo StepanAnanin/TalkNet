@@ -6,10 +6,10 @@ import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelecto
 import { DefaultLoader } from "../../../../shared/UI/Loader";
 import Avatar from "../../../../shared/UI/Avatar";
 import Preview from "../../../../shared/UI/Preview";
-import addFetchIncomingFriendRequests from "../../model/store/actionCreators/incomingFriendRequestsActions";
-import addFetchOutcomingFriendRequests from "../../model/store/actionCreators/outcomingFriendRequests";
+import { fetchIncomingFriendRequests } from "../../model/store/actionCreators/incomingFriendRequestsActions";
+import { fetchOutcomingFriendRequests } from "../../model/store/actionCreators/outcomingFriendRequests";
 import TalkNetAPI from "../../../../shared/api/TalkNetAPI";
-import addFetchFriends from "../../model/store/actionCreators/friendsActions";
+import { fetchFriends } from "../../model/store/actionCreators/friendsActions";
 import { AxiosError } from "axios";
 import Button from "../../../../shared/UI/Button";
 
@@ -45,12 +45,12 @@ export default function FriendRequests({ requestsType }: FriendRequestsProps) {
         }
 
         if (requestsType === "outcoming-friend-requests") {
-            await dispatch(addFetchOutcomingFriendRequests());
+            await dispatch(fetchOutcomingFriendRequests());
             return;
         }
 
         if (requestsType === "incoming-friend-requests") {
-            await dispatch(addFetchIncomingFriendRequests());
+            await dispatch(fetchIncomingFriendRequests());
             return;
         }
 
@@ -80,7 +80,7 @@ export default function FriendRequests({ requestsType }: FriendRequestsProps) {
 
             // If user accept incoming request need to update his friend list state
             if (requestsType === "incoming-friend-requests") {
-                await dispatch(addFetchFriends());
+                await dispatch(fetchFriends());
             }
         } catch (err) {
             if (!(err instanceof AxiosError)) {
@@ -127,7 +127,7 @@ export default function FriendRequests({ requestsType }: FriendRequestsProps) {
                                     onClick={friendRequestActionButtonClickHandler}
                                 >
                                     {requestsType === "incoming-friend-requests" && "Принять"}
-                                    {requestsType === "outcoming-friend-requests" && "Отклонить"}
+                                    {requestsType === "outcoming-friend-requests" && "Отменить"}
                                 </Button>
                             </div>
                         </Preview>

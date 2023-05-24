@@ -7,8 +7,6 @@
     border-radius: 100%;
 
     .TNUI-Avatar-img {
-        position: absolute;
-
         color: white;
 
         border-radius: 100%;
@@ -23,9 +21,13 @@
         z-index: 11;
     }
 
-    .TNUI-Avatar-alt {
-        // position: absolute;
+    &:has(.TNUI-Avatar-img) {
+        .TNUI-Avatar-alt {
+            display: none;
+        }
+    }
 
+    .TNUI-Avatar-alt {
         display: flex;
         align-items: center;
         justify-content: center;

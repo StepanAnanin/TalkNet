@@ -1,27 +1,23 @@
 import { AxiosError } from "axios";
 import TalkNetAPI from "../../../../../shared/api/TalkNetAPI";
-import { AppDispatch } from "../../../../../shared/types/store";
-import outcomingFriendRequestsSlice from "../reducers/outcomingFriendRequestsReducer";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import BaseUserData from "../../../../../shared/types/common/BaseUserData";
 
-export default function addFetchOutcomingFriendRequests() {
-    return async function (dispatch: AppDispatch) {
+export const fetchOutcomingFriendRequests = createAsyncThunk<BaseUserData[]>(
+    "outcomingFriendRequests/fetchOutcomingFriendRequests",
+    async function (args, { rejectWithValue }) {
         try {
-            dispatch(outcomingFriendRequestsSlice.actions.setRequestStatusToPending());
-
             const response = await TalkNetAPI.get("/user/friend-requests?type=outcoming");
 
-            dispatch(outcomingFriendRequestsSlice.actions.setOutcomingFriends(response.data));
+            return response.data;
         } catch (err) {
-            if (err instanceof AxiosError) {
-                dispatch(
-                    outcomingFriendRequestsSlice.actions.setError(
-                        err.response?.data.message ?? "При получении данных о исходящих заявках в друзьях произошла ошибка"
-                    )
-                );
-                return;
+            if (!(err instanceof AxiosError)) {
+                throw err;
             }
 
-            dispatch(outcomingFriendRequestsSlice.actions.setError("Произошла неуточнённая ошибка"));
+            return rejectWithValue(
+                err.response?.data.message ?? "При получении данных о исходящих заявках в друзьях произошла ошибка"
+            );
         }
-    };
-}
+    }
+);

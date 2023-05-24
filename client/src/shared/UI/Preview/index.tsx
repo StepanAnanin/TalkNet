@@ -10,31 +10,35 @@ interface PreviewProps extends UiComponentProps<HTMLElement> {
 }
 
 export default function Preview(props: PreviewProps) {
-    const { className = "", href, img, children, ...otherProps } = props;
+    const { className = "", img, children, ...otherProps } = props;
 
     const classes = ["TNUI-Preview", className ?? ""].join(" ");
 
-    function PreviewRoot({ children }: { children: React.ReactNode }) {
-        if (href) {
-            return (
-                <Link to={href ?? window.location.pathname + window.location.search} className={classes} {...otherProps}>
-                    {children}
-                </Link>
-            );
-        }
+    return (
+        <PreviewRoot className={classes} {...otherProps}>
+            {img && <div className="TNUI-Preview-img">{img}</div>}
+            <div className="TNUI-Preview-body">{children}</div>
+        </PreviewRoot>
+    );
+}
 
+function PreviewRoot({ href, className = "", children, ...otherProps }: PreviewProps) {
+    if (href) {
         return (
-            <div className={classes} {...otherProps}>
+            <Link
+                to={href ?? window.location.pathname + window.location.search}
+                className={className + "TNUI-Preview__link"}
+                {...otherProps}
+            >
                 {children}
-            </div>
+            </Link>
         );
     }
 
     return (
-        <PreviewRoot>
-            {img && <div className="TNUI-Preview-img">{img}</div>}
-            <div className="TNUI-Preview-body">{children}</div>
-        </PreviewRoot>
+        <div className={className} {...otherProps}>
+            {children}
+        </div>
     );
 }
 

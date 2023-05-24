@@ -4,9 +4,9 @@ import RefershIcon from "@mui/icons-material/AutorenewRounded";
 
 import Button from "../../../../shared/UI/Button";
 import { useTypedDispatch } from "../../../../shared/model/hooks/useTypedDispatch";
-import addFetchFriends from "../../model/store/actionCreators/friendsActions";
-import addFetchIncomingFriendRequests from "../../model/store/actionCreators/incomingFriendRequestsActions";
-import addFetchOutcomingFriendRequests from "../../model/store/actionCreators/outcomingFriendRequests";
+import { fetchFriends } from "../../model/store/actionCreators/friendsActions";
+import { fetchIncomingFriendRequests } from "../../model/store/actionCreators/incomingFriendRequestsActions";
+import { fetchOutcomingFriendRequests } from "../../model/store/actionCreators/outcomingFriendRequests";
 import { useTypedSelector } from "../../../../shared/model/hooks/useTypedSelector";
 
 interface FriendsExplorerRefreshButtonProps {
@@ -39,15 +39,15 @@ export default function FriendsExplorerRefreshButton({ explorerTarget }: Friends
         }
 
         if (explorerTarget === "friend-list") {
-            await dispatch(addFetchFriends());
+            await dispatch(fetchFriends());
         }
 
         if (explorerTarget === "incoming-friend-requests") {
-            await dispatch(addFetchIncomingFriendRequests());
+            await dispatch(fetchIncomingFriendRequests());
         }
 
         if (explorerTarget === "outcoming-friend-requests") {
-            await dispatch(addFetchOutcomingFriendRequests());
+            await dispatch(fetchOutcomingFriendRequests());
         }
     }
 

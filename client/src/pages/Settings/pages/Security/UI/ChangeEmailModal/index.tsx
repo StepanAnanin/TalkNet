@@ -9,7 +9,8 @@ import TextInput from "../../../../../../shared/UI/TextInput";
 import { AxiosError } from "axios";
 import TalkNetAPI from "../../../../../../shared/api/TalkNetAPI";
 import Alert from "../../../../../../shared/UI/Alert";
-import { useAuthControl } from "../../../../../../features/Auth";
+import { useTypedDispatch } from "../../../../../../shared/model/hooks/useTypedDispatch";
+import { logout } from "../../../../../../features/Auth/model/store/actionCreators/authActions";
 
 interface ChangeEmailModalProps extends UiComponentProps<HTMLDivElement> {
     openState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
@@ -18,7 +19,7 @@ interface ChangeEmailModalProps extends UiComponentProps<HTMLDivElement> {
 export default function ChangeEmailModal(props: ChangeEmailModalProps) {
     const { className = "", openState, ...otherProps } = props;
 
-    const { logout } = useAuthControl();
+    const dispatch = useTypedDispatch();
 
     const [request, setRequest] = React.useState<ChangeRequest | null>(null);
     const [isOpen, setIsOpen] = openState;
@@ -28,7 +29,7 @@ export default function ChangeEmailModal(props: ChangeEmailModalProps) {
 
     async function closeButtonClickHander() {
         if (request?.status === "Success") {
-            await logout();
+            await dispatch(logout());
 
             // This is not a bug or mistake, page should be reloaded.
             window.location.pathname = "/signin";

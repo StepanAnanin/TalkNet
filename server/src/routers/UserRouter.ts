@@ -38,4 +38,6 @@ UserRouter.get("/:id/chats", UserController.getUserChats);
 
 UserRouter.get("/activate/:link", UserController.activateAccount);
 
+UserRouter.delete("/friends/:id", authMiddleware, UserController.deleteFriend);
+
 export default UserRouter;

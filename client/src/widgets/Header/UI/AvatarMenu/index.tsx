@@ -14,7 +14,7 @@ import { useTypedDispatch } from "../../../../shared/model/hooks/useTypedDispatc
 import ClickAwayListener from "../../../../shared/UI/ClickAwayListener";
 import { ConfirmModal } from "../../../../features/Modal";
 import { Navigate } from "react-router-dom";
-import { useAuthControl } from "../../../../features/Auth";
+import { logout } from "../../../../features/Auth/model/store/actionCreators/authActions";
 
 interface AvatarMenuProps extends UiComponentProps<HTMLUListElement> {
     user: User;
@@ -31,7 +31,7 @@ interface AvatarMenuProps extends UiComponentProps<HTMLUListElement> {
 export default function AvatarMenu(props: AvatarMenuProps) {
     const { user, className = "", avatarClassName, avatarId, ...otherProps } = props;
 
-    const { logout } = useAuthControl();
+    const dispatch = useTypedDispatch();
 
     const [isOpen, setIsOpen] = React.useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
@@ -74,7 +74,7 @@ export default function AvatarMenu(props: AvatarMenuProps) {
     }
 
     async function confirmModalConfirmHandler() {
-        await logout();
+        await dispatch(logout());
 
         return <Navigate to="/signin" />;
     }

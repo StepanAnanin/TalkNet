@@ -79,11 +79,13 @@ export default function FriendsExplorer() {
                 </span>
             </div>
             <FriendsExplorerRefreshButton explorerTarget={friendsExplorerTarget} />
-            {friendsExplorerTarget === "friend-list" ? (
-                <FriendList />
-            ) : (
-                <FriendRequests requestsType={friendsExplorerTarget} />
-            )}
+            <div className="TNUI-Friends-explorer-content">
+                {friendsExplorerTarget === "friend-list" ? (
+                    <FriendList />
+                ) : (
+                    <FriendRequests requestsType={friendsExplorerTarget} />
+                )}
+            </div>
         </div>
     );
 }

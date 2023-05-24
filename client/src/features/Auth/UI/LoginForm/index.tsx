@@ -11,7 +11,8 @@ import validateEmail from "../../../../shared/lib/validators/validateEmail";
 import Alert from "../../../../shared/UI/Alert";
 import Checkbox from "../../../../shared/UI/Checkbox";
 import { DefaultLoader } from "../../../../shared/UI/Loader";
-import useAuthControl from "../../model/hooks/useAuthControl";
+import { useTypedDispatch } from "../../../../shared/model/hooks/useTypedDispatch";
+import { login } from "../../model/store/actionCreators/authActions";
 
 interface LoginFormProps {
     className?: string;
@@ -20,7 +21,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ className, style }: LoginFormProps) {
     const { request: authRequest } = useTypedSelector((state) => state.auth);
-    const { login } = useAuthControl();
+    const dispatch = useTypedDispatch();
 
     const [error, setError] = React.useState<string | null>(null);
     const [isPasswordHidden, setIsPasswordHidden] = React.useState(true);
@@ -60,7 +61,7 @@ export default function LoginForm({ className, style }: LoginFormProps) {
             return;
         }
 
-        await login(emailInputValue, passwordInputValue);
+        await dispatch(login({ email: emailInputValue, password: passwordInputValue }));
     }
 
     function goBackButtonClickHandler(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {

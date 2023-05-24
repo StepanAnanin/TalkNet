@@ -299,6 +299,24 @@ class UserService {
         await sender.save();
     }
 
+    public async deleteFriend(userID: string, friendID: string) {
+        const user = await UserExplorer.getUserByID(userID);
+        const friend = await UserExplorer.getUserByID(friendID);
+
+        const userFriendIndex = user.friends.indexOf(friend._id);
+        const friendUserIndex = friend.friends.indexOf(user._id);
+
+        if (userFriendIndex === -1 || friendUserIndex === -1) {
+            throw new HTTPError(404, "Пользователь не был найден в списке друзей");
+        }
+
+        user.friends.splice(userFriendIndex, 1);
+        friend.friends.splice(friendUserIndex, 1);
+
+        await user.save();
+        await friend.save();
+    }
+
     /**
      * In DB friend requests is just array of users id.
      *

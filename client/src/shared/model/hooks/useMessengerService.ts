@@ -6,8 +6,9 @@ import type MessengerServiceEventModel from "../../types/shared/lib/MessengerSer
 import { useTypedSelector } from "./useTypedSelector";
 import MessengerServiceURL from "../../lib/URL/MessengerServiceURL";
 import MessengerServiceEventEmitter from "../../lib/MessengerService/MessengerServiceEventEmitter";
-import { useAuthControl } from "../../../features/Auth";
 import MessengerServiceEventController from "../../lib/MessengerService/MessengerServiceEventController";
+import { useTypedDispatch } from "./useTypedDispatch";
+import { refreshAuth } from "../../../features/Auth/model/store/actionCreators/authActions";
 
 type ConnectionEventMainData = Omit<Omit<MessengerServiceEventModel.OutcomingEvent.Request.Any, "type">, "severity">;
 
@@ -29,7 +30,7 @@ let MSEventController: MessengerServiceEventController | null = null;
  */
 export default function useMessengerService() {
     const { payload: user } = useTypedSelector((state) => state.auth);
-    const { refreshAuth } = useAuthControl();
+    const dispatch = useTypedDispatch();
 
     const [error, setError] = React.useState<string | null>(null);
 
@@ -72,7 +73,7 @@ export default function useMessengerService() {
         socket.on("access-token-expired", async (e) => {
             console.log("[Messenger Service] Request error: Access token expired. Updating...");
 
-            await refreshAuth();
+            await dispatch(refreshAuth());
 
             MSEventEmitter!.repeatLastOutcomingEventRequest();
         });

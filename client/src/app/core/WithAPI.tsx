@@ -4,7 +4,8 @@ import LocalStorageController from "../../shared/lib/LocalStorageController";
 import { useTypedSelector } from "../../shared/model/hooks/useTypedSelector";
 import LoadingPage from "../../pages/Loading";
 import { AxiosError } from "axios";
-import { useAuthControl } from "../../features/Auth";
+import { useTypedDispatch } from "../../shared/model/hooks/useTypedDispatch";
+import { refreshAuth } from "../../features/Auth/model/store/actionCreators/authActions";
 
 interface WithAPIProps {
     children: React.ReactNode;
@@ -24,7 +25,8 @@ export default function WithAPI({ children }: WithAPIProps) {
     const [isAuthUpdatingInProcess, setIsAuthUpdatingInProcess] = React.useState(false);
 
     const { payload: user } = useTypedSelector((state) => state.auth);
-    const { refreshAuth } = useAuthControl();
+    const dispatch = useTypedDispatch();
+
     const retryRef = React.useRef(false);
 
     React.useEffect(() => {
@@ -32,7 +34,7 @@ export default function WithAPI({ children }: WithAPIProps) {
             if (LocalStorageController.accessToken.get() && !user) {
                 setIsAuthUpdatingInProcess(true);
 
-                await refreshAuth();
+                await dispatch(refreshAuth());
 
                 setIsAuthUpdatingInProcess(false);
             }
@@ -61,7 +63,7 @@ export default function WithAPI({ children }: WithAPIProps) {
                 try {
                     if (LocalStorageController.accessToken.get() && !retryRef.current) {
                         retryRef.current = true; // idk is this work?
-                        await refreshAuth();
+                        await dispatch(refreshAuth());
                     }
 
                     return TalkNetAPI.request(originalRequest);
