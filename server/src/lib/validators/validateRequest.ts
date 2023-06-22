@@ -1,5 +1,5 @@
 import type DefaultTypes from "../../types/DefaultTypes";
-import type ValidationResult from "../../types/lib/ValidationResult";
+import type ValidationResult from "../../types/lib/validationResult";
 
 interface ExpectedProperty {
     key: string;

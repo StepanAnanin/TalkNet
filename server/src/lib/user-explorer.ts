@@ -1,7 +1,7 @@
 import type IUser from "../types/DB/models/User";
 
 import userModel from "../DB/models/User";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import UserDTO from "../DTO/user-DTO";
 import HTTPError from "../errors/HTTPError";
 

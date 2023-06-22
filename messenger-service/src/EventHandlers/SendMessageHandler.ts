@@ -2,7 +2,7 @@ import type { SendMessageEvent } from "../types/WebSocket/Events";
 
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 import { Socket } from "socket.io";
-import TalkNetAPIRequest from "../lib/TalkNetApiRequest";
+import TalkNetAPIRequest from "../lib/TalkNetAPIRequest";
 
 export default async function SendMessageHandler(event: SendMessageEvent, socket: Socket<any, any, any, any>) {
     const requestOptions = new TalkNetAPIRequestOptions("/chat/message/" + event.payload.chatID, "POST", event.accessToken);

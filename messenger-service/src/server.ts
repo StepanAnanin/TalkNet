@@ -20,7 +20,7 @@ io.on("connection", EventController);
 server.listen(process.env.PORT, () => {
     checkEnviromentVariables();
 
-    console.log(`Messenger Service started on: http://localhost:${process.env.port}`);
+    console.log(`Messenger Service started on: http://localhost:${process.env.PORT}`);
 });
 
 function checkEnviromentVariables() {

@@ -5,7 +5,7 @@ import http from "http";
 import MessengerServiceResponse from "../lib/MessengerServiceResponse";
 import TalkNetAPIRequestOptions from "../api/TalkNetAPIRequestOptions";
 import { Socket } from "socket.io";
-import TalkNetAPIRequest from "../lib/TalkNetApiRequest";
+import TalkNetAPIRequest from "../lib/TalkNetAPIRequest";
 
 export default async function SendMessageHandler(event: UpdateMessageReadDate, socket: Socket<any, any, any, any>) {
     const requestOptions = new TalkNetAPIRequestOptions(

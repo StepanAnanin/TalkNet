@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import fsSync from "fs";
 import { v4 as uuid } from "uuid";
 import UserModel from "../DB/models/User";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import EMailService from "./email-service";
 import TokenService from "./token-service";
 import config from "../config";
